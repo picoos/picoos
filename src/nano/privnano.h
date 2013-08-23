@@ -44,6 +44,10 @@
 #include <stdlib.h>
 #endif
 
+#if NOSCFG_FEATURE_USE_STDARG == 1
+#include <stdarg.h>
+#endif
+
 /*-------------------------------------------------------------------------*/
 
 #if POSCFG_FEATURE_INHIBITSCHED == 0

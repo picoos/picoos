@@ -66,6 +66,10 @@
 #define NOSCFG_FEATURE_REGISTRY  0
 #endif
 
+#ifndef NOSCFG_FEATURE_USE_STDARG
+#define NOSCFG_FEATURE_USE_STDARG 0
+#endif
+
 #if POSCFG_TASKSTACKTYPE==0
 #define NOS_NEEDTASKEXITHOOK
 #else
@@ -562,14 +566,18 @@ NANOEXT void POSCALL nosPrint(const char *s);
 #endif
 #endif
 
-#if NOSCFG_FEATURE_PRINTF != 0 || NOSCFG_FEATURE_SPRINTF != 0
+#if (NOSCFG_FEATURE_PRINTF != 0 || NOSCFG_FEATURE_SPRINTF != 0) && NOSCFG_FEATURE_USE_STDARG == 0
 typedef void* NOSARG_t;
 #endif
 
 
 #if DOX!=0 || ((NOSCFG_FEATURE_CONOUT != 0)&&(NOSCFG_FEATURE_PRINTF != 0))
 
+#if NOSCFG_FEATURE_USE_STDARG == 0
 NANOEXT void POSCALL n_printFormattedN(const char *fmt, NOSARG_t args);
+#else
+NANOEXT void POSCALL n_printFormattedN(const char *fmt, ...);
+#endif
 
 #if DOX
 /**
@@ -582,7 +590,8 @@ NANOEXT void POSCALL n_printFormattedN(const char *fmt, NOSARG_t args);
  * @note    ::NOSCFG_FEATURE_CONOUT and ::NOSCFG_FEATURE_PRINTF 
  *          must be defined to 1
  *          to have this function compiled in.@n
- *          This function is not variadic. To print strings with
+ *          This function is variadic only if ::NOSCFG_FEATURE_USE_STDARG 
+ *          is defined to 1. Otherwise, to print strings with
  *          more than one argument, you may use the functions
  *          nosPrintf2 (2 arguments) to nosPrintf6 (6 arguments).
  * @sa      nosPrintChar, nosPrint
@@ -590,6 +599,7 @@ NANOEXT void POSCALL n_printFormattedN(const char *fmt, NOSARG_t args);
 NANOEXT void POSCALL nosPrintf1(const char *fmt, arg a1);
 
 #else /* DOX!=0 */
+#if NOSCFG_FEATURE_USE_STDARG == 0
 #define nosPrintf1(fmt, a1)  \
   do { \
     NOSARG_t args[1]; args[0] = (NOSARG_t)(a1); \
@@ -634,7 +644,17 @@ NANOEXT void POSCALL nosPrintf1(const char *fmt, arg a1);
     args[4] = (NOSARG_t)(a5); args[5] = (NOSARG_t)(a6); \
     n_printFormattedN(fmt, args); \
   } while(0);
+#else
 
+#define nosPrintf n_printFormattedN
+#define nosPrintf1(fmt, a1) n_printFormattedN(fmt, a1)
+#define nosPrintf2(fmt, a1, a2)  n_printFormattedN(fmt, a1, a2)
+#define nosPrintf3(fmt, a1, a2, a3)  n_printFormattedN(fmt, a1, a2, a3)
+#define nosPrintf4(fmt, a1, a2, a3, a4)  n_printFormattedN(fmt, a1, a2, a3, a4)
+#define nosPrintf5(fmt, a1, a2, a3, a4, a5)  n_printFormattedN(fmt, a1, a2, a3, a4, a5)
+#define nosPrintf6(fmt, a1, a2, a3, a4, a5, a6)  n_printFormattedN(fmt, a1, a2, a3, a4, a5, a6)
+
+#endif /* NOSCFG_FEATURE_USE_STDARG == 0 */
 #endif /* DOX!=0 */
 #endif /* NOSCFG_FEATURE_PRINTF */
 
@@ -651,7 +671,8 @@ NANOEXT void POSCALL nosPrintf1(const char *fmt, arg a1);
  * @param   a1   first argument
  * @note    ::NOSCFG_FEATURE_SPRINTF must be defined to 1 
  *          to have this function compiled in.@n
- *          This function is not variadic. To print strings with
+ *          This function is variadic only if ::NOSCFG_FEATURE_USE_STDARG 
+ *          is defined to 1. Otherwise, to print strings with
  *          more than one argument, you may use the functions
  *          nosSPrintf2 (2 arguments) to nosSPrintf6 (6 arguments).
  * @sa      nosPrintf1, nosPrint
@@ -660,9 +681,14 @@ NANOEXT void POSCALL nosSPrintf1(char *buf, const char *fmt, arg a1);
 
 #else /* DOX!=0 */
 
+#if NOSCFG_FEATURE_USE_STDARG == 0
 NANOEXT void POSCALL n_sprintFormattedN(char *buf, const char *fmt,
                                         NOSARG_t args);
+#else
+NANOEXT void POSCALL n_sprintFormattedN(char *buf, const char *fmt, ...);
+#endif
 
+#if NOSCFG_FEATURE_USE_STDARG == 0
 #define nosSPrintf1(buf, fmt, a1)  \
   do { \
     NOSARG_t args[1]; args[0] = (NOSARG_t)(a1); \
@@ -708,6 +734,17 @@ NANOEXT void POSCALL n_sprintFormattedN(char *buf, const char *fmt,
     n_sprintFormattedN(buf, fmt, args); \
   } while(0);
 
+#else
+
+#define nosSPrintf n_sprintFormattedN
+#define nosSPrintf1(buf, fmt, a1) n_sprintFormattedN(buf, fmt, a1)
+#define nosSPrintf2(buf, fmt, a1, a2)  n_sprintFormattedN(buf, fmt, a1, a2)
+#define nosSPrintf3(buf, fmt, a1, a2, a3)  n_sprintFormattedN(buf, fmt, a1, a2, a3)
+#define nosSPrintf4(buf, fmt, a1, a2, a3, a4)  n_sprintFormattedN(buf, fmt, a1, a2, a3, a4)
+#define nosSPrintf5(buf, fmt, a1, a2, a3, a4, a5)  n_sprintFormattedN(buf, fmt, a1, a2, a3, a4, a5)
+#define nosSPrintf6(buf, fmt, a1, a2, a3, a4, a5, a6)  n_sprintFormattedN(buf, fmt, a1, a2, a3, a4, a5, a6)
+
+#endif /* NOSCFG_FEATURE_USE_STDARG == 0 */
 #endif /* DOX!=0 */
 #endif /* NOSCFG_FEATURE_SPRINTF */
 #undef NANOEXT

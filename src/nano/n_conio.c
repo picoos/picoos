@@ -78,7 +78,12 @@ void POSCALL nos_initConIO(void);
 
 /* private */
 #if FEAT_XPRINTF != 0
+#if NOSCFG_FEATURE_USE_STDARG == 0
 static void POSCALL n_printf(const char *fmt, NOSARG_t *args);
+#else
+static void POSCALL n_printf(const char *fmt, va_list args);
+static void POSCALL n_printfN(const char *fmt, ...);
+#endif
 #endif
 #if NOSCFG_FEATURE_SPRINTF != 0
 static UVAR_t POSCALL n_updstr(char c);
@@ -298,15 +303,21 @@ void POSCALL nosPrintChar(char c)
 void POSCALL nosPrint(const char *str)
 {
 #if NOSCFG_FEATURE_PRINTF != 0
+#if NOSCFG_FEATURE_USE_STDARG == 0
   NOSARG_t arg;
+#endif
   posSemaGet(printsema_g);
 #if NOSCFG_CONOUT_HANDSHAKE != 0
   SET_PRFUNC(nos_putchar);
 #else
   SET_PRFUNC(p_putchar);
 #endif
+#if NOSCFG_FEATURE_USE_STDARG == 0
   arg = (NOSARG_t) str;
   n_printf("%s", &arg);
+#else
+  n_printfN("%s", str);
+#endif
   posSemaSignal(printsema_g);
 #else
   char c;
@@ -334,12 +345,29 @@ void POSCALL nosPrint(const char *str)
 
 #if FEAT_XPRINTF != 0
 
+#if NOSCFG_FEATURE_USE_STDARG != 0
+void POSCALL n_printfN(const char *fmt, ...)
+{
+  va_list args;
+
+  va_start(args, fmt);
+  n_printf(fmt, args);
+  va_end(args);
+}
+#endif
+
+#if NOSCFG_FEATURE_USE_STDARG == 0
 void POSCALL n_printf(const char *fmt, NOSARG_t *args)
+#else
+void POSCALL n_printf(const char *fmt, va_list args)
+#endif
 {
   char   b, c, *s;
   UVAR_t base;
   UINT_t nbr;
+#if NOSCFG_FEATURE_USE_STDARG == 0
   unsigned char a = 0;
+#endif
   char   fill = 0;
   char   width = 0;
   UVAR_t i = 0;
@@ -367,9 +395,14 @@ void POSCALL n_printf(const char *fmt, NOSARG_t *args)
     }
 
     /* save index to value in parameter list */
+#if NOSCFG_FEATURE_USE_STDARG == 0
     nbr = (UINT_t) args[a];
     s   = (char*)  args[a];
     a++;
+#else
+    nbr = va_arg(args, UINT_t);
+    s   = (char*)nbr;
+#endif
 
     /* get width. width can be '1'-'9', '01'-'09', or '*' */
     width = 0;
@@ -401,7 +434,11 @@ void POSCALL n_printf(const char *fmt, NOSARG_t *args)
       else
       if (c == '*')
       {
+#if NOSCFG_FEATURE_USE_STDARG == 0
         width = (char) (UINT_t) args[a++];
+#else
+        width = va_arg(args, UINT_t);
+#endif
         c = *f++;
       }
     }
@@ -504,8 +541,17 @@ void POSCALL n_printf(const char *fmt, NOSARG_t *args)
 
 #if NOSCFG_FEATURE_PRINTF != 0
 
+#if NOSCFG_FEATURE_USE_STDARG == 0
 void POSCALL n_printFormattedN(const char *fmt, NOSARG_t args)
+#else
+void POSCALL n_printFormattedN(const char *fmt, ...)
+#endif
 {
+#if NOSCFG_FEATURE_USE_STDARG != 0
+  va_list args;
+
+  va_start(args, fmt);
+#endif
   posSemaGet(printsema_g);
 #if NOSCFG_CONOUT_HANDSHAKE != 0
   SET_PRFUNC(nos_putchar);
@@ -514,6 +560,9 @@ void POSCALL n_printFormattedN(const char *fmt, NOSARG_t args)
 #endif
   n_printf(fmt, args);
   posSemaSignal(printsema_g);
+#if NOSCFG_FEATURE_USE_STDARG != 0
+  va_end(args);
+#endif
 }
 
 #endif /* NOSCFG_FEATURE_PRINTF */
@@ -530,14 +579,26 @@ static UVAR_t POSCALL n_updstr(char c)
   return 1;
 }
 
+#if NOSCFG_FEATURE_USE_STDARG == 0
 void POSCALL n_sprintFormattedN(char *buf, const char *fmt, NOSARG_t args)
+#else
+void POSCALL n_sprintFormattedN(char *buf, const char *fmt, ...)
+#endif
 {
+#if NOSCFG_FEATURE_USE_STDARG != 0
+  va_list args;
+
+  va_start(args, fmt);
+#endif
   posSemaGet(printsema_g);
   SET_PRFUNC(n_updstr);
   sprptr_g = buf;
   n_printf(fmt, args);
   *sprptr_g = 0;
   posSemaSignal(printsema_g);
+#if NOSCFG_FEATURE_USE_STDARG != 0
+  va_end(args);
+#endif
 }
 
 #endif /* NOSCFG_FEATURE_SPRINTF */
