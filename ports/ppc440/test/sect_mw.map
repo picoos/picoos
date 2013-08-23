@@ -1,0 +1,49 @@
+
+/*---------------------------------------------------------------------------
+ | Specify memory regions
+ *-------------------------------------------------------------------------*/
+
+MEMORY {
+   RAM:  ORIGIN = 0x00100000  LENGTH = 127M
+}
+
+
+/*---------------------------------------------------------------------------
+ | Specify group order within text section
+ *-------------------------------------------------------------------------*/
+
+SECTIONS {
+   GROUP : {
+     .text    :  {}
+     .rodata  :  {}
+     .init?   :  {}
+     .tls?    :  {}
+     .fini?   :  {}
+     .initdat :  {}
+   } > RAM
+}
+
+
+/*---------------------------------------------------------------------------
+ | Specify group order within data section
+ *-------------------------------------------------------------------------*/
+
+SECTIONS {
+   GROUP : {
+     .data    :  {}
+     .sbss    ALIGN(16) :  {}
+     .bss     ALIGN(16) :  {}
+     .stack (BSS) ALIGN(8) BLOCK(8):
+     {
+       // Use this space as the stack at startup.
+       ___s1 = .;
+       * (.stack)
+       ___s2 = .;
+       // Make the stack at least 8K
+       . += (___s2 - ___s1 < 8K) ? (8K - (___s2 - ___s1)) : 0;
+     }
+   } > RAM
+}
+
+__STACK_TOP = ADDR(.stack) + SIZEOF(.stack);
+

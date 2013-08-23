@@ -1,0 +1,112 @@
+
+This directory contains some example source files.
+
+
+The following abbreviations are used in the file names:
+
+  ex    -  example
+  flag  -  pico]OS flag event example (functions posFlag...)
+  init  -  pico]OS inititialization example
+  lists -  pico]OS list example for several list functions
+  mesg  -  pico]OS message example (functions posMessage...)
+  mutx  -  pico]OS mutex example (functions posMutex...)
+  sema  -  pico]OS semaphore example (functions posSema...)
+  sint  -  pico]OS software interrupt example (functions posSoftInt...)
+  task  -  pico]OS task management example (functions posTask...)
+  timr  -  pico]OS timer example (functions posTimer...)
+
+
+
+Overview and short description of the examples:
+
+  ex_bhalf.c :  Demonstrates the use of bottom halfs for interrupts.
+
+  ex_flag1.c :  Demonstration of the flag events, especially the mode
+                POSFLAG_MODE_GETSINGLE of the posFlagGet - function.
+
+  ex_flag2.c :  Demonstration of the flag events, especially the mode
+                POSFLAG_MODE_GETMASK of the posFlagGet - function.
+
+  ex_init1.c :  Example of pico]OS initialization for mode
+                POSCFG_TASKSTACKTYPE == 0
+
+  ex_init2.c :  Example of pico]OS initialization for mode
+                POSCFG_TASKSTACKTYPE == 1
+
+  ex_init3.c :  Example of pico]OS initialization for mode
+                POSCFG_TASKSTACKTYPE == 2
+
+  ex_init4.c :  Example of pico]OS initialization with
+                nano layer enabled
+
+  ex_lists.c :  Extensive demonstration of blocking and
+                nonblocking lists (queues)
+
+  ex_mesg1.c :  Demonstration 1 for the usage of message boxes
+                for inter task communication. This is a simple
+                example that uses the posMessageGet function.
+
+  ex_mesg2.c :  Demonstration 2 for the usage of message boxes
+                for inter task communication. This example is a
+                bit more complex than ex_mesg1.c. It demonstrates
+                the usage of the function posMessageWait for nonblock
+                message reception, the receiving task does periodic
+                things in the background while no message is received.
+                This example does also demonstrate the usage of the
+                jiffies counter variable and the POS_TIMEAFTER macro.
+
+  ex_mutx1.c :  Demonstrates how to use a mutex to protect a variable
+                or any other shared resource against multiple tasks.
+
+  ex_mutx2.c :  Demonstrates the advantage of mutexes above semaphores.
+                A mutex is used in a recursive function call.
+
+  ex_sema1.c :  Demonstrates how a semaphore can be used to
+                signal an event.
+
+  ex_sema2.c :  Demonstrates how to use a semaphore to protect a variable
+                or any other shared resource against multiple tasks.
+                Please see also the example ex_mutx1.c.
+
+  ex_sema3.c :  Demonstrates how to use a semaphore to limit the number of
+                tasks that are allowed to use a resource simultaneously.
+                
+  ex_sema4.c :  Demonstrates the usage of the function posSemaWait.
+
+  ex_sint1.c :  Demonstrates how software interrupts are set up and used.
+  
+  ex_task1.c :  Demonstrates how to create a new task with the
+                configuration POSCFG_TASKSTACKTYPE == 0
+
+  ex_task2.c :  Demonstrates how to create a new task with the
+                configuration POSCFG_TASKSTACKTYPE == 1
+
+  ex_task3.c :  Demonstrates how to create a new task with the
+                configuration POSCFG_TASKSTACKTYPE == 2
+
+  ex_task4.c :  Demonstrates how to create a new task
+                by use of the nano layer.
+
+  ex_timr1.c :  Demonstrates how to set up a one-shot timer.
+
+  ex_timr2.c :  Demonstrates how to set up a continousely running timer.
+
+  noscfg.h   :  This is an example of the nano layer configuration file.
+
+  poscfg.h   :  This is an example of the pico layer configuration file.
+
+  port.h     :  This is an example of the port configuration file.
+
+  test.c     :  This is an example program for pico]OS (pico layer only).
+  test.txt   :  Description of the output that is produced by test.c.
+
+
+
+In the examples directory is also a makefile that can be used to build the
+executables of the listed files above. Syntax:  make PORT=yourport
+If PORT is not specified, the makefile chooses 6502 (C64) as default. You may
+download the CC65 compiler and the 6502 simulator to play with the examples:
+
+Download CC65 compiler at       http://www.cc65.org/
+Download VICE 6502 emulator at  http://www.viceteam.org/
+

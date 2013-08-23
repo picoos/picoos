@@ -1,0 +1,63 @@
+
+/*---------------------------------------------------------------------------
+ | Specify memory regions
+ *-------------------------------------------------------------------------*/
+
+MEMORY {
+   RAM :  ORIGIN = 0x00100000,  LENGTH = 127M
+}
+
+
+/*---------------------------------------------------------------------------
+ | Specify group order within text section
+ *-------------------------------------------------------------------------*/
+
+SECTIONS {
+   .text    : { *(.text)    } > RAM
+   .rodata  : { *(.rodata*) } > RAM
+   .init    : { *(.init?)   } > RAM
+   .tls     : { *(.tls?)    } > RAM
+   .fini    : { *(.fini?)   } > RAM
+   .initdat : { *(.initdat) } > RAM
+   .data    : { *(.data*)   } > RAM
+   .sdata   :
+   {
+     __SDATA_START__ = .;
+     *(.sdata)
+     __SDATA_END__ = .;
+   } > RAM
+   .sdata2 :
+   {
+     __SDATA2_START__ = .;
+     *(.sdata2)
+     __SDATA2_END__ = .;
+   } > RAM
+   . = ALIGN(8);
+   __CTOR_LIST__ = .;
+   .ctors : { *(SORT(.ctors)) } > RAM
+   __CTOR_END__ = .;
+   __DTOR_LIST__ = .;
+   .dtors : { *(SORT(.ctors)) } > RAM
+   __DTOR_END__ = .;
+   .got2 : { *(.got2)         } > RAM
+   .eh_frame : { *(.eh_frame) } > RAM
+   .fixup : { *(.fixup)       } > RAM
+   .comment : { *(.comment)   } > RAM
+   .gnu : { *(.gnu*)          } > RAM
+   __BSS_START__ = .;
+   .sbss : { *(.sbss)         } > RAM
+   .bss  : { *(.bss)          } > RAM
+   __BSS_END__ = .;
+   .stack : 
+   {
+     /* Use this space as the stack at startup. Size = 8K */
+     . = ALIGN(8);
+     ___s1 = .;
+     * (.stack)
+     ___s2 = .;
+     . += (___s2 - ___s1 < 8K) ? (8K - (___s2 - ___s1)) : 0;
+   } > RAM
+   __STACK_MEM_BASE = ADDR(.stack);
+   __STACK_MEM_SIZE = SIZEOF(.stack);
+   __STACK_TOP = ADDR(.stack) + SIZEOF(.stack);
+}

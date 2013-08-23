@@ -1,0 +1,48 @@
+
+Informations about TEST.C
+-------------------------
+
+The test program tests several pico]OS functions. It uses 14 tasks (including
+the idle task). This file shall help you interpreting the outputted text.
+
+_P1_ / _P2_ / _P3_  :   The program starts three low priority tasks that are
+                        doing busy waiting (that means, they poll for the
+                        content of the jiffies variable). All 500 ms the tasks
+                        print out their task numbers (P1/P2/P3).
+                        If the OS works correctly, every 500 ms all the tasks
+                        must have printed out their numbers.
+
+:M1_ / :M2_ / :M3_  :   Mutexes. Three threads are trying to access a code
+                        region that is locked by a mutex. This code region
+                        delays task execution for one second.
+                        If the OS works correctly, every second one of the
+                        task names must appear on the screen, within three
+                        seconds all task names must have been printed out.
+                        If more than one task has entered the protected
+                        code region, an error message is printed.
+
+2S1_ / 2S2_ / 2S3_   :  Semaphore test. The program allocates a semaphore
+                        and initializes its counter with 2. Three threads
+                        are started and are trying to get the semaphore.
+                        The leading number in the printed string shows how
+                        much threads are currently holding the semaphore.
+                        Normally, the leading number is 2, in rare cases
+                        it may be a 1. The number after the 'S' is the number
+                        of the thread that did the print. If this test fails
+                        (more than the allowed two tasks got the semaphore),
+                        an error message is printed.
+                        The string xS2_ is printed two times within a second.
+
+>F2_ / >F3_ / >F6_   :  Flag event and timer test. A task waits for a flag
+                        object and prints out the number of the set flag.
+                        The flag F2 is set by the main task every 3 seconds.
+                        The flag F3 is set by a task that is triggered by
+                        a timer every 2 seconds.
+                        The flag F6 is set by a software interrupt that is
+                        rised every 1.67 seconds.
+
+Notes:
+ (1) All texts are printed by use of the message box system. A task is
+     waiting for messages and prints the message content (an ASCII string).
+ (2) The underline '_' in the above description denotes a white space ' '.
+
