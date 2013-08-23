@@ -91,7 +91,7 @@ SECTIONS {
   .vectors :
   {
      . = ALIGN(4);
-     KEEP(*(.vectors))
+     KEEP(*(.startup))
      . = ALIGN(4);
   } >flash
 

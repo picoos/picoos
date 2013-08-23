@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Ari Suutari <ari@stonepile.fi>.
+ * Copyright (c) 2006-2013, Ari Suutari <ari@stonepile.fi>.
  * All rights reserved. 
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -28,49 +28,99 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#define NANOINTERNAL
 #include <picoos.h>
-#include <msp430.h>
-#include <in430.h>
-#include <string.h>
+#include "lpc_reg.h"
+
+static void Uart_Handler(void);
+
+/*
+ * Initialize uart console.
+ */
 
 #if NOSCFG_FEATURE_CONOUT == 1 || NOSCFG_FEATURE_CONIN == 1
-#if defined(__MSP430_HAS_USCI__) && (PORTCFG_CON_PERIPH == 0 || PORTCFG_CON_PERIPH == 1)
-
-#if NOSCFG_CONOUT_HANDSHAKE != 0
-void uartTxIrqHandler(void);
-#endif
-
-void uartRxIrqHandler(void);
-
-void portInitUSCIirq()
+void
+portInitUart(void)
 {
-#if NOSCFG_FEATURE_CONIN == 1
+  unsigned short consoleDll;
 
-  UC0IE |= UCA0RXIE; // Enable USCI_A0 RX interrupt
+/*
+ * Initialize console. Our peripheral bus runs at same speed as
+ * CPU.
+ */
 
-#endif
+  consoleDll = (PORTCFG_CRYSTAL_CLOCK / (PORTCFG_CONSOLE_SPEED * 16.0)) + 0.5;
+  UART0_LCR = UART_LCR_DLAB;
+  UART0_DLL = (unsigned char)(consoleDll & 0x00ff);
+  UART0_DLM = (unsigned char)(consoleDll >> 8);
+  UART0_LCR = UART_LCR_NOPAR;
+
+/*
+ * 8 databits, no parity, 1 stopbit.
+ */
+
+  UART0_LCR = UART_LCR_8BITS;
+
+/*
+ * Enable/Reset FIFO.
+ */
+
+  UART0_FCR = UART_LCR_8BITS | UART_FCR_CLR;
+
+
+/*
+ * Configure & enable uart interrupts.
+ */
+
+  VIC_IntSelect &= ~(VIC_IntSelect_UART0);
+  VIC_IntEnable |= VIC_IntEnable_UART0;
+  VIC_VectAddr1 = (unsigned long)Uart_Handler;
+  VIC_VectCntl1 = VIC_Channel_UART0 | VIC_VectCntl_ENABLE;
+  
+  UART0_IER = UART_IER_EI;
 }
-
-#if NOSCFG_FEATURE_CONOUT == 1
 
 /*
  * Uart interrupt handler.
  */
 
-#if NOSCFG_CONOUT_HANDSHAKE != 0
-void PORT_NAKED __attribute__((interrupt(USCIAB0TX_VECTOR))) uartTxIrqHandler()
+static void
+Uart_Handler()
 {
+  int reason;
+  unsigned char ch;
+		
   portSaveContext();
   c_pos_intEnter();
 
-  UC0IE &= ~UCA0TXIE; // Disable USCI_A0 TX interrupt
-  c_nos_putcharReady();
+  reason = UART0_IIR & 0xf;
+  switch (reason) {
+  case 0x2: // TX
+#if NOSCFG_FEATURE_CONOUT == 1
+    c_nos_putcharReady();
+#endif
+    break;
 
+  case 0x4: // RX
+    ch = UART0_RBR;
+#if NOSCFG_FEATURE_CONIN == 1
+    c_nos_keyinput(ch);
+#endif
+    break;
+
+  case 0x6: // err
+    ch= UART0_LSR;
+    break;
+  }
+
+  VIC_VectAddr = 0;
   c_pos_intExit();
   portRestoreContext();
 }
+
 #endif
 
+#if NOSCFG_FEATURE_CONOUT == 1
 /*
  * Console output.
  */
@@ -78,40 +128,10 @@ void PORT_NAKED __attribute__((interrupt(USCIAB0TX_VECTOR))) uartTxIrqHandler()
 UVAR_t
 p_putchar(char c)
 {
-#if NOSCFG_CONOUT_HANDSHAKE != 0
-
-  if (UC0IE & UCA0TXIE) // if interrupt is enabled then previous char is being processed.
+  if (!(UART0_LSR & 0x20))
     return 0;
 
-  UCA0TXBUF = c;
-  UC0IE |= UCA0TXIE; // Enable USCI_A0 TX interrupt
-
-#else
-
-  while (!(UC0IFG & UCA0TXIFG)); // Wait for char to be transmitted
-  UCA0TXBUF = c;
-
-#endif
-
+  UART0_THR = c;
   return 1;
 }
-#endif
-
-#if NOSCFG_FEATURE_CONIN == 1
-
-void __attribute__((interrupt(USCIAB0RX_VECTOR))) uartRxIrqHandler()
-{
-  portSaveContext();
-  c_pos_intEnter();
-
-  char ch = UCA0RXBUF;
-  c_nos_keyinput(ch);
-
-  c_pos_intExit();
-  portRestoreContext();
-}
-
-#endif
-
-#endif
 #endif

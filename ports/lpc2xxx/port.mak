@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2011-2013, Ari Suutari <ari@stonepile.fi>.
+# Copyright (c) 2012-2013, Ari Suutari <ari@stonepile.fi>.
 # Copyright (c) 2004,      Dennis Kuschel / Swen Moczarski.
 # All rights reserved. 
 # 
@@ -32,7 +32,7 @@
 #  This file is originally from the pico]OS realtime operating system
 #  (http://picoos.sourceforge.net).
 #
-#  $Id: port.mak,v 1.2 2006/04/29 15:37:54 dkuschel Exp $
+#  $Id: port.mak,v 1.9 2012/02/02 09:08:17 ari Exp $
 
 
 # Set default compiler.
@@ -42,19 +42,10 @@ COMPILER = GCC
 endif
 export COMPILER
 
-# Check if CPU is defined 
-ifeq '$(strip $(CPU))' '' 
-$(error Can't continue, CPU not defined. Please add parameter: CPU=your_cpu) 
-endif 
-
 ifeq '$(strip $(THUMB))' ''
 THUMB = no
 endif
 export THUMB
-
-ifeq '$(strip $(LD_SCRIPT))' ''
-LD_SCRIPT = lpc2129-rom.ld
-endif
 
 # Set to 1 to include generic pico]OS "findbit" function
 GENERIC_FINDBIT = 1
@@ -111,7 +102,7 @@ ifeq '$(BUILD)' 'DEBUG'
   CDEFINES += _DBG
   ADEFINES += _DBG
 else
-  CFLAGS   += -Os -fomit-frame-pointer
+  CFLAGS   += -O2 -fomit-frame-pointer
   CDEFINES += _REL
   ADEFINES += _REL
 endif
@@ -127,8 +118,9 @@ endif
 
 # Define Compiler Flags
 # TODO: extract -mcpu as constant
-CFLAGS += -mcpu=arm7tdmi
-CFLAGS += -Wcast-align -Wall -Wextra -Wshadow -Wpointer-arith -Wbad-function-cast -Waggregate-return -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Wno-unused-parameter -Wno-unused-label
+CFLAGS += -fno-common -mcpu=arm7tdmi -ffunction-sections
+CFLAGS += -Wcast-align -Wall -Wextra -Wshadow -Wpointer-arith -Wbad-function-cast -Waggregate-return -Wno-strict-prototypes -Wmissing-prototypes -Wmissing-declarations -Wno-unused-parameter -Wno-unused-label -Wno-unused-but-set-variable
+CFLAGS += $(EXTRA_CFLAGS)
 CFLAGS += -c -o
 
 
@@ -142,8 +134,8 @@ ASFLAGS += -x assembler-with-cpp -o
 #  -Wl   : pass arguments to the linker
 #  -Map  : create a map file
 #  --cref: add cross reference to the map file
-LDFLAGS += -L$(DIR_PORT)/boot  $(addprefix -T,$(LD_SCRIPT)) -mcpu=arm7tdmi
-LDFLAGS += -nostartfiles -Wl,-Map,$(DIR_OUT)/$(TARGET).map,--cref -o 
+LDFLAGS += -L$(DIR_PORT)/boot  $(addprefix -T,$(LD_SCRIPTS)) -mcpu=arm7tdmi
+LDFLAGS += -nostartfiles -Wl,-Map,$(DIR_OUT)/$(TARGET).map,--cref,--gc-sections -o 
 
 # Define archiver flags
 ARFLAGS = cr 

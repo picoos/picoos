@@ -1,36 +1,31 @@
 /*
- * Copyright (c) 2011, Ari Suutari, ari@suutari.iki.fi.
+ * Copyright (c) 2011-2013, Ari Suutari <ari@stonepile.fi>.
+ * All rights reserved. 
  * 
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
+ * modification, are permitted provided that the following conditions
+ * are met:
  * 
- * 1. Redistributions of source code must retain the above copyright notice,
- * this list of conditions and the following disclaimer. 2. Redistributions
- * in binary form must reproduce the above copyright notice, this list of
- * conditions and the following disclaimer in the documentation and/or other
- * materials provided with the distribution. 3. The name of the author may
- * not be used to endorse or promote products derived from this software
- * without specific prior written permission.
+ *  1. Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *  2. Redistributions in binary form must reproduce the above copyright
+ *     notice, this list of conditions and the following disclaimer in the
+ *     documentation and/or other materials provided with the distribution.
+ *  3. The name of the author may not be used to endorse or promote
+ *     products derived from this software without specific prior written
+ *     permission. 
  * 
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
- * EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,  INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
- * TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
- * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
- */
-
-/*
- * This file is originally from the pico]OS realtime operating system
- * (http://picoos.sourceforge.net).
- * 
- * CVS-ID $Id: arch_c.c,v 1.67 2012/01/27 06:30:28 ari Exp $
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS
+ * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT,
+ * INDIRECT,  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+ * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #define NANOINTERNAL
@@ -44,24 +39,43 @@
 static inline void constructStackFrame(POSTASK_t task, void* stackPtr, POSTASKFUNC_t funcptr, void *funcarg);
 void timerIrqHandler(void);
 
-#ifdef POSCFG_ENABLE_NANO
+#if POSCFG_ENABLE_NANO != 0
+#if NOSCFG_FEATURE_MEMALLOC == 1 && NOSCFG_MEM_MANAGER_TYPE == 1
 void *__heap_start;
 void *__heap_end;
+#endif
 #endif
 
 unsigned char *portIrqStack;
 
-void __attribute__((weak)) Reset_Handler(void);
-void __attribute__((weak)) SVC_Handler(void);
-void __attribute__((weak)) PendSV_Handler(void);
-void __attribute__((weak)) SysTick_Handler(void);
-void __attribute__((weak)) HardFault_Handler(void);
-void __attribute__((weak)) UsageFault_Handler(void);
+#ifndef __CODE_RED
+void Reset_Handler(void);
+#endif
+
+void SVC_Handler(void);
+void PendSV_Handler(void);
+void SysTick_Handler(void);
+void HardFault_Handler(void);
+void UsageFault_Handler(void);
 
 void sysCall(unsigned int*);
 void sysCallWrapper(unsigned int callerSp, unsigned int callerLr);
 void hardFault(void);
 
+/*
+ * __CODE_RED is defined by LPCExpresso Code Red IDE environment.
+ * Workaround stack different stack top symbol (_vStackTop).
+ *
+ * Also, when using RedLib, don't use our own startup code
+ * at all, since LPCExpresso IDE generates it's own (generated
+ * startup includes also interrupt vector table).
+ */
+#ifdef __CODE_RED
+
+#define __stack _vStackTop
+extern unsigned int _vStackTop[];
+
+#else
 extern unsigned int _end[];
 
 extern unsigned int __stack[];
@@ -90,12 +104,62 @@ unsigned int * myvectors[] __attribute__ ((section(".vectors"))) =
     (unsigned int *) PendSV_Handler, // Context switch
     (unsigned int *) SysTick_Handler };
 
+#endif
+
 /*
  * Control gets here after reset.
  * Initialize C environment and heap.
  */
 
 extern int main(void);
+
+/*
+ * Calculate stack bottom address based on __stack symbol generated by linker and
+ * configured stack size.
+ */
+static void* __attribute__((always_inline)) stackBottom()
+{
+  return (void*) (((unsigned int) __stack - PORTCFG_IRQ_STACK_SIZE) & ~(POSCFG_ALIGNMENT - 1));
+}
+
+#if POSCFG_ARGCHECK > 1
+/*
+ * Fill unused portion of IRQ stack with PORT_STACK_MAGIC.
+ */
+static void __attribute__((always_inline)) fillStackWithDebugPattern()
+{
+  register uint32_t si      = __get_MSP() - 10; // Just to be sure not to overwrite anything
+  register unsigned char* s = (unsigned char*) si;
+
+  while (s >= portIrqStack)
+  *(s--) = PORT_STACK_MAGIC;
+
+  *s = 0;// Separator between lowest stack location and heap
+}
+
+#endif
+
+#ifdef __REDLIB__
+
+/*
+ * This allows us to use RedLib provided malloc/free.
+ * It checks if heap would overflow over interrupt stack.
+ */
+unsigned __check_heap_overflow (void * newHeapEnd)
+{
+	if (newHeapEnd >= stackBottom())
+		return 1;
+
+	return 0;
+}
+
+#endif
+
+#ifndef __CODE_RED
+
+/*
+ * Our own startup code. Setup data & bss and provide region for heap.
+ */
 void Reset_Handler(void)
 {
   unsigned int *src, *dst;
@@ -115,31 +179,29 @@ void Reset_Handler(void)
   while (dst < __bss_end)
     *dst++ = 0;
 
+  SystemInit();
+
   /*
    * Start heap after .bss segment, align it upwards.
    * Reserve IRQ stack at top of memory, heap end before it.
    */
-  portIrqStack = (void*) (((unsigned int) __stack - PORTCFG_IRQ_STACK_SIZE) & ~(POSCFG_ALIGNMENT - 1));
+  portIrqStack = stackBottom();
 
-#ifdef POSCFG_ENABLE_NANO
+#if POSCFG_ENABLE_NANO != 0
+#if NOSCFG_FEATURE_MEMALLOC == 1 && NOSCFG_MEM_MANAGER_TYPE == 1
   __heap_end = (void*) (portIrqStack - 4);
   __heap_start = (void*) (((unsigned int) _end + POSCFG_ALIGNMENT) & ~(POSCFG_ALIGNMENT - 1));
+#endif
 #endif
 
 #if POSCFG_ARGCHECK > 1
 
-  /*
-   * Fill unused portion of IRQ stack with PORT_STACK_MAGIC.
-   */
-  register uint32_t si      = __get_MSP() - 10; // Just to be sure not to overwrite anything
-  register unsigned char* s = (unsigned char*) si;
+  fillStackWithDebugPattern();
 
-  while (s >= portIrqStack)
-  *(s--) = PORT_STACK_MAGIC;
+#if POSCFG_ENABLE_NANO != 0
+#if NOSCFG_FEATURE_MEMALLOC == 1 && NOSCFG_MEM_MANAGER_TYPE == 1
 
-  *s = 0;// Separator between lowest stack location and heap
-
-#ifdef POSCFG_ENABLE_NANO
+  register unsigned char* s;
 
   s = (unsigned char*) __heap_start;
   while (s <= (unsigned char*) __heap_end)
@@ -147,11 +209,14 @@ void Reset_Handler(void)
 
 #endif
 #endif
+#endif
 
   main();
   while (1)
     ;
 }
+
+#endif
 
 /*
  * Initialize task stack frame. The layout must be same
@@ -182,7 +247,7 @@ static inline void constructStackFrame(POSTASK_t task, void* stackPtr, POSTASKFU
   *(stk) = (unsigned int) 0x00000000; /* bottom     */
   *(--stk) = 0x01000000;              /* thumb      */
   *(--stk) = (unsigned int) funcptr; /* Entry point */
-  *(--stk) = posTaskExit; /* LR */
+  *(--stk) = (unsigned int) posTaskExit; /* LR */
   *(--stk) = 12;
 
   for (r = 3; r >= 1; r--)
@@ -246,6 +311,11 @@ VAR_t p_pos_initTask(POSTASK_t task,
   return 0;
 }
 
+void p_pos_freeStack(POSTASK_t task)
+{
+  (void)task;
+}
+
 #else
 #error "Error in configuration for the port (poscfg.h): POSCFG_TASKSTACKTYPE must be 0, 1 or 2"
 #endif
@@ -256,16 +326,32 @@ VAR_t p_pos_initTask(POSTASK_t task,
 
 void p_pos_initArch(void)
 {
-  SystemInit();
   SCB->CCR = SCB->CCR | 0x200; // Stack align ?
+
+#ifdef __CODE_RED
+
+  /*
+   * If using LPCExpresso ide startup code, handle
+   * IRQ stack setup here. This way we don't have to
+   * modify generated startup routines. Delaying
+   * this doesn't cause much harm -- heap overflow before
+   * this point wouldn't be detected, but it is unlikely
+   * to occur anyway.
+   */
+  portIrqStack = stackBottom();
+
+#if POSCFG_ARGCHECK > 1
+
+  fillStackWithDebugPattern();
+
+#endif
+#endif
 
 #if __CORTEX_M >= 3
   __set_BASEPRI(portCmsisPrio2HW(PORT_SVCALL_PRI + 1)); // Allow SVCall, but no Timer/PendSV
 #else
   __disable_irq();
 #endif
-
-  //  portInitBoard();
 
   SysTick_Config(SystemCoreClock / HZ);
 

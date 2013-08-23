@@ -1,0 +1,33 @@
+- mspgcc & msp430-gdbproxy from mspgcc.sourceforge.net
+- MinGW MSYS for gnu make
+
+- Build under Eclicpse
+  - C Project/Makefile project
+
+- Debug setup: GDB proxy
+  - Windows
+    - For Texas Instruments experimenters boards
+      - Install IAR workbench
+      - Put msp430-gdbproxy into ti-proxy directory
+      - copy hil.dll and msp430.dll from IAR workbench into ti-proxy
+
+      - start with "ti-proxy\msp430-gdbproxy msp430 --spy-bi-wire TIUSB"
+
+    - For Olimex MSP430-JTAG-TINY
+      - Install drivers as show in olimex docs
+      - Run "Olimex MSP Programmer" once to update JTAG firmware
+      - Put msp430-gdbproxy into olimex-proxy directory
+      - Copy hil.dll and msp430.dll from Olimex programmer directory
+      - start with "olimex-proxy\msp430-gdbproxy msp430 --spy-bi-wire TIUSB" 
+  - Linux/Unix
+    - MspDebug ?
+
+-Debug setup: Eclipse
+  - Install Eclipse IDE for C/C++ Developers
+    - Add C/C++ GCC Cross Compiler Support
+    - Add C/C++ GDB Hardware Debugging
+  - Add gdbproxy starts as external tools
+  - New debug configuration from "GDB Hardware Debuggin"
+  - JTAG Device: TCP/IP, host: localhost, port 2000
+  - Debugger startup: Reset, Halt, Load Image, Load Symbols
+  - Debugger command windows "monitor erase main"

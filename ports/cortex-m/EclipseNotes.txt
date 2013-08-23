@@ -1,0 +1,34 @@
+- yagarto from net ?
+- MinGW MSYS for gnu make
+- CMSIS for CPU required
+
+- Build under Eclicpse
+  - C Project/Makefile project
+
+- Debug setup: GDB proxy
+  - Windows & Olimex ARM-USB-TINY-H JTag adapter
+    - Install drivers as show in olimex docs
+    - OpenOCD from openocd.sourceforge.net
+
+-Debug setup: Eclipse
+  - Install Eclipse IDE for C/C++ Developers
+    - Add C/C++ GCC Cross Compiler Support
+    - Add C/C++ GDB Hardware Debugging
+  - Create openocd.cnf
+       source [find interface/olimex-arm-usb-tiny-h.cfg]
+       source [find target/stm32f1x.cfg]
+
+  - Add new external tool
+    openocd-x75-050.exe -f openocd.cnf
+
+  - New debug configuration from "GDB Hardware Debuggin"
+  - GDB command: arm-none-eabi-gdb
+  - JTAG Device: TCP/IP, host: localhost, port 3333
+  - Debugger startup: Reset, Halt, Load Image, Load Symbols
+  - Debugger command windows:
+      monitor reset halt
+      monitor poll
+  - Runtime options:
+      monitor reset hal
+      break main
+      continue

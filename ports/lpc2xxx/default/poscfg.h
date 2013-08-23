@@ -38,7 +38,7 @@
  * This file is originally from the pico]OS realtime operating system
  * (http://picoos.sourceforge.net).
  *
- * CVS-ID $Id: poscfg.h,v 1.6 2011/11/03 09:51:21 ari Exp $
+ * CVS-ID $Id: poscfg.h,v 1.8 2011/12/19 06:56:07 ari Exp $
  */
 
 
@@ -86,7 +86,9 @@
  * dynamically allocate memory for additional task structures if the volume
  * of tasks defined by ::POSCFG_MAX_TASKS is exhausted.
  */
-#define POSCFG_MAX_TASKS       16
+// idle, main, sensors, net and 4 sockets
+#define SOCK_COUNT (4+1)
+#define POSCFG_MAX_TASKS       (SOCK_COUNT + 4)
 
 /** Maximum count of events.
  * This define sets the maximum count of event data structures which can be
@@ -99,7 +101,11 @@
  * dynamically allocate memory for additional events if the volume of events
  * defined by ::POSCFG_MAX_EVENTS is exhausted.
  */
-#define POSCFG_MAX_EVENTS       16
+// net: 1 mutex, 1 sema, sensors: 1 mutex, 1 sema, each socket: 1 mutex, 2 flags = (4tcp+1udp socks)5 *3 = 12
+//  conio: 2 sema
+// start net: 2, sensors:2, 2 sockets = 2*3 = 6, conio 2 -> 12
+
+#define POSCFG_MAX_EVENTS       (6 + SOCK_COUNT * 3)
 
 /** Maximum count of message buffers.
  * This definition sets the maximum count of message buffers that can be
@@ -114,7 +120,7 @@
  * dynamically allocate additional message buffers if the volume of buffers
  * defined by ::POSCFG_MAX_MESSAGES is exhausted.
  */
-#define POSCFG_MAX_MESSAGES     4
+#define POSCFG_MAX_MESSAGES     5
 
 /** Maximum count of timers.
  * This define sets the maximum count of timers that can be allocated
@@ -126,7 +132,7 @@
  * dynamically allocate memory for additional timers if the volume of timers
  * defined by ::POSCFG_MAX_TIMER is exhausted.
  */
-#define POSCFG_MAX_TIMER            4 
+#define POSCFG_MAX_TIMER            5 
 
 /** Set scheduling scheme.
  * The pico]OS supports two types of scheduling:<br>
@@ -177,7 +183,7 @@
  * If the combine threshold is set to 0, a context switch will never
  * occure as result of triggering events.
  */
-#define POSCFG_CTXSW_COMBINE    4
+#define POSCFG_CTXSW_COMBINE    10
 
 /** Realtime priority threshold for soft multitasking.
  * With this define some priority levels can be defined to be hard realtime,
@@ -187,7 +193,7 @@
  * Note that this define takes only effect when ::POSCFG_SOFT_MTASK = 1
  * and ::POSCFG_ROUNDROBIN = 1.
  */
-#define POSCFG_REALTIME_PRIO     10
+#define POSCFG_REALTIME_PRIO     (POSCFG_MAX_PRIO_LEVEL-10)
 
 /** When this define is set to a non-zero value, some user
  * available space is inserted into each task control block. The user
@@ -205,7 +211,7 @@
  * Note: This requires that message boxes are enabled (the defintion
  * ::POSCFG_FEATURE_MSGBOXES must be set to 1).
  */
-#define POSCFG_MSG_MEMORY        1
+#define POSCFG_MSG_MEMORY        0
 
 /** Size of message buffers in bytes.
  * If message boxes are enabled and ::POSCFG_MSG_MEMORY is set to 1,
@@ -213,7 +219,7 @@
  * operating system as simple as possible, only one fixed
  * buffer size is supported.
  */
-#define POSCFG_MSG_BUFSIZE      40
+#define POSCFG_MSG_BUFSIZE      80
 
 /** Set number of software interrupts.
  * pico]OS has a built in mechanism to simulate software interrupts.
@@ -229,7 +235,7 @@
  *        this define correctly (add 4) and do not use the lower 4
  *        interrupts in your application.
  */
-#define POSCFG_SOFTINTERRUPTS    8
+#define POSCFG_SOFTINTERRUPTS    40
 
 /** Set the number of software interrupts pico]OS shall be able to queue.
  * A software interrupt is executed each time the scheduler is called.
@@ -242,13 +248,22 @@
  * @note  The define ::POSCFG_FEATURE_SOFTINTS must be set to 1 to have
  *        software interrupts compiled in.
  */
-#define POSCFG_SOFTINTQUEUELEN  20
+#define POSCFG_SOFTINTQUEUELEN  40
 
 /** Timer tick rate.
  * This define must be set to the tickrate of the timer
  * interrupt (= timer ticks per second).
  */
-#define HZ                   10  /* timer ticks per second */
+#ifdef unix
+#define HZ                   100  /* timer ticks per second */
+#else
+#define HZ                   1000  /* timer ticks per second */
+#endif
+
+/**
+ * Defines the crystal clock in HZ
+ */
+#define PORTCFG_CRYSTAL_CLOCK          58982400
 
 /** @} */
 
@@ -268,14 +283,14 @@
  * inlined instead of doing subroutine calls. Note that the fastest possible
  * code is generated when also the define ::POSCFG_SMALLCODE is set to 0.
  */
-#define POSCFG_FASTCODE          1 
+#define POSCFG_FASTCODE          0 
 
 /** Configure code size.
  * Set this define to 1 to get a small code. This only touches some pico]OS
  * features, so expect not too much. Note that the smallest possible
  * code is generated when also the define ::POSCFG_FASTCODE is set to 0.
  */
-#define POSCFG_SMALLCODE         0
+#define POSCFG_SMALLCODE         1
 
 /** Function argument checking.
  * There are three methods of argument checking:<br>
@@ -336,13 +351,13 @@
  * If this definition is set to 1, the function ::posTaskGetPriority will
  * be included into the pico]OS kernel.
  */
-#define POSCFG_FEATURE_GETPRIORITY   1
+#define POSCFG_FEATURE_GETPRIORITY   0
 
 /** Include function ::posTaskSetPriority.
  * If this definition is set to 1, the function ::posTaskSetPriority will
  * be included into the pico]OS kernel.
  */
-#define POSCFG_FEATURE_SETPRIORITY   1
+#define POSCFG_FEATURE_SETPRIORITY   0
 
 /** Include semaphore functions.
  * If this definition is set to 1, the semaphore functions are
@@ -394,20 +409,20 @@
  * If this definition is set to 1, the function ::posTaskUnused will
  * be included into the pico]OS kernel.
  */
-#define POSCFG_FEATURE_TASKUNUSED    1
+#define POSCFG_FEATURE_TASKUNUSED    0
 
 /** Include message box functions.
  * If this definition is set to 1, the message box functions are
  * added to the user API.
  */
-#define POSCFG_FEATURE_MSGBOXES      1
+#define POSCFG_FEATURE_MSGBOXES      0
 
 /** Include function ::posMessageWait.
  * If this definition is set to 1, the function ::posMessageWait will
  * be included into the pico]OS kernel. Note that also
  * ::POSCFG_FEATURE_MSGBOXES must be set to 1.
  */
-#define POSCFG_FEATURE_MSGWAIT       1
+#define POSCFG_FEATURE_MSGWAIT       0
 
 /** Include functions ::posTaskSchedLock and ::posTaskSchedUnlock.
  * If this definition is set to 1, the functions ::posTaskSchedLock
@@ -419,7 +434,7 @@
  * If this definition is set to 1, the ::jiffies timer variable
  * will be available.
  */
-#define POSCFG_FEATURE_JIFFIES       1
+#define POSCFG_FEATURE_JIFFIES       0
 
 /** Include timer functions.
  * If this definition is set to 1, the timer functions are
@@ -465,7 +480,7 @@
  * If this definition is set to 1, the software interrupt functions are
  * added to the user API.
  */
-#define POSCFG_FEATURE_SOFTINTS      1
+#define POSCFG_FEATURE_SOFTINTS      0
 
 /** Include function ::posSoftIntDelHandler.
  * If this definition is set to 1, the function ::posSoftIntDelHandler
@@ -478,13 +493,13 @@
  * If this definition is set to 1, the function ::posInstallIdleTaskHook
  * will be added to the user API.
  */
-#define POSCFG_FEATURE_IDLETASKHOOK  1
+#define POSCFG_FEATURE_IDLETASKHOOK  0
 
 /** Enable atomic variable support.
  * If this definition is set to 1, the functions needed for accessing
  * atomic variables will be added to the user API.
  */
-#define POSCFG_FEATURE_ATOMICVAR     1
+#define POSCFG_FEATURE_ATOMICVAR     0
 
 /** Provide a task global error state variable.
  * If this definition is set to 1, the ::errno variable is supported.
@@ -495,7 +510,7 @@
  * If this definition is set to 1, the list functions are
  * added to the user API.
  */
-#define POSCFG_FEATURE_LISTS         1
+#define POSCFG_FEATURE_LISTS         0
 
 /** Include function ::posListJoin.
  * If this definition is set to 1, the function ::posListJoin will
@@ -517,19 +532,22 @@
  * may help you debugging your code using an in-circuit debugger
  * with appropriated IDE.
  */
+#ifdef _DBG
 #define POSCFG_FEATURE_DEBUGHELP     1
+#else
+#define POSCFG_FEATURE_DEBUGHELP     0
+#endif
 
 /** @} */
 
+
 /*---------------------------------------------------------------------------
- *  ADDITIONAL USER SETTINGS FOR THE UNIX PORT
+ *  ADDITIONAL USER SETTINGS FOR THE ARM PORT
  *-------------------------------------------------------------------------*/
 
-/** Set minimum stacksize. 
- * Stacksizes used on real embedded hardware are usually
- * way too small for unix system. If requested size
- * is less than this use minimum value instead.
- */
-#define POSCFG_MIN_STACK_SIZE	65535
+#ifdef unix
+#define PORTCFG_MIN_STACK_SIZE	65535
+#endif
 
+#define PORTCFG_IRQ_STACK_SIZE 1024
 #endif /* _POSCFG_H */

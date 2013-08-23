@@ -38,7 +38,7 @@
  * This file is originally from the pico]OS realtime operating system
  * (http://picoos.sourceforge.net).
  *
- * CVS-ID $Id: noscfg.h,v 1.5 2011/11/27 09:03:46 ari Exp $
+ * CVS-ID $Id: noscfg.h,v 1.10 2011/11/27 09:15:57 ari Exp $
  */
 
 #ifndef _NOSCFG_H
@@ -76,7 +76,7 @@
 #ifdef __arm__
 #define NOSCFG_MEM_MANAGER_TYPE      1
 #else
-#define NOSCFG_MEM_MANAGER_TYPE      1
+#define NOSCFG_MEM_MANAGER_TYPE      0
 #endif
 
 /** This is a pointer to the start of the memory heap.
@@ -143,14 +143,14 @@ extern void *__heap_end;
  * If this definition is set to 1, the function ::nosMemSet will
  * be included into the nano layer.
  */
-#define NOSCFG_FEATURE_MEMSET        0
+#define NOSCFG_FEATURE_MEMSET        1
 
 /** Include function ::nosMemCopy.
  * If this definition is set to 1, the function ::nosMemCopy will
  * be included into the nano layer.
  */
-#define NOSCFG_FEATURE_MEMCOPY       0
-#define NOSCFG_MEM_OVWR_STANDARD     0
+#define NOSCFG_FEATURE_MEMCOPY       1
+#define NOSCFG_MEM_OVWR_STANDARD	0
 
 /** @} */
 
@@ -203,7 +203,7 @@ extern void *__heap_end;
  *        either call ::c_nos_keyinput or rise the software interrupt 0
  *        to feed keyboard data into the nano layer.
  */
-#define NOSCFG_FEATURE_CONIN         1
+#define NOSCFG_FEATURE_CONIN         0
 
 /** Set keyboard buffer size (in bytes).
  * If the console input is enabled (when ::NOSCFG_FEATURE_CONIN is to 1),
@@ -229,7 +229,7 @@ extern void *__heap_end;
  * a runtime library linked (the header file <stdarg.h> is not needed).
  * @sa    ::nosPrintf1, ::NOSCFG_FEATURE_SPRINTF
  */
-#define NOSCFG_FEATURE_PRINTF        0
+#define NOSCFG_FEATURE_PRINTF        1
 
 /** Enable generic string printf ('sprintf') functions.
  * The nano layer supports a set of realy generic sprintf functions.
@@ -238,7 +238,7 @@ extern void *__heap_end;
  * a runtime library linked (the header file <stdarg.h> is not needed).
  * @sa    ::nosSPrintf1, ::NOSCFG_FEATURE_PRINTF
  */
-#define NOSCFG_FEATURE_SPRINTF       0
+#define NOSCFG_FEATURE_SPRINTF       1
 
 /** @} */
 
@@ -336,17 +336,16 @@ extern void *__heap_end;
 
 /** @} */
 
-/**
- * Console peripheral type.
- * 0: default, usually USCI_A if available,
- * 1: USCI_A,
- * 2: UART 0
- */
-#define PORTCFG_CON_PERIPH        0
-
 
 /*---------------------------------------------------------------------------
- *  ADDITIONAL USER SETTINGS FOR THE MSP430 PORT
+ *  ADDITIONAL USER SETTINGS FOR THE ARM PORT
  *-------------------------------------------------------------------------*/
+
+/** Set the console speed.
+ */
+
+#define PORTCFG_CONSOLE_SPEED		     115200
+#define NOSCFG_FEATURE_SEMAPHORES 1
+//#define NOSCFG_FEATURE_TIMER 1
 
 #endif /* _NOSCFG_H */

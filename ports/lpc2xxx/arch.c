@@ -31,17 +31,25 @@
 #define NANOINTERNAL
 #define PORT_INTERNAL
 #include <picoos.h>
-#include <msp430.h>
-#include <in430.h>
 #include <string.h>
+#include "lpc_reg.h"
+
+#define SYS_MODE  0x1f       // System Mode
+#define THUMB_MODE  0x20     // Thumb Mode
+#define SWI_SOFT_CONTEXT_SWITCH    1
+
+#ifdef __thumb__
+
+#define CPU_MODE  (SYS_MODE | THUMB_MODE)
+
+#else
+
+#define CPU_MODE  SYS_MODE
+
+#endif
 
 static inline void constructStackFrame(POSTASK_t task, void* stackPtr, POSTASKFUNC_t funcptr, void *funcarg);
-void timerIrqHandler(void);
-
-/*
- * Initialize nano layer heap by overriding mspgcc __low_level_init().
- * Also disable watchdog here.
- */
+static void sysCall(unsigned int* args);
 
 #if POSCFG_ENABLE_NANO != 0
 #if NOSCFG_FEATURE_MEMALLOC == 1 && NOSCFG_MEM_MANAGER_TYPE == 1
@@ -52,12 +60,43 @@ void *__heap_end;
 
 unsigned char *portIrqStack;
 
+void Reset_Handler(void);
+void SWI_Handler(void);
+
 extern unsigned int _end[];
 extern unsigned int __stack[];
-void __pos_nos_malloc_init(void);
+extern unsigned int __data_start[];
+extern unsigned int __data_load_start[];
+extern unsigned int _edata[];
+extern unsigned int _etext[];
+extern unsigned int __bss_start[];
+extern unsigned int __bss_end[];
 
-__attribute__((naked, section(".init8"))) __attribute__ ((__optimize__("omit-frame-pointer"))) void __pos_nos_malloc_init()
+/*
+ * Control gets here after reset.
+ * Initialize C environment and heap.
+ */
+
+extern int main(void);
+void Reset_Handler(void)
 {
+  unsigned int *src, *dst;
+
+  /*
+   *  Copy data section from flash to RAM
+   */
+  src = __data_load_start;
+  dst = __data_start;
+  while (dst < _edata)
+    *dst++ = *src++;
+
+  /*
+   *  Clear the bss section
+   */
+  dst = __bss_start;
+  while (dst < __bss_end)
+    *dst++ = 0;
+
   /*
    * Start heap after .bss segment, align it upwards.
    * Reserve IRQ stack at top of memory, heap end before it.
@@ -66,7 +105,7 @@ __attribute__((naked, section(".init8"))) __attribute__ ((__optimize__("omit-fra
 
 #if POSCFG_ENABLE_NANO != 0
 #if NOSCFG_FEATURE_MEMALLOC == 1 && NOSCFG_MEM_MANAGER_TYPE == 1
-  __heap_end = (void*) (portIrqStack - 2);
+  __heap_end = (void*) (portIrqStack - 4);
   __heap_start = (void*) (((unsigned int) _end + POSCFG_ALIGNMENT) & ~(POSCFG_ALIGNMENT - 1));
 #endif
 #endif
@@ -76,29 +115,29 @@ __attribute__((naked, section(".init8"))) __attribute__ ((__optimize__("omit-fra
   /*
    * Fill unused portion of IRQ stack with PORT_STACK_MAGIC.
    */
-  register unsigned char* s = (unsigned char*) __read_stack_pointer() - 10; // Just to be sure not to overwrite anything
+  register uint32_t sp asm("sp");
+  register uint32_t si      = sp - 10; // Just to be sure not to overwrite anything
+  register unsigned char* s = (unsigned char*) si;
 
-  while (s >= portIrqStack) {
+  while (s >= portIrqStack)
+  *(s--) = PORT_STACK_MAGIC;
 
-    WDTCTL = WDTPW + WDTCNTCL;
-    *(s--) = PORT_STACK_MAGIC;
-  }
-
-  *s = 0; // Separator between lowest stack location and heap
+  *s = 0;// Separator between lowest stack location and heap
 
 #if POSCFG_ENABLE_NANO != 0
 #if NOSCFG_FEATURE_MEMALLOC == 1 && NOSCFG_MEM_MANAGER_TYPE == 1
 
   s = (unsigned char*) __heap_start;
-  while (s <= (unsigned char*) __heap_end) {
-
-    WDTCTL = WDTPW + WDTCNTCL;
-    *(s++) = 'H';
-  }
-#endif
-#endif
+  while (s <= (unsigned char*) __heap_end)
+  *(s++) = 'H';
 
 #endif
+#endif
+#endif
+
+  main();
+  while (1)
+    ;
 }
 
 /*
@@ -108,38 +147,36 @@ __attribute__((naked, section(".init8"))) __attribute__ ((__optimize__("omit-fra
 
 static inline void constructStackFrame(POSTASK_t task, void* stackPtr, POSTASKFUNC_t funcptr, void *funcarg)
 {
-  unsigned int *stk, z;
+  unsigned int   *stk, z;
   int r;
 
-  /*
-   * Get aligned stack pointer.
-   */
+/*
+ * Get aligned stack pointer, reserve 32 bytes.
+ */
 
-  z = (unsigned int) stackPtr;
-  z = z & ~(POSCFG_ALIGNMENT - 1);
-  stk = (unsigned int *) z;
+  z = (unsigned int)stackPtr;
+  z = (z - POSCFG_ALIGNMENT) & ~(POSCFG_ALIGNMENT - 1);
+  stk = (unsigned int *)z;
 
-  /*
-   * Put initial values to stack, including entry point address,
-   * some detectable register values, status register (which
-   * switches cpu to system mode during context switch) and
-   * dummy place for exception stack pointer (see comments
-   * assember files for this).
-   */
+/*
+ * Put initial values to stack, including entry point address,
+ * some detectable register values, status register (which
+ * switches cpu to system mode during context switch) and
+ * dummy place for exception stack pointer (see comments
+ * assember files for this).
+ */
 
-  *(stk) = (unsigned int) posTaskExit; /* bottom               */
-  *(--stk) = (unsigned int) funcptr;  /* Entry Point          */
-  *(--stk) = (unsigned int) GIE;      /* Status reg           */
+  *(stk) = (unsigned int)0x00000000;    /* bottom               */
+  *(--stk) = (unsigned int)funcptr;     /* Entry Point          */
+  *(--stk) = (unsigned int)posTaskExit; /* lr                   */
 
-  for (r = 4; r <= 14; r++)
-    *(--stk) = (unsigned int) r;      /* r4-r15               */
+  for (r = 12; r >= 1; r--)
+    *(--stk) = r;
 
-  /*
-   * R15 is argument to function.
-   */
-  *(--stk) = (unsigned int) funcarg;
+  *(--stk) = (unsigned int)funcarg;     /* r0 : argument        */
+  *(--stk) = (unsigned int)CPU_MODE;    /* CPSR                 */
 
-  task->stackptr = (struct PortMspStack *) stk;
+  task->stackptr = (void *)stk;
 }
 
 /*
@@ -155,10 +192,10 @@ VAR_t p_pos_initTask(POSTASK_t task, UINT_t stacksize, POSTASKFUNC_t funcptr, vo
 
   task->stack = NOS_MEM_ALLOC(stacksize);
   if (task->stack == NULL)
-    return -1;
+  return -1;
 
 #if POSCFG_ARGCHECK > 1
-  memset(task->stack, PORT_STACK_MAGIC, stacksize);
+  nosMemSet(task->stack, PORT_STACK_MAGIC, stacksize);
 #endif
 
   z = (unsigned int) task->stack + stacksize - 2;
@@ -173,7 +210,7 @@ void p_pos_freeStack(POSTASK_t task)
 
 #elif (POSCFG_TASKSTACKTYPE == 2)
 
-#if PORTCFG_FIXED_STACK_SIZE < 30
+#if PORTCFG_FIXED_STACK_SIZE < 256
 #error fixed stack size too small
 #endif
 
@@ -207,65 +244,59 @@ void p_pos_freeStack(POSTASK_t task)
 void p_pos_initArch(void)
 {
 /*
- * Disable watchdog.
+ * First, put CPU pins to known state.
  */
 
-  WDTCTL = WDTPW + WDTHOLD;
+  PCB_PINSEL0 = PCB_PINSEL0_ALL_GPIO;
+  PCB_PINSEL1 = PCB_PINSEL1_ALL_GPIO;
 
-#if defined(__MSP430_HAS_BC2__) || \
-    defined(__MSP430_HAS_UCS__) || \
-    defined(__MSP430_HAS_UCS_RF__) || \
-    defined(__MSP430_HAS_FLLPLUS__)
+  GPIO0_IOSET = 0x00000000;
+  GPIO0_IOCLR = 0x00000000;
+  GPIO0_IODIR = 0x00000000;
 
-  portInitClock();
+/*
+ * Configure pins for UART 0 (used as console)
+ */
 
-#else
-#warning no suitable clock module
-#endif
+  PCB_PINSEL0 |= PCB_PINSEL0_P00_TXD0 | PCB_PINSEL0_P01_RXD0; /* Enable Rs232 RX & TX */
 
-#if defined(__MSP430_HAS_TA3__) || defined(__MSP430_HAS_T0A5__) || defined(__MSP430_HAS_TA2__)
+/*
+ * Configure PLL so that crystal frequency is multiplied by 4.
+ */
 
-  TA0CTL = 0;                         // Stop timer.
-  TA0CTL = TASSEL_1;                  // Use ACLK.
-  TA0CTL |= TACLR;                    // Clear everything.
+  SCB_PLLCFG = SCB_PLLCFG_MUL4;
 
-#if defined(PORTCFG_XT1_HZ) && PORTCFG_XT1_HZ > 0
+  SCB_PLLCON  = SCB_PLLCON_PLLE;
+  SCB_PLLFEED = SCB_PLLFEED_FEED1;
+  SCB_PLLFEED = SCB_PLLFEED_FEED2;
 
-  TA0CCR0 = (PORTCFG_XT1_HZ / HZ) - 1;      // Using crystal XT1
+  while (!(SCB_PLLSTAT & SCB_PLLSTAT_PLOCK)); /* Wait for PLL to lock */
 
-#else
+  SCB_PLLCON = SCB_PLLCON_MASK;
+  SCB_PLLFEED = SCB_PLLFEED_FEED1;
+  SCB_PLLFEED = SCB_PLLFEED_FEED2;
 
-#if defined(__msp430x22x4) || defined(__msp430x22x2) || defined(__MSP430G2553__) || defined(__MSP430G2533__)
+/*
+ * LPC chips don't have cache, but they have this "MAM".
+ * Enable it.
+ */
 
-  TA0CCR0 = (12000 / HZ) - 1;      // VLO on msp430x2xx is 12 Khz
+  MAM_TIM = MAM_TIM_3;
+  MAM_CR  = MAM_CR_FULL;
 
-#elif defined(__cc430x513x)
+/*
+ * Make periphral bus clock run same speed as CPU clock
+ */
 
-  TA0CCR0 = (10000 / HZ) - 1;      // VLO on msp430x5xx is 10 Khz
-
-#else
-
-#warning VLO frequency unknown, assuming 12 Khz
-
-  TA0CCR0 = (12000 / HZ) - 1;      // VLO on msp430x2xx is 12 Khz
-
-#endif
-
-#endif
-
-  TA0CCTL0 = CCIE;                    // Interrupts ON.
-  TA0CTL |= TACLR;                    // Startup clear.
-  TA0CTL |= MC_1;                     // Up mode.
-
-#else
-#warning No TA0 timer, one required for ticks.
-#endif
+  SCB_VPBDIV = SCB_VPBDIV_100;
 
 #if NOSCFG_FEATURE_CONOUT == 1 || NOSCFG_FEATURE_CONIN == 1
 
-  portInitConsole();
+  portInitUart();
 
 #endif
+
+  portInitTimer();
 }
 
 /*
@@ -277,15 +308,9 @@ void p_pos_initArch(void)
  * The actual switching is then performed by armSwiHandler.
  */
 
-void PORT_NAKED p_pos_softContextSwitch(void)
+void p_pos_softContextSwitch(void)
 {
-  asm volatile ("push r2");
-  __dint();
-
-  portSaveContext();
-  posCurrentTask_g = posNextTask_g;
-  posCurrentTask_g->stackptr->sr &= ~LPM4_bits; // Ensure CPU is active for next task
-  portRestoreContext();
+  asm volatile("swi #1");
 }
 
 /*
@@ -300,8 +325,7 @@ void PORT_NAKED p_pos_softContextSwitch(void)
 void PORT_NAKED p_pos_intContextSwitch(void)
 {
   posCurrentTask_g = posNextTask_g;
-  posCurrentTask_g->stackptr->sr &= ~LPM4_bits; // Ensure CPU is active for next task
-  portRestoreContext();
+  asm volatile ("bl portRestoreContextImpl");
 }
 
 /*
@@ -311,77 +335,99 @@ void PORT_NAKED p_pos_intContextSwitch(void)
 
 void PORT_NAKED p_pos_startFirstContext()
 {
-  portRestoreContext();
+  asm volatile ("bl portRestoreContextImpl");
 }
 
-void PORT_NAKED portRestoreContextImpl(void)
-{
-#if POSCFG_ARGCHECK > 1
-  P_ASSERT("IStk", (portIrqStack[0] == PORT_STACK_MAGIC));
-#endif
 
-  if (posInInterrupt_g == 0) {
-
-    asm volatile("mov %0, r1" : : "m"(posCurrentTask_g->stackptr) : "r1");
-  }
-
-  asm volatile("pop   r15 \n"
-      "         pop   r14 \n"
-      "         pop   r13 \n"
-      "         pop   r12 \n"
-      "         pop   r11 \n"
-      "         pop   r10 \n"
-      "         pop   r9  \n"
-      "         pop   r8  \n"
-      "         pop   r7  \n"
-      "         pop   r6  \n"
-      "         pop   r5  \n"
-      "         pop   r4  \n"
-      "         reti");
-}
-
+/*
+ * Nothing to do, put CPU to sleep.
+ */
 void portIdleTaskHook()
 {
-#if defined(__MSP430_HAS_UART1__) && (PORTCFG_CON_PERIPH == 2)
-  if (!(U1TCTL & TXEPT) || !(U1TCTL & SSEL0)) { // Cannot stop SMCLK if USART is working
-
-    __bis_status_register(LPM0_bits);
-    return;
-  }
-#endif
-
-#if defined(__MSP430_HAS_UCS_RF__) || defined(__MSP430_HAS_UCS__)
-
-  // UCS7 Errata workaround, FLL must be on for 3 * refclk cycles
-
-#if PORTCFG_XT1_HZ > 0
-  __delay_cycles((1000000L * PORTCFG_CPU_CLOCK_MHZ / PORTCFG_XT1_HZ) * 3);
-#else
-  __delay_cycles((1000000L * PORTCFG_CPU_CLOCK_MHZ / 32768) * 3);
-#endif
-#endif
-
-  __bis_status_register(LPM3_bits);
+  // __bis_status_register(LPM3_bits);
 }
 
-#ifdef TIMER0_A0_VECTOR
-void PORT_NAKED __attribute__((interrupt(TIMER0_A0_VECTOR))) timerIrqHandler()
-#else
-void PORT_NAKED __attribute__((interrupt(TIMERA0_VECTOR))) timerIrqHandler()
-#endif
+/*
+ * Handle SVC (System call). Used for starting first task and soft context switch.
+ */
+static void sysCall(unsigned int* args)
 {
-  portSaveContext();
-  c_pos_intEnter();
-  c_pos_timerInterrupt();
-  c_pos_intExit();
-  portRestoreContext();
+  int svcNumber;
+
+#ifdef __thumb__
+
+  unsigned short* swiInstr = (unsigned short*) (posCurrentTask_g->stackptr->pc - 2);
+
+  svcNumber = (*swiInstr) & 0xff;
+
+#else
+
+  unsigned int* swiInstr = (unsigned int*) (posCurrentTask_g->stackptr->pc - 4);
+
+  svcNumber = (*swiInstr) & 0xffffff;
+
+#endif
+
+  switch (svcNumber)
+  {
+  case SWI_SOFT_CONTEXT_SWITCH: // p_pos_softContextSwitch
+    posCurrentTask_g = posNextTask_g;
+    break;
+
+  }
+}
+
+/*
+ * SWI handler wrapper, dig out arguments.
+ */
+
+void SWI_Handler()
+{
+  sysCall((unsigned int*)posCurrentTask_g->stackptr);
 }
 
 #ifdef HAVE_PLATFORM_ASSERT
+
+static char* xtoa(int val)
+{
+  static char buf[32] = { 0 };
+  int i = 30;
+
+  for (; val && i; --i, val /= 10)
+
+    buf[i] = "0123456789abcdef"[val % 10];
+
+  return &buf[i + 1];
+}
+
 void p_pos_assert(const char* text, const char *file, int line)
 {
 // Something fatal, stay here forever.
-  __dint();
+
+  portEnterCritical();
+
+  while (*text) {
+
+    while (!(UART0_LSR & 0x20));
+    UART0_THR = *text;
+    ++text;
+  }
+
+  while (*file) {
+
+    while (!(UART0_LSR & 0x20));
+    UART0_THR = *file;
+    ++file;
+  }
+
+  char* l = xtoa(line);
+  while (*l) {
+
+    while (!(UART0_LSR & 0x20));
+    UART0_THR = *l;
+    ++l;
+  }
+
   while(1);
 }
 #endif

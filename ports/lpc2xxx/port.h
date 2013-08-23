@@ -38,14 +38,14 @@
  * This file is originally from the pico]OS realtime operating system
  * (http://picoos.sourceforge.net).
  *
- * CVS-ID $Id: port.h,v 1.63 2012/01/19 10:14:51 ari Exp $
+ * CVS-ID $Id: port.h,v 1.36 2012/01/26 16:13:42 ari Exp $
  */
 
 
 #ifndef _PORT_H
 #define _PORT_H
 
-#include <msp430.h>
+#include <lpc_reg.h>
 #include <stdint.h>
 
 /*---------------------------------------------------------------------------
@@ -81,7 +81,7 @@
  * position, but some others don't. For example, set
  * this define to 8 (bits) if ::MVAR_t is defined to @e char.
  */
-#define MVAR_BITS              16  /* = (sizeof(MVAR_t) * 8) */
+#define MVAR_BITS              32  /* = (sizeof(MVAR_t) * 8) */
 
 /** Integer variable type used for memory pointers.
  * This define must be set to an integer type that has the
@@ -100,7 +100,7 @@
  * If your architecture does not require memory alignment,
  * set this value to 0 or 1.
  */
-#define POSCFG_ALIGNMENT        2
+#define POSCFG_ALIGNMENT        4
 
 /** Interruptable interrupt service routines.
  * This define must be set to 1 (=enabled) when an
@@ -137,9 +137,9 @@
  * have different prototypes for each stack handling type.
  */
 #ifdef POSNANO
-#define POSCFG_TASKSTACKTYPE    1
+#define POSCFG_TASKSTACKTYPE     1
 #else
-#define POSCFG_TASKSTACKTYPE    2
+#define POSCFG_TASKSTACKTYPE     2
 #endif
 
 /** Enable call to function ::p_pos_initArch.
@@ -236,7 +236,7 @@
  * "register VAR_t flags;" would be added to each function
  * using the macros ::POS_SCHED_LOCK and ::POS_SCHED_UNLOCK.
  */
-#define POSCFG_LOCK_FLAGSTYPE    unsigned int
+#define POSCFG_LOCK_FLAGSTYPE    register unsigned int
 
 /** Scheduler locking.
  * Locking the scheduler for a short time is done by
@@ -245,13 +245,16 @@
  * code that stores the processor state and disables
  * the interrupts. See ::POSCFG_LOCK_FLAGSTYPE for more details.
  */
-#define POS_SCHED_LOCK          { flags = __read_status_register() & GIE; __dint(); }
+#define POS_SCHED_LOCK           flags = portEnterCritical()
 
 /** Scheduler unlocking.
  * This is the counterpart macro of ::POS_SCHED_LOCK. It restores
  * the saved processor flags and reenables the interrupts this way.
  */
-#define POS_SCHED_UNLOCK        { __bis_status_register(flags); }
+#define POS_SCHED_UNLOCK         portExitCritical(flags)
+
+unsigned int portEnterCritical(void);
+void portExitCritical(unsigned int old_int);
 
 /** @} */
 
@@ -342,7 +345,7 @@
  * not have a hardware FIFO. To enable the FIFO, set this define to
  * the FIFO size in bytes. A zero will disable the FIFO buffer.
  */
-#define NOSCFG_CONOUT_FIFOSIZE       20
+#define NOSCFG_CONOUT_FIFOSIZE       80
 
 /** @} */
 
@@ -358,23 +361,19 @@
  * Please see detailed description of ::POSTASK_t.
  * @sa POSTASK_t
  */
-#define POS_USERTASKDATA  struct PortMspStack *stackptr;
+#define POS_USERTASKDATA  struct PortArmStack *stackptr;
 #else
 
 #if (POSCFG_TASKSTACKTYPE == 1)
 
 #define POS_USERTASKDATA \
-    struct PortMspStack  *stackptr;          \
-    unsigned char        *stack;
+    struct PortArmStack  *stackptr;          \
+    unsigned char    *stack;
 
 #elif (POSCFG_TASKSTACKTYPE == 2)
 
-/* context switch (stack frame):   28 bytes
- * 70 bytes with NANO layer seems to be about minimum.
- */
-
 #define POS_USERTASKDATA \
-   struct PortMspStack  *stackptr; \
+   struct PortArmStack  *stackptr; \
    unsigned char stack[PORTCFG_FIXED_STACK_SIZE];
 
 #endif
@@ -395,15 +394,28 @@
  * To detect stack overflows, fill stack area with
  * PORT_STACK_MAGIC during initialization.
  */
-#define PORT_STACK_MAGIC  0x56
+#define PORT_STACK_MAGIC       0x56
 
 /**
- * Task stack frame for MSP430 CPU.
+ * Task stack frame.
  */
-struct PortMspStack
+struct PortArmStack
 {
-  unsigned int r[12];
-  unsigned int sr;
+  unsigned int spsr;
+  unsigned int r0;
+  unsigned int r1;
+  unsigned int r2;
+  unsigned int r3;
+  unsigned int r4;
+  unsigned int r5;
+  unsigned int r6;
+  unsigned int r7;
+  unsigned int r8;
+  unsigned int r9;
+  unsigned int r10;
+  unsigned int r11;
+  unsigned int r12;
+  unsigned int lr;
   unsigned int pc;
 };
 
@@ -413,38 +425,22 @@ extern void p_pos_assert(const char* text, const char *file, int line);
 #endif
 
 /**
- * Macro to save context of current stack.
+ * Finish saving of context to task stack. Nothing else
+ * left to do except check for stack overflow.
  */
 #define portSaveContext() { \
-  asm volatile("push  r4  \n\t"         \
-               "push  r5  \n\t"         \
-               "push  r6  \n\t"         \
-               "push  r7  \n\t"         \
-               "push  r8  \n\t"         \
-               "push  r9  \n\t"         \
-               "push  r10 \n\t"         \
-               "push  r11 \n\t"         \
-               "push  r12 \n\t"         \
-               "push  r13 \n\t"         \
-               "push  r14 \n\t"         \
-               "push  r15");            \
-  if (posInInterrupt_g == 0) {                   \
-                                                 \
-    asm volatile("mov r1, %[ts]\n\t"             \
-                 "mov %[is], r1"                 \
-        : [ts]"=m"(posCurrentTask_g->stackptr)   \
-        : [is]"r"(__stack) : "r1");              \
-      if (POSCFG_ARGCHECK > 1)                   \
-            P_ASSERT("TStk", (posCurrentTask_g->stack[0] == PORT_STACK_MAGIC)); \
-        } \
+    if (POSCFG_ARGCHECK > 1)                                              \
+      P_ASSERT("TStk", (posCurrentTask_g->stack[0] == PORT_STACK_MAGIC)); \
+}
+/**
+ * Restore context for current task. Nothing else to do
+ * except for check interrupt stack overflow.
+ */
+#define portRestoreContext() { \
+    if (POSCFG_ARGCHECK > 1)                                              \
+      P_ASSERT("IStk", (portIrqStack[0] == PORT_STACK_MAGIC));            \
 }
 
-/**
- * Restore context for current task.
- */
-#define portRestoreContext() asm volatile("br #portRestoreContextImpl")
-
-extern void portRestoreContextImpl(void);
 extern unsigned char *portIrqStack;
 extern unsigned int __stack[];
 
@@ -459,15 +455,7 @@ extern unsigned int __stack[];
 void portIdleTaskHook(void);
 #define HOOK_IDLETASK   portIdleTaskHook();
 
-void portInitClock(void);
-void portInitConsole(void);
-void portInitUSCIirq(void);
-void portInitBoard(void);
-void portConSpeed(uint32_t brClock, uint32_t baudRate, uint16_t* brDiv, uint16_t* brMod);
-void portConSpeedModPattern(uint32_t brClock, uint32_t baudRate, uint16_t* brDiv, uint8_t* brModPattern);
-
-#ifdef __MSP430_HAS_PMM__
-uint16_t portSetVCore(uint8_t level);
-#endif
+void portInitTimer(void);
+void portInitUart(void);
 
 #endif /* _PORT_H */

@@ -1,12 +1,5 @@
 /*
- * Modified for new arm port by Ari Suutari, ari@stonepile.fi.
- * UNTESTED - I HAVE NO HARDWARE FOR THIS.
- * 
- */
-
-/*
- * Copyright (c) 2004,      Jun Li <lj_sourceforge@users.sourceforge.net>.
- * Copyright (c) 2004,      Dennis Kuschel.
+ * Copyright (c) 2006-2013, Ari Suutari <ari@stonepile.fi>.
  * All rights reserved. 
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -35,53 +28,60 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/*
- * This file is originally from the pico]OS realtime operating system
- * (http://picoos.sourceforge.net).
- * 
- * CVS-ID $Id: cpu_c.c,v 1.2 2006/04/29 15:25:54 dkuschel Exp $
- */
-
 #define NANOINTERNAL
 #include <picoos.h>
-#include "arm7pid_reg.h"
+#include "lpc_reg.h"
 
-static PortIrqHandlerFunction defaultIrqHandler;
-void portCpuIrqHandler(int irq);
+static void Tick_Handler(void);
 
 /*
- * Initialize CPU pins, clock and console.
+ * Initialize timer..
  */
 
 void
-p_pos_initArch(void)
+portInitTimer(void)
 {
-  defaultIrqHandler = NULL;
-  Timer1Ctrl = 0x44;		// Periodic / prescale_16
-  Timer1Load = 150000;		// Load
-  Timer1Ctrl = 0xC4;		// Enable
-  IrqEnable  = 0x20;		// Enable Time IRQ
+/*
+ * Configure timer so that it ticks every 1 ms.
+ */
+
+  T0_PR = 0x0;
+
+  T0_MR0 = PORTCFG_CRYSTAL_CLOCK / HZ;
+  T0_MCR = T_MCR_MR0R | T_MCR_MR0I;   /* Reset & interrupt on match */
+
+/*
+ * Configure VIC to handle timer interrupts.
+ */
+
+  VIC_IntSelect &= ~(VIC_IntSelect_Timer0);
+  VIC_IntEnable |= VIC_IntEnable_Timer0;
+  VIC_VectAddr0 = (unsigned long)Tick_Handler;
+  VIC_VectCntl0 = VIC_Channel_Timer0 | VIC_VectCntl_ENABLE;
+
+/*
+ * Start timer !
+ */
+
+  T0_TCR = T_TCR_CE;
 }
 
 /*
- * Route interupt to correct handler (called from assembly).
+ * Timer interrupt handler. Just call generic pico]OS timer function
+ * and enable the timer again.
  */
 
-void portCpuIrqHandler(int irq)
+static void
+Tick_Handler()
 {
-  switch (irq) {
-  case 0x20:
-    c_pos_timerInterrupt();
-    Timer1Clr = 0;
-    break;
+  portSaveContext();
+  c_pos_intEnter();
+  c_pos_timerInterrupt();
 
-  default:
-    if (defaultIrqHandler != NULL)
-        (*defaultIrqHandler)(irq);
-  }
+  T0_IR = T_IR_MR0;
+  VIC_VectAddr = 0;
+
+  c_pos_intExit();
+  portRestoreContext();
 }
-  
-void portSetDefaultIrqHandler(PortIrqHandlerFunction func)
-{
-  defaultIrqHandler = func;
-}
+

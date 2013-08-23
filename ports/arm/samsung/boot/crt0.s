@@ -1,7 +1,7 @@
 /*
  * Copyright 2003/12/28 Aeolus Development				
  * Modified for pico]OS by Ari Suutari,
- *   modifications Copyright 2006 Ari Suutari, ari@suutari.iki.fi
+ *   Modifications copyright (c) 2006-2012 Ari Suutari, ari@stonepile.fi.
  *									
  * Freely modifiable and redistributable.  Modify to suit your own needs
  * Please remove Aeolus Development copyright for any significant	
