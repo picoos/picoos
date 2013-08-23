@@ -71,26 +71,26 @@ endif
 
 ifeq '$(strip $(DOS))' ''
 # Set executable extension
-EEXT = .exe
+EEXT =
 # Set host
-COMPILEHOST = DOS
+COMPILEHOST = LINUX
 # Delete path
 SHCMDPATH =
 # Generate macro for Unix style paths
 adjpath = $(subst \,/,$(1))
 # Get current path
-CURRENTDIR = $(shell pwd)
+CURRENTDIR := $(shell pwd)
 else
 # Set host
-COMPILEHOST = LINUX
+COMPILEHOST = DOS
 # Set executable extension
-EEXT =
+EEXT = .exe
 # Set path to tools
 SHCMDPATH = $(RELROOT)make/tools/
 # Generate macro for DOS style paths
 adjpath = $(subst /,\,$(1))
 # Get current path
-CURRENTDIR = $(subst \,/,$(shell cd))
+CURRENTDIR := $(subst \,/,$(shell cd))
 ifeq '$(strip $(CURRENTDIR))' ''
 CURRENTDIR := $(subst \,/,$(shell cmd /Ccd))
 ifeq '$(strip $(CURRENTDIR))' ''

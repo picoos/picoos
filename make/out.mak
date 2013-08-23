@@ -124,7 +124,7 @@ LINKLIST+=$(addprefix $(OPT_LD_PFLIB),$(subst $(space),$(replace),$(strip $(LIBL
 LINKLIST+=$(addprefix $(OPT_LD_PFLIB),$(subst $(space),$(replace),$(strip $(PICOOS_LIB))))
 LINKLIST+=$(OPT_LD_LAST)
 
-$(TARGETOUT): $(ALL_MODULES) $(PICOOS_LIB) $(OBJLIST) $(COMMONDEP) $(DIR_OUT)
+$(TARGETOUT): $(ALL_MODULES) $(PICOOS_LIB) $(OBJLIST) $(COMMONDEP) | $(DIR_OUT)
 	$(PRELINK1)
 	$(PRELINK2)
 	$(PRELINK3)
