@@ -63,6 +63,7 @@ EXT_OUT = .elf
 #
 
 # Define tools: compiler, assembler, archiver, linker
+CXX = msp430-g++
 CC = msp430-gcc
 AS = msp430-gcc
 AR = msp430-ar
@@ -96,24 +97,27 @@ AINCLUDES = .
 
 # Distinguish between build modes
 ifeq '$(BUILD)' 'DEBUG'
-  CFLAGS   += -O0 -g
-  AFLAGS   += -g
-  LDFLAGS  += -g
-  CDEFINES += _DBG
-  ADEFINES += _DBG
+  CFLAGS_COMMON   += -g
+  AFLAGS          += -g
+  LDFLAGS         += -g
+  CDEFINES        += _DBG
+  ADEFINES        += _DBG
 else
-  CFLAGS   += -Os
-  CDEFINES += _REL
-  ADEFINES += _REL
+  CFLAGS_COMMON   += -Os
+  CDEFINES        += _REL
+  ADEFINES        += _REL
 endif
 
 # Define Compiler Flags
 # TODO: extract -mcpu as constant
-CFLAGS += -fno-common -mmcu=$(MCU) -ffunction-sections
-CFLAGS += -Wcast-align -Wall -Wextra -Wshadow -Wpointer-arith -Wbad-function-cast -Waggregate-return -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Wno-unused-parameter -Wno-unused-label -Wno-unused-but-set-variable
-CFLAGS += $(EXTRA_CFLAGS)
-CFLAGS += -c -o
+CFLAGS_COMMON += -fno-common -mmcu=$(MCU) -ffunction-sections
+CFLAGS_COMMON += -Wcast-align -Wall -Wextra -Wshadow -Wpointer-arith -Waggregate-return
+CFLAGS_COMMON += -Wmissing-declarations -Wno-unused-parameter -Wno-unused-label -Wno-unused-but-set-variable
 
+CFLAGS += -Wbad-function-cast -Wno-strict-prototypes -Wmissing-prototypes
+CFLAGS += $(CFLAGS_COMMON) $(EXTRA_CFLAGS)
+CFLAGS += -c -o
+CXXFLAGS += $(CFLAGS_COMMON) -c -o
 
 # Define Assembler Flags
 # TODO: extract -mcpu as constant

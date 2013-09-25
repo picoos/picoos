@@ -89,9 +89,10 @@ endif
 endif
 
 # Define all object files.
-OBJC = $(filter-out $(SRC),$(SRC:$(EXT_C)=$(EXT_OBJ)))
-OBJA = $(filter-out $(SRC),$(SRC:$(EXT_ASM)=$(EXT_OBJ)))
-OBJ += $(addprefix $(DIR_OBJ)/,$(notdir $(OBJC) $(OBJA)))
+OBJCXX = $(filter-out $(SRC),$(SRC:$(EXT_CXX)=$(EXT_OBJ)))
+OBJC   = $(filter-out $(SRC),$(SRC:$(EXT_C)=$(EXT_OBJ)))
+OBJA   = $(filter-out $(SRC),$(SRC:$(EXT_ASM)=$(EXT_OBJ)))
+OBJ += $(addprefix $(DIR_OBJ)/,$(notdir $(OBJC) $(OBJCXX) $(OBJA)))
 
 # Define source directories. Strip them from the SRC variable.
 SRCDIRS  = $(sort $(dir $(SRC)))
@@ -197,6 +198,21 @@ endif
 
 # ---------------------------------------------------------------------------
 
+# Build a macro that is used to generate the correct C++-flags
+ifneq '$(strip $(OPT_CC_ODIR))' ''
+ifneq '$(strip $(OPT_CC_OFILE))' ''
+make_cxxflags = $(CXXFLAGS) $(OPT_CC_ODIR)$(call adjpath,$(DIR_OBJ)) $(OPT_CC_OFILE)$(call adjpath,$(1))
+else
+make_cxxflags = $(CXXFLAGS) $(OPT_CC_ODIR)$(call adjpath,$(DIR_OBJ))
+endif
+else
+ifneq '$(strip $(OPT_CC_OFILE))' ''
+make_cxxflags = $(CXXFLAGS) $(OPT_CC_OFILE)$(call adjpath,$(1))
+else
+make_cxxflags = $(CXXFLAGS)$(call adjpath,$(1))
+endif
+endif
+
 # Build a macro that is used to generate the correct C-flags
 ifneq '$(strip $(OPT_CC_ODIR))' ''
 ifneq '$(strip $(OPT_CC_OFILE))' ''
@@ -226,6 +242,26 @@ else
 make_asflags = $(ASFLAGS)$(call adjpath,$(1))
 endif
 endif
+
+# Compile: create object files from C++ source files
+$(DIR_OBJ)/%$(EXT_OBJ) : $(DIR_SRC1)%$(EXT_CXX) $(COMMONDEP) | $(DIR_OBJ)
+	$(CXX) $(call make_cxxflags,$@) $(CINCS) $(CDEFS) $(call adjpath,$<)
+$(DIR_OBJ)/%$(EXT_OBJ) : $(DIR_SRC2)%$(EXT_CXX) $(COMMONDEP) | $(DIR_OBJ)
+	$(CXX) $(call make_cxxflags,$@) $(CINCS) $(CDEFS) $(call adjpath,$<)
+$(DIR_OBJ)/%$(EXT_OBJ) : $(DIR_SRC3)%$(EXT_CXX) $(COMMONDEP) | $(DIR_OBJ)
+	$(CXX) $(call make_cxxflags,$@) $(CINCS) $(CDEFS) $(call adjpath,$<)
+$(DIR_OBJ)/%$(EXT_OBJ) : $(DIR_SRC4)%$(EXT_CXX) $(COMMONDEP) | $(DIR_OBJ)
+	$(CXX) $(call make_cxxflags,$@) $(CINCS) $(CDEFS) $(call adjpath,$<)
+$(DIR_OBJ)/%$(EXT_OBJ) : $(DIR_SRC5)%$(EXT_CXX) $(COMMONDEP) | $(DIR_OBJ)
+	$(CXX) $(call make_cxxflags,$@) $(CINCS) $(CDEFS) $(call adjpath,$<)
+$(DIR_OBJ)/%$(EXT_OBJ) : $(DIR_SRC6)%$(EXT_CXX) $(COMMONDEP) | $(DIR_OBJ)
+	$(CXX) $(call make_cxxflags,$@) $(CINCS) $(CDEFS) $(call adjpath,$<)
+$(DIR_OBJ)/%$(EXT_OBJ) : $(DIR_SRC7)%$(EXT_CXX) $(COMMONDEP) | $(DIR_OBJ)
+	$(CXX) $(call make_cxxflags,$@) $(CINCS) $(CDEFS) $(call adjpath,$<)
+$(DIR_OBJ)/%$(EXT_OBJ) : $(DIR_SRC8)%$(EXT_CXX) $(COMMONDEP) | $(DIR_OBJ)
+	$(CXX) $(call make_cxxflags,$@) $(CINCS) $(CDEFS) $(call adjpath,$<)
+$(DIR_OBJ)/%$(EXT_OBJ) : $(DIR_SRC9)%$(EXT_CXX) $(COMMONDEP) | $(DIR_OBJ)
+	$(CXX) $(call make_cxxflags,$@) $(CINCS) $(CDEFS) $(call adjpath,$<)
 
 ifeq '$(strip $(CC2ASM))' '1'
 

@@ -59,6 +59,7 @@ EXT_OUT =
 #
 
 # Define tools: compiler, assembler, archiver, linker
+CXX = c++
 CC = cc
 AS = cc
 AR = ar
@@ -92,20 +93,24 @@ AINCLUDES = .
 
 # Distinguish between build modes
 ifeq '$(BUILD)' 'DEBUG'
-  CFLAGS   += -O0 -g
-  AFLAGS   += -g
-  CDEFINES += _DBG
-  ADEFINES += _DBG
+  CFLAGS_COMMON   += -g
+  AFLAGS          += -g
+  CDEFINES        += _DBG
+  ADEFINES        += _DBG
 else
-  CFLAGS   += -O2
-  CDEFINES += _REL
-  ADEFINES += _REL
+  CFLAGS_COMMON   += -O2
+  CDEFINES        += _REL
+  ADEFINES        += _REL
 endif
 
 # Define Compiler Flags
-CFLAGS += -Wcast-align -Wall -Wextra -Wshadow -Wpointer-arith -Wbad-function-cast -Waggregate-return -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Wno-unused-parameter -Wno-unused-label
-CFLAGS += -c -o
+CFLAGS_COMMON += -Wcast-align -Wall -Wextra -Wshadow -Wpointer-arith -Waggregate-return
+CFLAGS_COMMON += -Wno-unused-parameter -Wno-unused-label
 
+CFLAGS += -Wmissing-declarations -Wbad-function-cast -Wno-strict-prototypes -Wmissing-prototypes
+CFLAGS += $(CFLAGS_COMMON) $(EXTRA_CFLAGS)
+CFLAGS += -c -o
+CXXFLAGS += $(CFLAGS_COMMON) -c -o
 
 # Define Assembler Flags
 # TODO: extract -mcpu as constant

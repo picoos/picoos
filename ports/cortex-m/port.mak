@@ -63,6 +63,7 @@ EXT_OUT = .elf
 #
 
 # Define tools: compiler, assembler, archiver, linker
+CXX = arm-none-eabi-g++
 CC = arm-none-eabi-gcc
 AS = arm-none-eabi-gcc
 AR = arm-none-eabi-ar
@@ -96,26 +97,29 @@ AINCLUDES = .
 
 # Distinguish between build modes
 ifeq '$(BUILD)' 'DEBUG'
-  CFLAGS   += -O0 -g
-  AFLAGS   += -g
-  CDEFINES += _DBG
-  ADEFINES += _DBG
+  CFLAGS_COMMON   += -g
+  AFLAGS          += -g
+  CDEFINES        += _DBG
+  ADEFINES        += _DBG
 else
-  CFLAGS   += -O2 -fomit-frame-pointer
-  CDEFINES += _REL
-  ADEFINES += _REL
+  CFLAGS_COMMON   += -O2 -fomit-frame-pointer
+  CDEFINES        += _REL
+  ADEFINES        += _REL
 endif
 
-CFLAGS  += -mthumb
-LDFLAGS += -mthumb
+CFLAGS_COMMON  += -mthumb
+LDFLAGS        += -mthumb
 
 # Define Compiler Flags
 # TODO: extract -mcpu as constant
-CFLAGS += -fno-common -mcpu=cortex-$(CORTEX) -ffunction-sections
-CFLAGS += -Wcast-align -Wall -Wextra -Wshadow -Wpointer-arith -Wbad-function-cast -Waggregate-return -Wno-strict-prototypes -Wmissing-prototypes -Wmissing-declarations -Wno-unused-parameter -Wno-unused-label -Wno-unused-but-set-variable
-CFLAGS += $(EXTRA_CFLAGS)
-CFLAGS += -c -o
+CFLAGS_COMMON += -fno-common -mcpu=cortex-$(CORTEX) -ffunction-sections
+CFLAGS_COMMON += -Wcast-align -Wall -Wextra -Wshadow -Wpointer-arith -Waggregate-return
+CFLAGS_COMMON += -Wmissing-prototypes -Wno-unused-parameter -Wno-unused-label -Wno-unused-but-set-variable
 
+CFLAGS += -Wbad-function-cast -Wno-strict-prototypes -Wmissing-prototypes
+CFLAGS += $(CFLAGS_COMMON) $(EXTRA_CFLAGS)
+CFLAGS += -c -o
+CXXFLAGS += $(CFLAGS_COMMON) -c -o
 
 # Define Assembler Flags
 # TODO: extract -mcpu as constant

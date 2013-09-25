@@ -176,6 +176,9 @@ include $(DIR_PORT)/port.mak
 endif
 
 # Set defaults
+ifeq '$(strip $(EXT_CXX))' ''
+EXT_CXX := .cxx
+endif
 ifeq '$(strip $(EXT_C))' ''
 EXT_C := .c
 endif
