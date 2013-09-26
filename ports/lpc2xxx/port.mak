@@ -126,7 +126,7 @@ CFLAGS_COMMON += -Wno-unused-parameter -Wno-unused-label -Wno-unused-but-set-var
 CFLAGS += -Wbad-function-cast -Wno-strict-prototypes -Wmissing-prototypes
 CFLAGS += $(CFLAGS_COMMON) $(EXTRA_CFLAGS)
 CFLAGS += -c -o
-CXXFLAGS += $(CFLAGS_COMMON) -c -o
+CXXFLAGS += -fno-exceptions -fno-rtti $(CFLAGS_COMMON) -c -o
 
 # Define Assembler Flags
 # TODO: extract -mcpu as constant
