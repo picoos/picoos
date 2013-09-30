@@ -52,9 +52,10 @@ VAR_t p_pos_initTask(POSTASK_t task,
                     void *funcarg)
 {
   int ret;
+  volatile int stk = stacksize;
 
-  if (stacksize < PORTCFG_MIN_STACK_SIZE)
-    stacksize = PORTCFG_MIN_STACK_SIZE;
+  if (stk < PORTCFG_MIN_STACK_SIZE)
+    stk = PORTCFG_MIN_STACK_SIZE;
 
   ret = getcontext(&task->ucontext);
   assert(ret != -1);
@@ -63,14 +64,14 @@ VAR_t p_pos_initTask(POSTASK_t task,
   assert(ret != -1);
 
   task->uexit.uc_link           = 0;
-  task->uexit.uc_stack.ss_sp    = malloc(stacksize);
-  task->uexit.uc_stack.ss_size  = stacksize;
+  task->uexit.uc_stack.ss_sp    = malloc(stk);
+  task->uexit.uc_stack.ss_size  = stk;
   task->uexit.uc_stack.ss_flags = 0;
 
   makecontext(&task->uexit, (void(*)(void)) posTaskExit, 0);
   task->ucontext.uc_link           = &task->uexit;
-  task->ucontext.uc_stack.ss_sp    = malloc(stacksize);
-  task->ucontext.uc_stack.ss_size  = stacksize;
+  task->ucontext.uc_stack.ss_sp    = malloc(stk);
+  task->ucontext.uc_stack.ss_size  = stk;
   task->ucontext.uc_stack.ss_flags = 0;
   sigemptyset(&task->ucontext.uc_sigmask);
   assert(task->ucontext.uc_stack.ss_sp != 0);
