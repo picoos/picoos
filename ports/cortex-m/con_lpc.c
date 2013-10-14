@@ -46,15 +46,17 @@ void portInitConsole(void)
   Chip_UART_SetupFIFOS(LPC_USART, (UART_FCR_FIFO_EN | UART_FCR_TRG_LEV2));
   Chip_UART_TXEnable(LPC_USART);
 
-#if 0
-  /* Enable receive data and line status interrupt */
-  Chip_UART_IntEnable(LPC_USART, (UART_IER_RBRINT | UART_IER_RLSINT));
+#if NOSCFG_FEATURE_CONIN == 1
 
-  /* preemption = 1, sub-priority = 1 */
-  NVIC_SetPriority(UART0_IRQn, 1);
-  NVIC_EnableIRQ(UART0_IRQn);
+  // Enable receive data interrupt.
+  Chip_UART_IntEnable(LPC_USART, UART_IER_RBRINT);
 
 #endif
+
+  // Console shouldn't be realtime-critical,
+  // use low interrupt priority for it.
+  NVIC_SetPriority(UART0_IRQn, PORT_PENDSV_PRI - 1);
+  NVIC_EnableIRQ(UART0_IRQn);
 }
 
 /*
@@ -63,40 +65,26 @@ void portInitConsole(void)
 
 void Uart_Handler()
 {
-#if 0
-  int reason;
-  unsigned char ch;
-		
-  portSaveContext();
   c_pos_intEnter();
 
-  reason = UART0_IIR & 0xf;
-  switch (reason) {
-  case 0x2: // TX
 #if NOSCFG_FEATURE_CONOUT == 1
+  if (LPC_USART->IER & UART_IER_THREINT) {
+
+    Chip_UART_IntDisable(LPC_USART, UART_IER_THREINT);
     c_nos_putcharReady();
-#endif
-    break;
-
-  case 0x4: // RX
-    ch = UART0_RBR;
-#if NOSCFG_FEATURE_CONIN == 1
-    c_nos_keyinput(ch);
-#endif
-    break;
-
-  case 0x6: // err
-    ch= UART0_LSR;
-    break;
   }
-
-  VIC_VectAddr = 0;
-  c_pos_intExit();
-  portRestoreContext();
 #endif
+
+#if NOSCFG_FEATURE_CONIN == 1
+
+  unsigned char ch;
+  ch = Chip_UART_ReadByte(LPC_USART);
+  c_nos_keyinput(ch);
+
+#endif
+
+  c_pos_intExitQuick();
 }
-
-#endif
 
 #if NOSCFG_FEATURE_CONOUT == 1
 /*
@@ -106,16 +94,14 @@ void Uart_Handler()
 UVAR_t
 p_putchar(char c)
 {
-  while ((Chip_UART_ReadLineStatus(LPC_USART) & UART_LSR_THRE) == 0);
-  Chip_UART_SendByte(LPC_USART, c);
-  return 1;
-/*
-  if (!(UART0_LSR & 0x20))
+  if ((Chip_UART_ReadLineStatus(LPC_USART) & UART_LSR_THRE) == 0)
     return 0;
 
-  UART0_THR = c;
-  return 1;*/
+  Chip_UART_SendByte(LPC_USART, c);
+  Chip_UART_IntEnable(LPC_USART, UART_IER_THREINT);
+  return 1;
 }
 #endif
 
+#endif
 #endif
