@@ -29,7 +29,6 @@
  */
 
 #define NANOINTERNAL
-#define PORT_INTERNAL
 #include <picoos.h>
 #include <string.h>
 #include "lpc_reg.h"

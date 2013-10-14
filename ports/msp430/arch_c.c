@@ -29,7 +29,6 @@
  */
 
 #define NANOINTERNAL
-#define PORT_INTERNAL
 #include <picoos.h>
 #include <msp430.h>
 #include <in430.h>
