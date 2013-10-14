@@ -47,16 +47,6 @@ void *__heap_end;
 
 unsigned char *portIrqStack;
 
-#ifndef __CODE_RED
-void Reset_Handler(void);
-#endif
-
-void SVC_Handler(void);
-void PendSV_Handler(void);
-void SysTick_Handler(void);
-void HardFault_Handler(void);
-void UsageFault_Handler(void);
-
 void sysCall(unsigned int*);
 void sysCallWrapper(unsigned int callerSp, unsigned int callerLr);
 void hardFault(void);
@@ -85,6 +75,7 @@ extern unsigned int _etext[];
 extern unsigned int __bss_start[];
 extern unsigned int __bss_end[];
 
+#if !defined(PORTCFG_VECTORS) || PORTCFG_VECTORS == 0
 unsigned int * myvectors[] __attribute__ ((section(".vectors"))) =
 { (unsigned int *) __stack, // stack pointer
     (unsigned int *) Reset_Handler, // code entry point
@@ -103,6 +94,7 @@ unsigned int * myvectors[] __attribute__ ((section(".vectors"))) =
     (unsigned int *) PendSV_Handler, // Context switch
     (unsigned int *) SysTick_Handler };
 
+#endif
 #endif
 
 /*
@@ -360,6 +352,7 @@ void p_pos_initArch(void)
 
 #if NOSCFG_FEATURE_CONOUT == 1 || NOSCFG_FEATURE_CONIN == 1
 
+  portInitConsole();
 
 #endif
 }

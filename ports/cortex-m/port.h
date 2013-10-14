@@ -556,4 +556,17 @@ extern unsigned char *portIrqStack;
 void portIdleTaskHook(void);
 #define HOOK_IDLETASK   portIdleTaskHook();
 
+void portInitConsole(void);
+
+#ifndef __CODE_RED
+void Reset_Handler(void);
+#endif
+
+void SVC_Handler(void);
+void PendSV_Handler(void);
+void SysTick_Handler(void);
+void HardFault_Handler(void);
+void UsageFault_Handler(void);
+void Uart_Handler(void);
+
 #endif /* _PORT_H */
