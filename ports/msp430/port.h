@@ -462,7 +462,6 @@ void portIdleTaskHook(void);
 void portInitClock(void);
 void portInitConsole(void);
 void portInitUSCIirq(void);
-void portInitBoard(void);
 void portConSpeed(uint32_t brClock, uint32_t baudRate, uint16_t* brDiv, uint16_t* brMod);
 void portConSpeedModPattern(uint32_t brClock, uint32_t baudRate, uint16_t* brDiv, uint8_t* brModPattern);
 

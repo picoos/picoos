@@ -556,6 +556,4 @@ extern unsigned char *portIrqStack;
 void portIdleTaskHook(void);
 #define HOOK_IDLETASK   portIdleTaskHook();
 
-void portInitBoard(void);
-
 #endif /* _PORT_H */
