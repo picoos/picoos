@@ -460,7 +460,7 @@ void PORT_NAKED portRestoreContextImpl(void)
  */
 void portIdleTaskHook()
 {
-  // __bis_status_register(LPM3_bits);
+  __WFI();
 }
 
 /*
