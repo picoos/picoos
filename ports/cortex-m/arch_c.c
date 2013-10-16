@@ -77,7 +77,7 @@ extern unsigned int __bss_end[];
 
 #if !defined(PORTCFG_VECTORS) || PORTCFG_VECTORS == 0
 
-PortExcHandlerFunc vectorTable[] = {
+PortExcHandlerFunc vectorTable[] __attribute__ ((section(".vectors"))) = {
   (PortExcHandlerFunc) __stack,  // stack pointer
   Reset_Handler,                 // code entry point
   Reset_Handler,                 // NMI handler (not really)
