@@ -76,23 +76,25 @@ extern unsigned int __bss_start[];
 extern unsigned int __bss_end[];
 
 #if !defined(PORTCFG_VECTORS) || PORTCFG_VECTORS == 0
-unsigned int * myvectors[] __attribute__ ((section(".vectors"))) =
-{ (unsigned int *) __stack, // stack pointer
-    (unsigned int *) Reset_Handler, // code entry point
-    (unsigned int *) Reset_Handler, // NMI handler (not really)
-    (unsigned int *) HardFault_Handler, // hard fault handler (let's hope not)
-    (unsigned int *) Reset_Handler, // MemManage failt
-    (unsigned int *) Reset_Handler, // Bus fault
-    (unsigned int *) UsageFault_Handler, // Usage fault
-    (unsigned int *) 0, // Reserved
-    (unsigned int *) 0, // Reserved
-    (unsigned int *) 0, // Reserved
-    (unsigned int *) 0, // Reserved
-    (unsigned int *) SVC_Handler, // SVC
-    (unsigned int *) Reset_Handler, // Debug monitor
-    (unsigned int *) 0, // Reserved
-    (unsigned int *) PendSV_Handler, // Context switch
-    (unsigned int *) SysTick_Handler };
+
+PortExcHandlerFunc vectorTable[] = {
+  (PortExcHandlerFunc) __stack,  // stack pointer
+  Reset_Handler,                 // code entry point
+  Reset_Handler,                 // NMI handler (not really)
+  HardFault_Handler,             // hard fault handler (let's hope not)
+  Reset_Handler,                 // MemManage failt
+  Reset_Handler,                 // Bus fault
+  UsageFault_Handler,            // Usage fault
+  0,                             // Reserved
+  0,                             // Reserved
+  0,                             // Reserved
+  0,                             // Reserved
+  SVC_Handler,                   // SVC
+  Reset_Handler,                 // Debug monitor
+  0,                             // Reserved
+  PendSV_Handler,                // Context switch
+  SysTick_Handler                // System tick
+};
 
 #endif
 #endif

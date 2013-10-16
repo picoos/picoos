@@ -558,6 +558,8 @@ void portIdleTaskHook(void);
 
 void portInitConsole(void);
 
+typedef void (* const PortExcHandlerFunc)(void);
+
 #ifndef __CODE_RED
 void Reset_Handler(void);
 #endif
