@@ -353,9 +353,11 @@ void p_pos_initArch(void)
   NVIC_SetPriority(PendSV_IRQn, PORT_PENDSV_PRI);
 
 #if NOSCFG_FEATURE_CONOUT == 1 || NOSCFG_FEATURE_CONIN == 1
+#ifdef PORTCFG_CON_LPC
 
   portInitConsole();
 
+#endif
 #endif
 }
 
