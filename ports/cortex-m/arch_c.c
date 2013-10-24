@@ -464,7 +464,9 @@ void PORT_NAKED portRestoreContextImpl(void)
  */
 void portIdleTaskHook()
 {
+#ifndef _DBG // Don't sleep if debugging, it causes problems with OpenOCD.
   __WFI();
+#endif
 }
 
 /*
