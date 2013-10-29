@@ -10,5 +10,9 @@ Compared to official release it contains updated versions of
 ports I have been writing (msp430, cortex-m, unix and lpc2xxx).
 There is some information about these in [my blogs][2].
 
+Updated doxygen manual is available [here][3].
+
 [1]: http://picoos.sf.net
 [2]: http://stonepile.fi/tags/picoos
+[3]: http://arizuu.github.io/picoos
+
