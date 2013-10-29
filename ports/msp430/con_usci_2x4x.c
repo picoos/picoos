@@ -99,7 +99,7 @@ p_putchar(char c)
 
 #if NOSCFG_FEATURE_CONIN == 1
 
-void __attribute__((interrupt(USCIAB0RX_VECTOR))) uartRxIrqHandler()
+void PORT_NAKED __attribute__((interrupt(USCIAB0RX_VECTOR))) uartRxIrqHandler()
 {
   portSaveContext();
   c_pos_intEnter();
