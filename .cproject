@@ -27,6 +27,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/picoos/ports/${PicoOsPortName}}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/picoos/ports/${PicoOsPortName}/default}&quot;"/>
 								</option>
+								<option id="gnu.c.compiler.option.preprocessor.def.symbols.711260014" superClass="gnu.c.compiler.option.preprocessor.def.symbols" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="POSNANO"/>
+								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.425910871" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.cross.cpp.compiler.1143829169" name="Cross G++ Compiler" superClass="cdt.managedbuild.tool.gnu.cross.cpp.compiler"/>
