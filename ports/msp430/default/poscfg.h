@@ -324,7 +324,7 @@
  * If this definition is set to 1, the function ::posTaskExit will
  * be included into the pico]OS kernel.
  */
-#define POSCFG_FEATURE_EXIT          0
+#define POSCFG_FEATURE_EXIT          1
 
 /** Include function ::posTaskGetPriority.
  * If this definition is set to 1, the function ::posTaskGetPriority will
