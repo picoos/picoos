@@ -566,8 +566,12 @@ NANOEXT void POSCALL nosPrint(const char *s);
 #endif
 #endif
 
-#if (NOSCFG_FEATURE_PRINTF != 0 || NOSCFG_FEATURE_SPRINTF != 0) && NOSCFG_FEATURE_USE_STDARG == 0
+#if (NOSCFG_FEATURE_PRINTF != 0 || NOSCFG_FEATURE_SPRINTF != 0)
+#if NOSCFG_FEATURE_USE_STDARG == 0
 typedef void* NOSARG_t;
+#else
+#include <stdarg.h>
+#endif
 #endif
 
 
@@ -576,7 +580,8 @@ typedef void* NOSARG_t;
 #if NOSCFG_FEATURE_USE_STDARG == 0
 NANOEXT void POSCALL n_printFormattedN(const char *fmt, NOSARG_t args);
 #else
-NANOEXT void POSCALL n_printFormattedN(const char *fmt, ...);
+NANOEXT void POSCALL n_printFormattedN(const char *fmt, va_list args);
+NANOEXT void POSCALL n_printFormatted(const char *fmt, ...);
 #endif
 
 #if DOX
@@ -646,13 +651,13 @@ NANOEXT void POSCALL nosPrintf1(const char *fmt, arg a1);
   } while(0);
 #else
 
-#define nosPrintf n_printFormattedN
-#define nosPrintf1(fmt, a1) n_printFormattedN(fmt, a1)
-#define nosPrintf2(fmt, a1, a2)  n_printFormattedN(fmt, a1, a2)
-#define nosPrintf3(fmt, a1, a2, a3)  n_printFormattedN(fmt, a1, a2, a3)
-#define nosPrintf4(fmt, a1, a2, a3, a4)  n_printFormattedN(fmt, a1, a2, a3, a4)
-#define nosPrintf5(fmt, a1, a2, a3, a4, a5)  n_printFormattedN(fmt, a1, a2, a3, a4, a5)
-#define nosPrintf6(fmt, a1, a2, a3, a4, a5, a6)  n_printFormattedN(fmt, a1, a2, a3, a4, a5, a6)
+#define nosPrintf n_printFormatted
+#define nosPrintf1(fmt, a1) n_printFormatted(fmt, a1)
+#define nosPrintf2(fmt, a1, a2)  n_printFormatted(fmt, a1, a2)
+#define nosPrintf3(fmt, a1, a2, a3)  n_printFormatted(fmt, a1, a2, a3)
+#define nosPrintf4(fmt, a1, a2, a3, a4)  n_printFormatted(fmt, a1, a2, a3, a4)
+#define nosPrintf5(fmt, a1, a2, a3, a4, a5)  n_printFormatted(fmt, a1, a2, a3, a4, a5)
+#define nosPrintf6(fmt, a1, a2, a3, a4, a5, a6)  n_printFormatted(fmt, a1, a2, a3, a4, a5, a6)
 
 #endif /* NOSCFG_FEATURE_USE_STDARG == 0 */
 #endif /* DOX!=0 */
@@ -685,7 +690,8 @@ NANOEXT void POSCALL nosSPrintf1(char *buf, const char *fmt, arg a1);
 NANOEXT void POSCALL n_sprintFormattedN(char *buf, const char *fmt,
                                         NOSARG_t args);
 #else
-NANOEXT void POSCALL n_sprintFormattedN(char *buf, const char *fmt, ...);
+NANOEXT void POSCALL n_sprintFormattedN(char *buf, const char *fmt, va_list args);
+NANOEXT void POSCALL n_sprintFormatted(char *buf, const char *fmt, ...);
 #endif
 
 #if NOSCFG_FEATURE_USE_STDARG == 0
@@ -736,13 +742,13 @@ NANOEXT void POSCALL n_sprintFormattedN(char *buf, const char *fmt, ...);
 
 #else
 
-#define nosSPrintf n_sprintFormattedN
-#define nosSPrintf1(buf, fmt, a1) n_sprintFormattedN(buf, fmt, a1)
-#define nosSPrintf2(buf, fmt, a1, a2)  n_sprintFormattedN(buf, fmt, a1, a2)
-#define nosSPrintf3(buf, fmt, a1, a2, a3)  n_sprintFormattedN(buf, fmt, a1, a2, a3)
-#define nosSPrintf4(buf, fmt, a1, a2, a3, a4)  n_sprintFormattedN(buf, fmt, a1, a2, a3, a4)
-#define nosSPrintf5(buf, fmt, a1, a2, a3, a4, a5)  n_sprintFormattedN(buf, fmt, a1, a2, a3, a4, a5)
-#define nosSPrintf6(buf, fmt, a1, a2, a3, a4, a5, a6)  n_sprintFormattedN(buf, fmt, a1, a2, a3, a4, a5, a6)
+#define nosSPrintf n_sprintFormatted
+#define nosSPrintf1(buf, fmt, a1) n_sprintFormatted(buf, fmt, a1)
+#define nosSPrintf2(buf, fmt, a1, a2)  n_sprintFormatted(buf, fmt, a1, a2)
+#define nosSPrintf3(buf, fmt, a1, a2, a3)  n_sprintFormatted(buf, fmt, a1, a2, a3)
+#define nosSPrintf4(buf, fmt, a1, a2, a3, a4)  n_sprintFormatted(buf, fmt, a1, a2, a3, a4)
+#define nosSPrintf5(buf, fmt, a1, a2, a3, a4, a5)  n_sprintFormatted(buf, fmt, a1, a2, a3, a4, a5)
+#define nosSPrintf6(buf, fmt, a1, a2, a3, a4, a5, a6)  n_sprintFormatted(buf, fmt, a1, a2, a3, a4, a5, a6)
 
 #endif /* NOSCFG_FEATURE_USE_STDARG == 0 */
 #endif /* DOX!=0 */
