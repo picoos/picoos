@@ -479,7 +479,7 @@ extern void p_pos_assert(const char* text, const char *file, int line);
 #define portSaveContext() { \
     register unsigned int pspReg asm("r0");             \
     asm volatile("mrs %0, psp           \n\t"           \
-                 "sub %0, %0, #4*10      \n\t"           \
+                 "sub %0, %0, #4*10     \n\t"           \
                  "mov r1, %0            \n\t"           \
                  "mrs r3, primask       \n\t"           \
                  "stmia r1!, {r3-r7}    \n\t"           \
