@@ -248,6 +248,7 @@ static inline void constructStackFrame(POSTASK_t task, void* stackPtr, POSTASKFU
 
   *(--stk) = (unsigned int) funcarg;
 
+  *(--stk) = 0xFFFFFFFD; // Initial EXC_RETURN
   for (r = 11; r >= 4; r--)
     *(--stk) = r;
 
@@ -430,10 +431,9 @@ void PORT_NAKED portRestoreContextImpl(void)
 
   asm volatile("mov sp, %[initMsp]     \n"  // Return MSP to initial value
       "         ldr r0, %[newPsp]      \n"  // Get PSP for next task
-      "         ldmia r0!, {r3-r11}    \n"  // Restore registers not handled by HW
+      "         ldmia r0!, {r3-r11,r14}\n"  // Restore registers not handled by HW
       "         msr psp, r0            \n"  // Set PSP
       "         msr basepri, r3        \n"  // Adjust BASEPRI back to task's setting
-      "         mvn lr, #2             \n"  // LR = 0xFFFFFFFD: Return to thread mode with PSP
       "         bx lr"
       : : [newPsp]"m"(posCurrentTask_g->stackptr), [initMsp]"r"(__stack));
 
@@ -446,14 +446,11 @@ void PORT_NAKED portRestoreContextImpl(void)
       "         ldmia r0!, {r1-r2}     \n"  // Restore more ...
       "         mov r8, r1             \n"  // .. Cortex-m0 can only use low
       "         mov r9, r2             \n"  //    registers in ldmia/stmia
-      "         ldmia r0!, {r1-r2}     \n"
+      "         ldmia r0!, {r1-r3}     \n"
       "         mov r10, r1            \n"
       "         mov r11, r2            \n"
       "         msr psp, r0            \n"  // Set PSP
-      "         mov r0, #3             \n"
-      "         neg r0, r0             \n"  // LR = 0xFFFFFFFD: Return to thread mode with PSP
-      "         mov lr, r0             \n"
-      "         bx lr"
+      "         bx r3"
       : : [newPsp]"m"(posCurrentTask_g->stackptr), [initMsp]"r"(__stack));
 
 #endif

@@ -436,6 +436,7 @@ struct PortArmStack
   unsigned int r9;
   unsigned int r10;
   unsigned int r11;
+  unsigned int excReturn;
 
   /*
    * This is frame pushed to stack during interrupt by Cortex-M hardware.
@@ -465,7 +466,7 @@ extern void p_pos_assert(const char* text, const char *file, int line);
     register unsigned int pspReg asm("r0");             \
     asm volatile("mrs %0, psp           \n\t"           \
                  "mrs r3, basepri       \n\t"           \
-                 "stmdb %0!, {r3-r11}       "           \
+                 "stmdb %0!, {r3-r11,r14}   "           \
                   : "=r"(pspReg) :: "r3");              \
     asm volatile("str %1, %0"                           \
                   : "=m"(posCurrentTask_g->stackptr) : "r"(pspReg));      \
@@ -478,15 +479,16 @@ extern void p_pos_assert(const char* text, const char *file, int line);
 #define portSaveContext() { \
     register unsigned int pspReg asm("r0");             \
     asm volatile("mrs %0, psp           \n\t"           \
-                 "sub %0, %0, #4*9      \n\t"           \
+                 "sub %0, %0, #4*10      \n\t"           \
                  "mov r1, %0            \n\t"           \
                  "mrs r3, primask       \n\t"           \
                  "stmia r1!, {r3-r7}    \n\t"           \
-                 "mov r4, r8            \n\t"           \
-                 "mov r5, r9            \n\t"           \
-                 "mov r6, r10           \n\t"           \
-                 "mov r7, r11           \n\t"           \
-                 "stmia r1!, {r4-r7}        "           \
+                 "mov r3, r8            \n\t"           \
+                 "mov r4, r9            \n\t"           \
+                 "mov r5, r10           \n\t"           \
+                 "mov r6, r11           \n\t"           \
+                 "mov r7, lr            \n\t"           \
+                 "stmia r1!, {r3-r7}        "           \
                   : "=r"(pspReg) :: "r1", "r3");        \
     asm volatile("str %1, %0"                           \
                   : "=m"(posCurrentTask_g->stackptr) : "r"(pspReg));      \
