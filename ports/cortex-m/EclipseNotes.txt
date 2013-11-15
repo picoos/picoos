@@ -1,6 +1,13 @@
-- yagarto from net ?
-- MinGW MSYS for gnu make
-- CMSIS for CPU required
+- Following software is needed to build/debug:
+
+  - Get GCC toolchain. For Linux/FreeBSD/Unix, compile it yourself.
+    For windows, this might be ok: https://launchpad.net/gcc-arm-embedded
+  - Get MinGW and MSYS for gnu make and unix-style tools
+  - CMSIS library for CPU being used, usually available from
+    chip vendor. CMSIS might be part of larger libary,
+    for example stm32 has a "peripheral library".
+  - Get eclipse version that has C/C++ development support.
+    - Add C/C++ GCC Cross Compiler Support after install
 
 - Build under Eclicpse
   - C Project/Makefile project
@@ -11,9 +18,7 @@
     - OpenOCD from openocd.sourceforge.net
 
 -Debug setup: Eclipse
-  - Install Eclipse IDE for C/C++ Developers
-    - Add C/C++ GCC Cross Compiler Support
-    - Add C/C++ GDB Hardware Debugging
+  - Add C/C++ GDB Hardware Debugging
   - Create openocd.cnf
        source [find interface/olimex-arm-usb-tiny-h.cfg]
        source [find target/stm32f1x.cfg]

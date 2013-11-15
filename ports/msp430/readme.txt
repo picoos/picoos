@@ -5,6 +5,7 @@ This is a port of pico]OS to Texas Instruments MSP430 chips.
 It has been tested with MSPGCC (from sourceforge) as compiler on following boards:
 
 - Texas Instruments ez430-RF2500 (msp430f2274 + 2.4 Ghz radio)
+- Texas Instruments msp430 launchpad (msp430g2533)
 - Olimex MSP430-CCR (cc430f5137, includes sub 1Ghz-radio)
 - Olimex MSP430-4619LCD (msp430fg4619)
 
