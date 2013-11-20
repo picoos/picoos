@@ -328,9 +328,8 @@ void p_pos_initArch(void)
    * If using LPCExpresso ide startup code, handle
    * IRQ stack setup here. This way we don't have to
    * modify generated startup routines. Delaying
-   * this doesn't cause much harm -- heap overflow before
-   * this point wouldn't be detected, but it is unlikely
-   * to occur anyway.
+   * this doesn't cause much harm -- irq stack overflow before
+   * this point wouldn't be detected.
    */
   portIrqStack = stackBottom();
 
