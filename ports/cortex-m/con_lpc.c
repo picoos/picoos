@@ -35,7 +35,7 @@
  * Initialize NXP/LPC uart console.
  */
 
-#ifdef PORTCFG_CON_LPC
+#if PORTCFG_CON_LPC == 1
 
 #if NOSCFG_FEATURE_CONOUT == 1 || NOSCFG_FEATURE_CONIN == 1
 void portInitConsole(void)
