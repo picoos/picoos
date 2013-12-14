@@ -346,18 +346,15 @@ void p_pos_initArch(void)
   __disable_irq();
 #endif
 
-  SysTick_Config(SystemCoreClock / HZ);
+  portInitClock();
 
   NVIC_SetPriority(SVCall_IRQn, PORT_SVCALL_PRI);
-  NVIC_SetPriority(SysTick_IRQn, PORT_SYSTICK_PRI);
   NVIC_SetPriority(PendSV_IRQn, PORT_PENDSV_PRI);
 
 #if NOSCFG_FEATURE_CONOUT == 1 || NOSCFG_FEATURE_CONIN == 1
-#if PORTCFG_CON_LPC == 1
 
   portInitConsole();
 
-#endif
 #endif
 }
 
@@ -583,30 +580,6 @@ void PORT_NAKED PendSV_Handler()
   c_pos_intExit();
   portRestoreContext();
 }
-
-/*
- * Timer interrupt from SysTick.
- */
-void SysTick_Handler()
-{
-  c_pos_intEnter();
-  c_pos_timerInterrupt();
-  c_pos_intExitQuick();
-}
-
-/*
- * Send character to debugger.
- */
-
-#if NOSCFG_FEATURE_CONOUT == 1 && PORTCFG_CONOUT_ITM == 1
-
-UVAR_t p_putchar(char ch)
-{
-  ITM_SendChar(ch);
-  return 1;
-}
-
-#endif
 
 #ifdef HAVE_PLATFORM_ASSERT
 void p_pos_assert(const char* text, const char *file, int line)

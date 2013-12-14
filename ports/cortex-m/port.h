@@ -558,6 +558,7 @@ extern unsigned char *portIrqStack;
 void portIdleTaskHook(void);
 #define HOOK_IDLETASK   portIdleTaskHook();
 
+void portInitClock(void);
 void portInitConsole(void);
 
 typedef void (* const PortExcHandlerFunc)(void);
