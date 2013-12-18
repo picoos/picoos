@@ -31,12 +31,12 @@
 #include <picoos.h>
 #include <string.h>
 
+#if PORTCFG_CLOCK_EFM32_RTC == 1
+
 #include "em_device.h"
 #include "em_chip.h"
 #include "em_rtc.h"
 #include "em_cmu.h"
-
-#if PORTCFG_CLOCK_EFM32_RTC == 1
 
 /*
  * Initialize Systick timer.
