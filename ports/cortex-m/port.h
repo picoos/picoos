@@ -567,6 +567,10 @@ typedef void (* const PortExcHandlerFunc)(void);
 void Reset_Handler(void);
 #endif
 
+// Helpful macro to define weak interrupt handler definitions.
+
+#define PORT_WEAK_HANDLER(n) void __attribute__((weak, alias("Default_Handler"))) n()
+
 void SVC_Handler(void);
 void PendSV_Handler(void);
 void SysTick_Handler(void);
