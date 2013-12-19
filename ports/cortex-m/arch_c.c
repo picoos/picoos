@@ -320,7 +320,7 @@ void p_pos_freeStack(POSTASK_t task)
 
 void p_pos_initArch(void)
 {
-  SCB->CCR = SCB->CCR | 0x200; // Stack align ?
+  SCB->CCR = SCB->CCR | SCB_CCR_STKALIGN_Msk;
 
 #ifdef __CODE_RED
 
@@ -384,6 +384,7 @@ void p_pos_softContextSwitch(void)
 void PORT_NAKED p_pos_intContextSwitch(void)
 {
   posCurrentTask_g = posNextTask_g;
+  SCB->SCR &= ~SCB_SCR_SLEEPONEXIT_Msk;
   portRestoreContext();
 }
 
@@ -457,8 +458,24 @@ void PORT_NAKED portRestoreContextImpl(void)
  */
 void portIdleTaskHook()
 {
-#ifndef _DBG // Don't sleep if debugging, it causes problems with OpenOCD.
+  /*
+   * Put CPU to sleep. Set SLEEPONEXIT to inhibit waking
+   * back to idle task. SLEEPONEXIT is cleared if context is switched.
+   */
+#if __CORTEX_M < 3
+  /*
+   * CoreDebug is not visible in Cortex-m0.
+   */
+#ifdef _DBG
+  SCB->SCR |= SCB_SCR_SLEEPONEXIT_Msk;
   __WFI();
+#endif
+#else
+  if ((CoreDebug->DHCSR & CoreDebug_DHCSR_C_DEBUGEN_Msk) == 0) {
+
+    SCB->SCR |= SCB_SCR_SLEEPONEXIT_Msk;
+    __WFI();
+  }
 #endif
 }
 
@@ -475,6 +492,7 @@ void sysCall(unsigned int* args)
   {
   case SVC_SOFT_CONTEXT_SWITCH: // p_pos_softContextSwitch
     posCurrentTask_g = posNextTask_g;
+    SCB->SCR &= ~SCB_SCR_SLEEPONEXIT_Msk; // Ensure that CPU wakes up.
     portRestoreContext();
     break;
 
