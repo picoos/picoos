@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Ari Suutari <ari@stonepile.fi>.
+ * Copyright (c) 2006-2013, Ari Suutari <ari@stonepile.fi>.
  * All rights reserved. 
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -28,62 +28,80 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#define NANOINTERNAL
 #include <picoos.h>
-#include <string.h>
-
-#if PORTCFG_CLOCK_EFM32_RTC == 1
-
-#include "em_device.h"
-#include "em_chip.h"
-#include "em_rtc.h"
-#include "em_cmu.h"
 
 /*
- * Initialize Systick timer.
+ * Initialize NXP/LPC uart console.
  */
 
-void portInitClock(void)
+#if PORTCFG_CON_USART == 1
+
+#if NOSCFG_FEATURE_CONOUT == 1 || NOSCFG_FEATURE_CONIN == 1
+void portInitConsole(void)
 {
-  /* Starting LFRCO and waiting until it is stable */
-  CMU_OscillatorEnable(cmuOsc_LFRCO, true, true);
-#warning PORTCFG_LFXO_HZ
-  /* Routing the LFRCO clock to the RTC */
-  CMU_ClockSelectSet(cmuClock_LFA,cmuSelect_LFRCO);
-  CMU_ClockEnable(cmuClock_RTC, true);
+  Chip_UART_Init(LPC_USART);
+  Chip_UART_SetBaud(LPC_USART, PORTCFG_CONSOLE_SPEED);
+  Chip_UART_ConfigData(LPC_USART, (UART_LCR_WLEN8 | UART_LCR_SBS_1BIT));
+  Chip_UART_SetupFIFOS(LPC_USART, (UART_FCR_FIFO_EN | UART_FCR_TRG_LEV2));
+  Chip_UART_TXEnable(LPC_USART);
 
-  /* Enabling clock to the interface of the low energy modules */
-  CMU_ClockEnable(cmuClock_CORELE, true);
+#if NOSCFG_FEATURE_CONIN == 1
 
-  RTC_Init_TypeDef rtcInit = RTC_INIT_DEFAULT;
+  // Enable receive data interrupt.
+  Chip_UART_IntEnable(LPC_USART, UART_IER_RBRINT);
 
-  rtcInit.enable   = true;      /* Enable RTC after init has run */
-  rtcInit.comp0Top = true;      /* Clear counter on compare match */
-  rtcInit.debugRun = false;     /* Counter shall keep running during debug halt. */
+#endif
 
-#define LFRCO_FREQUENCY              32768
-
-  /* Setting the compare value of the RTC */
-  RTC_CompareSet(0, (LFRCO_FREQUENCY / HZ) - 1);
-
-  /* Enabling Interrupt from RTC */
-  RTC_IntEnable(RTC_IFC_COMP0);
-  NVIC_EnableIRQ(RTC_IRQn);
-  NVIC_SetPriority(RTC_IRQn, PORT_SYSTICK_PRI);
-
-  /* Initialize the RTC */
-  RTC_Init(&rtcInit);
-
+  // Console shouldn't be realtime-critical,
+  // use low interrupt priority for it.
+  NVIC_SetPriority(UART0_IRQn, PORT_PENDSV_PRI - 1);
+  NVIC_EnableIRQ(UART0_IRQn);
 }
 
 /*
- * Timer interrupt from SysTick.
+ * Uart interrupt handler.
  */
-void RTC_IRQHandler(void)
+
+void Uart_Handler()
 {
   c_pos_intEnter();
-  RTC_IntClear(RTC_IFC_COMP0);
-  c_pos_timerInterrupt();
+
+#if NOSCFG_FEATURE_CONOUT == 1
+  if (LPC_USART->IER & UART_IER_THREINT) {
+
+    Chip_UART_IntDisable(LPC_USART, UART_IER_THREINT);
+    c_nos_putcharReady();
+  }
+#endif
+
+#if NOSCFG_FEATURE_CONIN == 1
+
+  unsigned char ch;
+  ch = Chip_UART_ReadByte(LPC_USART);
+  c_nos_keyinput(ch);
+
+#endif
+
   c_pos_intExitQuick();
 }
 
+#if NOSCFG_FEATURE_CONOUT == 1
+/*
+ * Console output.
+ */
+
+UVAR_t
+p_putchar(char c)
+{
+  if ((Chip_UART_ReadLineStatus(LPC_USART) & UART_LSR_THRE) == 0)
+    return 0;
+
+  Chip_UART_SendByte(LPC_USART, c);
+  Chip_UART_IntEnable(LPC_USART, UART_IER_THREINT);
+  return 1;
+}
+#endif
+
+#endif
 #endif
