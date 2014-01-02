@@ -44,11 +44,21 @@
 
 void portInitClock(void)
 {
+
+#define LFO_FREQUENCY              32768
+
+#if PORTCFG_RTC_LFXO != 0
+  /* Starting LFRCO and waiting until it is stable */
+  CMU_OscillatorEnable(cmuOsc_LFXO, true, true);
+  /* Routing the LFRCO clock to the RTC */
+  CMU_ClockSelectSet(cmuClock_LFA,cmuSelect_LFXO);
+#else
   /* Starting LFRCO and waiting until it is stable */
   CMU_OscillatorEnable(cmuOsc_LFRCO, true, true);
-#warning XXX implement crystal oscillator support with PORTCFG_LFXO_HZ
   /* Routing the LFRCO clock to the RTC */
   CMU_ClockSelectSet(cmuClock_LFA,cmuSelect_LFRCO);
+#endif
+
   CMU_ClockEnable(cmuClock_RTC, true);
 
   /* Enabling clock to the interface of the low energy modules */
@@ -60,10 +70,8 @@ void portInitClock(void)
   rtcInit.comp0Top = true;      /* Clear counter on compare match */
   rtcInit.debugRun = false;     /* Counter shall keep running during debug halt. */
 
-#define LFRCO_FREQUENCY              32768
-
   /* Setting the compare value of the RTC */
-  RTC_CompareSet(0, (LFRCO_FREQUENCY / HZ) - 1);
+  RTC_CompareSet(0, (LFO_FREQUENCY / HZ) - 1);
 
   /* Enabling Interrupt from RTC */
   RTC_IntEnable(RTC_IFC_COMP0);
