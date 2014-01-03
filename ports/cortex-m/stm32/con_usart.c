@@ -30,15 +30,12 @@
 
 #define NANOINTERNAL
 #include <picoos.h>
-#include <stdbool.h>
 
 /*
- * Initialize NXP/LPC uart console.
+ * Initialize STM32 usart console.
  */
 
 #if PORTCFG_CON_USART == 1
-
-static bool ready;
 
 #if NOSCFG_FEATURE_CONOUT == 1 || NOSCFG_FEATURE_CONIN == 1
 void portInitConsole(void)
@@ -56,8 +53,6 @@ void portInitConsole(void)
 
   USART_Init(USART2, &init);
   USART_Cmd(USART2, ENABLE);
-
-  ready = 1;
 
 #if NOSCFG_FEATURE_CONIN == 1
 
@@ -84,7 +79,6 @@ void USART2_IRQHandler()
   if (USART_GetITStatus(USART2, USART_IT_TXE) == SET) {
 
     USART_ITConfig (USART2, USART_IT_TXE, DISABLE);
-    ready = 1;
     c_nos_putcharReady();
   }
 #endif
@@ -112,10 +106,9 @@ void USART2_IRQHandler()
 UVAR_t
 p_putchar(char c)
 {
-  if (!ready)
+  if (USART2->CR1 & USART_FLAG_TXE) // If interrupt is enabled previous char is not yet transmitted
     return 0;
 
-  ready = 0;
   USART_SendData(USART2, c);
   USART_ITConfig (USART2, USART_IT_TXE, ENABLE);
   return 1;
