@@ -82,7 +82,9 @@ void POSCALL nos_initConIO(void);
 static void POSCALL n_printf(const char *fmt, NOSARG_t *args);
 #else
 static void POSCALL n_printf(const char *fmt, va_list args);
+#if NOSCFG_FEATURE_CONOUT != 0
 static void POSCALL n_printfN(const char *fmt, ...);
+#endif
 #endif
 #endif
 #if NOSCFG_FEATURE_SPRINTF != 0
@@ -345,7 +347,8 @@ void POSCALL nosPrint(const char *str)
 
 #if FEAT_XPRINTF != 0
 
-#if NOSCFG_FEATURE_USE_STDARG != 0
+#if NOSCFG_FEATURE_USE_STDARG != 0 && NOSCFG_FEATURE_CONOUT != 0
+
 void POSCALL n_printfN(const char *fmt, ...)
 {
   va_list args;
