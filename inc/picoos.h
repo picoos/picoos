@@ -250,7 +250,7 @@
 
 
 #define POS_VER_N           0x0104
-#define POS_VER_S           "1.0.4"
+#define POS_VER_S           "1.0.4a"
 #define POS_COPYRIGHT       "(c) 2004-2012, D.Kuschel"
 #define POS_STARTUPSTRING   "pico]OS " POS_VER_S "  " POS_COPYRIGHT
 
