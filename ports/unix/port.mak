@@ -104,7 +104,7 @@ else
 endif
 
 # Define Compiler Flags
-CFLAGS_COMMON += -Wcast-align -Wall -Wextra -Wshadow -Wpointer-arith -Waggregate-return
+CFLAGS_COMMON += -Wcast-align -Wall -Wextra -Wshadow -Wpointer-arith -Waggregate-return -ffunction-sections
 CFLAGS_COMMON += -Wno-unused-parameter -Wno-unused-label
 
 CFLAGS += -Wmissing-declarations -Wbad-function-cast -Wno-strict-prototypes -Wmissing-prototypes
@@ -122,7 +122,7 @@ ASFLAGS += -x assembler-with-cpp -o
 #  -Wl   : pass arguments to the linker
 #  -Map  : create a map file
 #  --cref: add cross reference to the map file
-LDFLAGS += -o 
+LDFLAGS += -Wl,--gc-sections -o 
 
 # Define archiver flags
 ARFLAGS = cr 
