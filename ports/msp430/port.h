@@ -460,6 +460,7 @@ void portIdleTaskHook(void);
 #define HOOK_IDLETASK   portIdleTaskHook();
 
 void portInitClock(void);
+void portInitTimer(void);
 void portInitConsole(void);
 void portInitUSCIirq(void);
 void portConSpeed(uint32_t brClock, uint32_t baudRate, uint16_t* brDiv, uint16_t* brMod);
