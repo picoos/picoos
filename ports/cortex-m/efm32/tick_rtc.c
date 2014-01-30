@@ -31,7 +31,7 @@
 #include <picoos.h>
 #include <string.h>
 
-#if PORTCFG_CLOCK_RTC == 1
+#if PORTCFG_TICK_RTC == 1
 
 #include "em_device.h"
 #include "em_chip.h"

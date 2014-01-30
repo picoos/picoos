@@ -31,7 +31,7 @@
 #include <picoos.h>
 #include <string.h>
 
-#if PORTCFG_CLOCK_SYSTICK == 1
+#if !defined(PORTCFG_TICK_SYSTICK) || PORTCFG_TICK_SYSTICK == 1
 
 /*
  * Initialize Systick timer.
