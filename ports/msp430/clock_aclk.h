@@ -28,52 +28,26 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define NANOINTERNAL
-#include <picoos.h>
-#include <msp430.h>
-#include <in430.h>
-#include <string.h>
-#include <clock_aclk.h>
+#if defined(PORTCFG_XT1_HZ) && PORTCFG_XT1_HZ > 0
 
-#if !defined(PORTCFG_TICK_TIMER_A0) || PORTCFG_TICK_TIMER_A0 == 1
-
-void timerIrqHandler(void);
-
-/*
- * Initialize timer.
- */
-
-void portInitTimer(void)
-{
-#if defined(__MSP430_HAS_TA3__) || defined(__MSP430_HAS_T0A5__) || defined(__MSP430_HAS_TA2__)
-
-  TA0CTL = 0;                         // Stop timer.
-  TA0CTL = TASSEL_1;                  // Use ACLK.
-  TA0CTL |= TACLR;                    // Clear everything.
-
-  TA0CCR0 = (PORT_ACLK_HZ / HZ) - 1;
-
-  TA0CCTL0 = CCIE;                    // Interrupts ON.
-  TA0CTL |= TACLR;                    // Startup clear.
-  TA0CTL |= MC_1;                     // Up mode.
+#define PORT_ACLK_HZ PORTCFG_XT1_HZ     // Using crystal XT1
 
 #else
-#warning No TA0 timer, one required for ticks.
-#endif
 
-}
+#if defined(__msp430x22x4) || defined(__msp430x22x2) || defined(__MSP430G2553__) || defined(__MSP430G2533__)
 
-#ifdef TIMER0_A0_VECTOR
-void PORT_NAKED __attribute__((interrupt(TIMER0_A0_VECTOR))) timerIrqHandler()
+#define PORT_ACLK_HZ 12000      // VLO on msp430x2xx is 12 Khz
+
+#elif defined(__cc430x513x)
+
+#define PORT_ACLK_HZ 10000      // VLO on msp430x5xx is 10 Khz
+
 #else
-void PORT_NAKED __attribute__((interrupt(TIMERA0_VECTOR))) timerIrqHandler()
-#endif
-{
-  portSaveContext();
-  c_pos_intEnter();
-  c_pos_timerInterrupt();
-  c_pos_intExit();
-  portRestoreContext();
-}
+
+#warning VLO frequency unknown, assuming 12 Khz
+
+#define PORT_ACLK_HZ 12000
 
 #endif
+#endif
+
