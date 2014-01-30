@@ -33,7 +33,7 @@
 #include <msp430.h>
 #include <in430.h>
 #include <string.h>
-#include <clock_aclk.h>
+#include "port_aclk.h"
 
 #if !defined(PORTCFG_TICK_TIMER_A0) || PORTCFG_TICK_TIMER_A0 == 1
 

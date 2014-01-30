@@ -33,6 +33,7 @@
 #include <msp430.h>
 #include <in430.h>
 #include <string.h>
+#include "port_aclk.h"
 
 #if PORTCFG_TICK_WDT == 1
 
