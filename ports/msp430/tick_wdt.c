@@ -39,6 +39,8 @@
 
 void timerIrqHandler(void);
 
+
+#if 0
 #ifdef HZ != 512
 #error HZ must be 512 for WDT timer
 #endif
@@ -46,14 +48,25 @@ void timerIrqHandler(void);
 #if !defined(PORTCFG_XT1_HZ) || PORTCFG_XT1_HZ == 0
 #error need crystal for now
 #endif
-
+#endif
 /*
  * Initialize timer.
  */
 
 void portInitTimer(void)
 {
-  WDTCTL = WDTPW + WDTTMSEL + WDTCNTCL + WDTSSEL + WDTIS1 + WDTIS0;
+#if HZ == (PORT_ACLK_HZ / 32768)
+  WDTCTL = WDT_ADLY_1000;
+#elif HZ == (PORT_ACLK_HZ / 8192)
+  WDTCTL = WDT_ADLY_250;
+#elif HZ == (PORT_ACLK_HZ / 512)
+  WDTCTL = WDT_ADLY_16;
+#elif HZ == (PORT_ACLK_HZ / 64)
+  WDTCTL = WDT_ADLY_1_9;
+#else
+#error HZ must be ACLK frequency divided by 32768, 8192, 512 or 64.
+#endif
+
   IE1 |= WDTIE;
 }
 
