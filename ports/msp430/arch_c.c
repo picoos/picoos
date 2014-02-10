@@ -126,16 +126,17 @@ static inline void constructStackFrame(POSTASK_t task, void* stackPtr, POSTASKFU
    */
 
   *(stk) = (unsigned int) posTaskExit; /* bottom               */
-  *(--stk) = (unsigned int) funcptr;  /* Entry Point          */
-  *(--stk) = (unsigned int) GIE;      /* Status reg           */
-
-  for (r = 4; r <= 14; r++)
-    *(--stk) = (unsigned int) r;      /* r4-r15               */
+  *(--stk) = (unsigned int) funcptr;   /* Entry Point          */
+  *(--stk) = (unsigned int) GIE;       /* Status reg           */
 
   /*
    * R15 is argument to function.
    */
   *(--stk) = (unsigned int) funcarg;
+
+  for (r = 14; r >= 4; r--)
+    *(--stk) = (unsigned int) r;       /* r14-r4               */
+
 
   task->stackptr = (struct PortMspStack *) stk;
 }
@@ -287,19 +288,24 @@ void PORT_NAKED portRestoreContextImpl(void)
     asm volatile("mov %0, r1" : : "m"(posCurrentTask_g->stackptr) : "r1");
   }
 
-  asm volatile("pop   r15 \n"
-      "         pop   r14 \n"
-      "         pop   r13 \n"
-      "         pop   r12 \n"
-      "         pop   r11 \n"
-      "         pop   r10 \n"
-      "         pop   r9  \n"
-      "         pop   r8  \n"
-      "         pop   r7  \n"
-      "         pop   r6  \n"
+#ifdef __MSP430X__
+  asm volatile("popm.w #12, r15");
+#else
+  asm volatile("pop   r4  \n"
       "         pop   r5  \n"
-      "         pop   r4  \n"
-      "         reti");
+      "         pop   r6  \n"
+      "         pop   r7  \n"
+      "         pop   r8  \n"
+      "         pop   r9  \n"
+      "         pop   r10 \n"
+      "         pop   r11 \n"
+      "         pop   r12 \n"
+      "         pop   r13 \n"
+      "         pop   r14 \n"
+      "         pop   r15");
+#endif
+
+  asm volatile("reti");
 }
 
 void portIdleTaskHook()

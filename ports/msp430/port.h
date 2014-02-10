@@ -415,19 +415,27 @@ extern void p_pos_assert(const char* text, const char *file, int line);
 /**
  * Macro to save context of current stack.
  */
-#define portSaveContext() { \
-  asm volatile("push  r4  \n\t"         \
-               "push  r5  \n\t"         \
-               "push  r6  \n\t"         \
-               "push  r7  \n\t"         \
-               "push  r8  \n\t"         \
-               "push  r9  \n\t"         \
-               "push  r10 \n\t"         \
-               "push  r11 \n\t"         \
-               "push  r12 \n\t"         \
-               "push  r13 \n\t"         \
+#ifdef __MSP430X__
+#define portPushRegs() \
+  asm volatile("pushm #12, r15")
+#else
+#define portPushRegs() \
+  asm volatile("push  r15 \n\t"         \
                "push  r14 \n\t"         \
-               "push  r15");            \
+               "push  r13 \n\t"         \
+               "push  r12 \n\t"         \
+               "push  r11 \n\t"         \
+               "push  r10 \n\t"         \
+               "push  r9  \n\t"         \
+               "push  r8  \n\t"         \
+               "push  r7  \n\t"         \
+               "push  r6  \n\t"         \
+               "push  r5  \n\t"         \
+               "push  r4")
+#endif
+
+#define portSaveContext() { \
+  portPushRegs();                       \
   if (posInInterrupt_g == 0) {                   \
                                                  \
     asm volatile("mov r1, %[ts]\n\t"             \
