@@ -424,7 +424,20 @@ void PORT_NAKED portRestoreContextImpl(void)
    * If not restored, stack would grow and grow as control
    * doesn't via same path as we got here.
    */
-#if __CORTEX_M >= 3
+#if __CORTEX_M >= 4
+
+  asm volatile("mov sp, %[initMsp]     \n"  // Return MSP to initial value
+      "         ldr r0, %[newPsp]      \n"  // Get PSP for next task
+      "         ldmia r0!, {r3-r11,r14}\n"  // Restore registers not handled by HW
+      "         tst r14, #0x10         \n"  // Check for need to restore FP registers
+      "         it eq                  \n"
+      "         vldmiaeq r0!, {s16-s31}\n"
+      "         msr psp, r0            \n"  // Set PSP
+      "         msr basepri, r3        \n"  // Adjust BASEPRI back to task's setting
+      "         bx lr"
+      : : [newPsp]"m"(posCurrentTask_g->stackptr), [initMsp]"r"(__stack));
+
+#elif __CORTEX_M == 3
 
   asm volatile("mov sp, %[initMsp]     \n"  // Return MSP to initial value
       "         ldr r0, %[newPsp]      \n"  // Get PSP for next task

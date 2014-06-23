@@ -116,6 +116,10 @@ CFLAGS_COMMON += -fno-common -mcpu=cortex-$(CORTEX) -ffunction-sections
 CFLAGS_COMMON += -Wcast-align -Wall -Wextra -Wshadow -Wpointer-arith -Waggregate-return
 CFLAGS_COMMON += -Wmissing-prototypes -Wno-unused-parameter -Wno-unused-label -Wno-unused-but-set-variable
 
+ifeq '$(strip $(CORTEX))' 'm4'
+CFLAGS_COMMON += -mfpu=fpv4-sp-d16 -mfloat-abi=hard
+endif
+
 CFLAGS += -Wbad-function-cast -Wno-strict-prototypes -Wmissing-prototypes
 CFLAGS += $(CFLAGS_COMMON) $(EXTRA_CFLAGS)
 CFLAGS += -c -o
