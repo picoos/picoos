@@ -47,6 +47,7 @@
 
 #include "pos_cmsis.h"
 #include <stdint.h>
+#include <stdbool.h>
 
 /*---------------------------------------------------------------------------
  *  ARCHITECTURE / CPU SPECIFIC SETTINGS
