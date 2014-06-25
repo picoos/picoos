@@ -54,16 +54,15 @@ void portInitConsole(void)
   //
   // Configure speed & parity.
   //
-  UARTConfigSetExpClk(UART0_BASE, SysCtlClockGet(), PORTCFG_CONSOLE_SPEED,
-                          (UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE |
-                           UART_CONFIG_PAR_NONE));
+  UARTConfigSetExpClk(PORTCFG_CON_USART, SysCtlClockGet(), PORTCFG_CONSOLE_SPEED,
+                      (UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE | UART_CONFIG_PAR_NONE));
 
   // Console shouldn't be realtime-critical,
   // use low interrupt priority for it.
   NVIC_ClearPendingIRQ(UART0_IRQn);
   NVIC_SetPriority(UART0_IRQn, PORT_PENDSV_PRI - 1);
   NVIC_EnableIRQ(UART0_IRQn);
-  UARTIntEnable(UART0_BASE, UART_INT_RX | UART_INT_RT | UART_INT_TX);
+  UARTIntEnable(PORTCFG_CON_USART, UART_INT_RX | UART_INT_RT | UART_INT_TX);
 
 }
 
@@ -77,8 +76,8 @@ void UART0_Handler()
 
   uint32_t status;
 
-  status = UARTIntStatus(UART0_BASE, true);
-  UARTIntClear(UART0_BASE, status);
+  status = UARTIntStatus(PORTCFG_CON_USART, true);
+  UARTIntClear(PORTCFG_CON_USART, status);
 
   if (status & UART_INT_TX)
     c_nos_putcharReady();
@@ -87,9 +86,9 @@ void UART0_Handler()
 
     unsigned char ch;
 
-    while (UARTCharsAvail(UART0_BASE)) {
+    while (UARTCharsAvail(PORTCFG_CON_USART)) {
 
-      ch = UARTCharGetNonBlocking(UART0_BASE);
+      ch = UARTCharGetNonBlocking(PORTCFG_CON_USART);
 #if NOSCFG_FEATURE_CONIN == 1
       c_nos_keyinput(ch);
 #endif
@@ -108,7 +107,7 @@ void UART0_Handler()
 UVAR_t
 p_putchar(char c)
 {
-  return UARTCharPutNonBlocking(UART0_BASE, c);
+  return UARTCharPutNonBlocking(PORTCFG_CON_USART, c);
 }
 #endif
 
