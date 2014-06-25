@@ -83,11 +83,14 @@ void Uart_Handler()
 
     unsigned char ch;
 
-    ch = Chip_UART_ReadByte(LPC_USART);
+    while (Chip_UART_ReadLineStatus(LPC_USART) & UART_LSR_RDR) {
 
-#if NOSCFG_FEATURE_CONIN == 1
-    c_nos_keyinput(ch);
-#endif
+      ch = Chip_UART_ReadByte(LPC_USART);
+
+  #if NOSCFG_FEATURE_CONIN == 1
+      c_nos_keyinput(ch);
+  #endif
+    }
   }
 
   c_pos_intExitQuick();
