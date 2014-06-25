@@ -53,6 +53,8 @@ void portInitConsole(void)
 
 #endif
 
+  Chip_UART_IntEnable(LPC_USART, UART_IER_THREINT);
+
   // Console shouldn't be realtime-critical,
   // use low interrupt priority for it.
   NVIC_SetPriority(UART0_IRQn, PORT_PENDSV_PRI - 1);
@@ -66,22 +68,27 @@ void portInitConsole(void)
 void Uart_Handler()
 {
   c_pos_intEnter();
+  uint32_t status;
+
+  status = Chip_UART_ReadIntIDReg(LPC_USART);
 
 #if NOSCFG_FEATURE_CONOUT == 1
-  if (LPC_USART->IER & UART_IER_THREINT) {
+  if (status & UART_IIR_INTID_THRE) {
 
-    Chip_UART_IntDisable(LPC_USART, UART_IER_THREINT);
     c_nos_putcharReady();
   }
 #endif
 
+  if (status & (UART_IIR_INTID_RDA | UART_IIR_INTID_CTI)) {
+
+    unsigned char ch;
+
+    ch = Chip_UART_ReadByte(LPC_USART);
+
 #if NOSCFG_FEATURE_CONIN == 1
-
-  unsigned char ch;
-  ch = Chip_UART_ReadByte(LPC_USART);
-  c_nos_keyinput(ch);
-
+    c_nos_keyinput(ch);
 #endif
+  }
 
   c_pos_intExitQuick();
 }
@@ -98,7 +105,6 @@ p_putchar(char c)
     return 0;
 
   Chip_UART_SendByte(LPC_USART, c);
-  Chip_UART_IntEnable(LPC_USART, UART_IER_THREINT);
   return 1;
 }
 #endif
