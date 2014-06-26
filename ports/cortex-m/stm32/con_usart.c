@@ -106,7 +106,7 @@ void USART2_IRQHandler()
 UVAR_t
 p_putchar(char c)
 {
-  if (USART2->CR1 & USART_FLAG_TXE) // If interrupt is enabled previous char is not yet transmitted
+  if (USART_GetFlagStatus(USART2, USART_FLAG_TXE) == RESET)
     return 0;
 
   USART_SendData(USART2, c);
