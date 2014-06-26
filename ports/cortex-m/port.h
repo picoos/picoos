@@ -465,8 +465,11 @@ extern void p_pos_assert(const char* text, const char *file, int line);
 
 #define portSaveContext() { \
     register unsigned int pspReg asm("r0");             \
-    asm volatile("mrs %0, psp           \n\t"           \
-                 "mrs r3, basepri       \n\t"           \
+    asm volatile("mrs %0, psp             \n\t"         \
+                 "tst r14, #0x10          \n\t"         \
+                 "it  eq                  \n\t"         \
+                 "vstmdbeq %0!, {s16-s31} \n\t"         \
+                 "mrs r3, basepri         \n\t"         \
                  "stmdb %0!, {r3-r11,r14}   "           \
                   : "=r"(pspReg) :: "r3");              \
     asm volatile("str %1, %0"                           \
@@ -480,9 +483,6 @@ extern void p_pos_assert(const char* text, const char *file, int line);
 #define portSaveContext() { \
     register unsigned int pspReg asm("r0");               \
     asm volatile("mrs %0, psp             \n\t"           \
-                 "tst r14, #0x10          \n\t"           \
-                 "it  eq                  \n\t"           \
-                 "vstmdbeq %0!, {s16-s31} \n\t"           \
                  "mrs r3, basepri         \n\t"           \
                  "stmdb %0!, {r3-r11,r14}   "             \
                   : "=r"(pspReg) :: "r3");                \
