@@ -79,6 +79,7 @@ void Uart_Handler()
   }
 #endif
 
+#if NOSCFG_FEATURE_CONIN == 1
   if (status & (UART_IIR_INTID_RDA | UART_IIR_INTID_CTI)) {
 
     unsigned char ch;
@@ -87,11 +88,10 @@ void Uart_Handler()
 
       ch = Chip_UART_ReadByte(LPC_USART);
 
-  #if NOSCFG_FEATURE_CONIN == 1
       c_nos_keyinput(ch);
-  #endif
     }
   }
+#endif
 
   c_pos_intExitQuick();
 }

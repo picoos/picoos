@@ -62,8 +62,11 @@ void portInitConsole(void)
   NVIC_ClearPendingIRQ(UART0_IRQn);
   NVIC_SetPriority(UART0_IRQn, PORT_PENDSV_PRI - 1);
   NVIC_EnableIRQ(UART0_IRQn);
-  UARTIntEnable(PORTCFG_CON_USART, UART_INT_RX | UART_INT_RT | UART_INT_TX);
+  UARTIntEnable(PORTCFG_CON_USART, UART_INT_TX);
 
+#if NOSCFG_FEATURE_CONIN == 1
+  UARTIntEnable(PORTCFG_CON_USART, UART_INT_RX | UART_INT_RT);
+#endif
 }
 
 /*
@@ -82,6 +85,7 @@ void UART0_Handler()
   if (status & UART_INT_TX)
     c_nos_putcharReady();
 
+#if NOSCFG_FEATURE_CONIN == 1
   if (status & (UART_INT_RX | UART_INT_RT)) {
 
     unsigned char ch;
@@ -89,11 +93,10 @@ void UART0_Handler()
     while (UARTCharsAvail(PORTCFG_CON_USART)) {
 
       ch = UARTCharGetNonBlocking(PORTCFG_CON_USART);
-#if NOSCFG_FEATURE_CONIN == 1
       c_nos_keyinput(ch);
-#endif
     }
   }
+#endif
 
 
   c_pos_intExitQuick();

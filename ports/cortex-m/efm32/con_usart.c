@@ -61,7 +61,6 @@ void portInitConsole(void)
   USART_InitAsync(USART1, &uartInit);
 
   USART_IntClear(USART1, _USART_IF_MASK);
-  USART_IntEnable(USART1, USART_IF_RXDATAV);
 
   NVIC_ClearPendingIRQ(USART1_TX_IRQn);
 
@@ -71,6 +70,8 @@ void portInitConsole(void)
   NVIC_EnableIRQ(USART1_TX_IRQn);
 
 #if NOSCFG_FEATURE_CONIN == 1
+
+  USART_IntEnable(USART1, USART_IF_RXDATAV);
 
   NVIC_ClearPendingIRQ(USART1_RX_IRQn);
   NVIC_SetPriority(USART1_RX_IRQn, PORT_PENDSV_PRI - 1);
