@@ -89,7 +89,11 @@
  * would usually define this to @e long, for a 8 bit
  * architecture @e short would be sufficient.
  */
+#if __amd64
+#define MPTR_t                long
+#else
 #define MPTR_t                int
+#endif
 
 /** Required memory alignment on the target CPU.
  * To reach maximum speed, some architecures need correctly
