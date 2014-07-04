@@ -402,9 +402,6 @@ void POSCALL n_printf(const char *fmt, va_list args)
     nbr = (UINT_t) args[a];
     s   = (char*)  args[a];
     a++;
-#else
-    nbr = va_arg(args, UINT_t);
-    s   = (char*)nbr;
 #endif
 
     /* get width. width can be '1'-'9', '01'-'09', or '*' */
@@ -451,6 +448,13 @@ void POSCALL n_printf(const char *fmt, va_list args)
     {
       c = *f++;
     }
+
+#if NOSCFG_FEATURE_USE_STDARG == 1
+    if (c == 's')
+      s = va_arg(args, char*);
+    else
+      nbr = va_arg(args, UINT_t);
+#endif
 
     /* Get format specifier.
        All not checked specifiers are ignored. */
