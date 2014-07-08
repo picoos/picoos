@@ -450,10 +450,16 @@ void POSCALL n_printf(const char *fmt, va_list args)
     }
 
 #if NOSCFG_FEATURE_USE_STDARG == 1
-    if (c == 's')
+    if (c == 's') {
+
       s = va_arg(args, char*);
-    else
+      nbr = 0;
+    }
+    else {
+
+      s = NULL;
       nbr = va_arg(args, UINT_t);
+    }
 #endif
 
     /* Get format specifier.
