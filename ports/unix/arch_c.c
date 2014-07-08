@@ -40,6 +40,14 @@
 static void timerExpiredContext(void);
 static void timerExpired(int sig, siginfo_t *info, void *uap);
 
+#if PORTCFG_IRQ_STACK_SIZE >= PORTCFG_MIN_STACK_SIZE
+static char sigStack[PORTCFG_IRQ_STACK_SIZE];
+#else
+static char sigStack[PORTCFG_MIN_STACK_SIZE];
+#endif
+
+ucontext_t sigContext;
+
 /*
  * Initialize task context.
  */
@@ -69,12 +77,19 @@ VAR_t p_pos_initTask(POSTASK_t task,
   task->uexit.uc_stack.ss_flags = 0;
 
   makecontext(&task->uexit, (void(*)(void)) posTaskExit, 0);
+
+  task->stack = malloc(stk);
+
   task->ucontext.uc_link           = &task->uexit;
-  task->ucontext.uc_stack.ss_sp    = malloc(stk);
+  task->ucontext.uc_stack.ss_sp    = (char*)task->stack;
   task->ucontext.uc_stack.ss_size  = stk;
   task->ucontext.uc_stack.ss_flags = 0;
   sigemptyset(&task->ucontext.uc_sigmask);
   assert(task->ucontext.uc_stack.ss_sp != 0);
+
+#if POSCFG_ARGCHECK > 1
+  nosMemSet(task->stack, PORT_STACK_MAGIC, stk);
+#endif
 
   makecontext(&task->ucontext, (void(*)(void)) funcptr, 1, funcarg);
 
@@ -194,15 +209,6 @@ void p_pos_idleTaskHook()
   sigemptyset(&set);
   sigsuspend(&set);
 }
-
-#if PORTCFG_IRQ_STACK_SIZE >= PORTCFG_MIN_STACK_SIZE
-static char sigStack[PORTCFG_IRQ_STACK_SIZE];
-#else
-static char sigStack[PORTCFG_MIN_STACK_SIZE];
-#endif
-
-
-ucontext_t sigContext;
 
 static void timerExpiredContext()
 {

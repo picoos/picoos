@@ -371,6 +371,7 @@
 
 #define POS_USERTASKDATA \
    ucontext_t	ucontext; \
+   unsigned char    *stack; \
    ucontext_t	uexit;
 
 #elif (POSCFG_TASKSTACKTYPE == 2)
@@ -394,6 +395,12 @@
 #ifndef NULL
 #define NULL ((void*)0)
 #endif
+
+/**
+ * To detect stack overflows, fill stack area with
+ * PORT_STACK_MAGIC during initialization.
+ */
+#define PORT_STACK_MAGIC       0x56
 
 void p_pos_blockSigs(sigset_t* old);
 void p_pos_unblockSigs(sigset_t* old);
