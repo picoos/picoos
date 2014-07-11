@@ -105,6 +105,8 @@
 /* 
  * Restore task context from stack of current task.
  */
+.type portRestoreContextImpl,%function
+.func portRestoreContextImpl
 portRestoreContextImpl:
 
   ldr     r0, =posCurrentTask_g   @ Get POSTASK pointer
@@ -125,6 +127,7 @@ portRestoreContextImpl:
 
   add     sp, sp, #14*4
   ldmfd   sp, {pc}^               @ 1) return address, jump and switch mode
+.endfunc
 
 /*
  * Setup SVC stack pointer and jump to Reset_Handler.
