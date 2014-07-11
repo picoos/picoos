@@ -200,18 +200,24 @@ IRQ_Wrapper:
 /*
  * Block all interrupts.
  */
+.type portEnterCritical,%function
+.func portEnterCritical
 portEnterCritical:
         mrs     r0, CPSR
         orr     r1, r0, #INTR_MASK
         msr     CPSR_c, r1
         bx  lr
+.endfunc
 
 /*
  * Restore interrupts.
  */
+.type portExitCritical,%function
+.func portExitCritical
 portExitCritical:
         msr     CPSR_c, r0
         bx  lr
+.endfunc
 
 /*
  * Exception / interrupt table.
