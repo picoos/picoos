@@ -104,7 +104,7 @@ void PORT_NAKED __attribute__((interrupt(USCIAB0RX_VECTOR))) uartRxIrqHandler()
   portSaveContext();
   c_pos_intEnter();
 
-  char ch = UCA0RXBUF;
+  register char ch = UCA0RXBUF;
   c_nos_keyinput(ch);
 
   c_pos_intExit();
