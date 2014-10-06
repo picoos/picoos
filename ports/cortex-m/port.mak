@@ -136,6 +136,9 @@ ASFLAGS += -x assembler-with-cpp -o
 #  -Map  : create a map file
 #  --cref: add cross reference to the map file
 LDFLAGS += -L$(DIR_PORT)/boot  $(addprefix -T,$(LD_SCRIPTS)) -mcpu=cortex-$(CORTEX)
+ifeq '$(strip $(CORTEX))' 'm4'
+LDFLAGS += -mfpu=fpv4-sp-d16 -mfloat-abi=hard
+endif
 LDFLAGS += -nostartfiles -Wl,-Map,$(DIR_OUT)/$(TARGET).map,--cref,--gc-sections -o 
 
 # Define archiver flags
