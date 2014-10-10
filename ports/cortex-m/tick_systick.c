@@ -39,7 +39,7 @@
 
 void portInitClock(void)
 {
-  SysTick_Config((SystemCoreClock / HZ) - 1);
+  SysTick_Config(SystemCoreClock / HZ);
   NVIC_SetPriority(SysTick_IRQn, PORT_SYSTICK_PRI);
 }
 
