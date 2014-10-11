@@ -54,7 +54,7 @@ void portInitConsole(void)
   //
   // Configure speed & parity.
   //
-  UARTConfigSetExpClk(PORTCFG_CON_USART, SysCtlClockGet(), PORTCFG_CONSOLE_SPEED,
+  UARTConfigSetExpClk(PORTCFG_CON_USART, SystemCoreClock, PORTCFG_CONSOLE_SPEED,
                       (UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE | UART_CONFIG_PAR_NONE));
 
   // Console shouldn't be realtime-critical,
