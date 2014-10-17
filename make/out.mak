@@ -58,6 +58,13 @@ OBJ :=
 MOD_LIB = $(addsuffix $(EXT_LIB),$(addprefix $(DIR_LIB)/,$(foreach \
                MODNAME,$(MODULES),$(notdir $(MODNAME)))))
 
+# Initialize module include path list to immediate expansion.
+# Include all module.mak files from modules and
+# append resulting include path into existing one.
+DIR_MODINC :=
+$(foreach MOD,$(MODULES),$(eval -include $(MOD)/module.mak))
+DIR_USRINC += $(DIR_MODINC)
+
 # Set pico]OS library
 PICOOS_LIB = $(DIR_LIB)/picoos$(EXT_LIB)
 

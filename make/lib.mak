@@ -58,6 +58,13 @@ COMMONDEP += $(SRC_HDR)
 # Clear object file list
 OBJ :=
 
+# Initialize module include path list to immediate expansion.
+# Include all module.mak files from modules and
+# append resulting include path into existing one.
+DIR_MODINC :=
+$(foreach MOD,$(MODULES),$(eval -include $(MOD)/module.mak))
+DIR_USRINC += $(DIR_MODINC)
+
 # Export variables
 ifneq '$(strip $(DIR_OUTPUT))' ''
 export DIR_OUTPUT

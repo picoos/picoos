@@ -344,10 +344,19 @@ main makefile, the library makefile will be automatically executed when
 the project is built. All command line parameters that are set to execute
 the main makefile will also be passed to the library makefiles.@n@n
 
+Library module can also contain file named module.mak to declare
+include paths for programs that use the module. This way program
+doesn't need to adjust DIR_USRINC for module as the correct
+settings are provided automatically by module itself.
 
-
-
-
+@code
+01 # ---------------------------------------------------------------------------
+02 # Declare include paths necessary for module use.
+03 # ---------------------------------------------------------------------------
+04
+05 DIR_MODINC += $(MOD)/include
+07
+@endcode
 
 @n               <h3> Format Of File port.mak </h3>
 
