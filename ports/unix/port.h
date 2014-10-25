@@ -372,6 +372,7 @@
 #define POS_USERTASKDATA \
    ucontext_t	ucontext; \
    unsigned char    *stack; \
+   UINT_t           stackSize; \
    ucontext_t	uexit;
 
 #elif (POSCFG_TASKSTACKTYPE == 2)

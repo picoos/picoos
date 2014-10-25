@@ -191,7 +191,9 @@ VAR_t p_pos_initTask(POSTASK_t task, UINT_t stacksize, POSTASKFUNC_t funcptr, vo
 
   task->stack = NOS_MEM_ALLOC(stacksize);
   if (task->stack == NULL)
-  return -1;
+    return -1;
+
+  task->stackSize = stacksize;
 
 #if POSCFG_ARGCHECK > 1
   nosMemSet(task->stack, PORT_STACK_MAGIC, stacksize);

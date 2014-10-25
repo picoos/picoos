@@ -368,7 +368,8 @@ void portExitCritical(unsigned int old_int);
 
 #define POS_USERTASKDATA \
     struct PortArmStack  *stackptr;          \
-    unsigned char    *stack;
+    unsigned char    *stack; \
+    UINT_t           stackSize;
 
 #elif (POSCFG_TASKSTACKTYPE == 2)
 

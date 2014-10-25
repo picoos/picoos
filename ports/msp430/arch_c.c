@@ -156,6 +156,8 @@ VAR_t p_pos_initTask(POSTASK_t task, UINT_t stacksize, POSTASKFUNC_t funcptr, vo
   if (task->stack == NULL)
     return -1;
 
+  task->stackSize = stacksize;
+
 #if POSCFG_ARGCHECK > 1
   memset(task->stack, PORT_STACK_MAGIC, stacksize);
 #endif

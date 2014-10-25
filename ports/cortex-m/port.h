@@ -386,8 +386,8 @@
 
 #define POS_USERTASKDATA \
     struct PortArmStack  *stackptr;          \
-    unsigned char    *stack;
-
+    unsigned char    *stack;                 \
+    UINT_t           stackSize;
 #elif (POSCFG_TASKSTACKTYPE == 2)
 
 #define POS_USERTASKDATA \

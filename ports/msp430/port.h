@@ -365,7 +365,8 @@
 
 #define POS_USERTASKDATA \
     struct PortMspStack  *stackptr;          \
-    unsigned char        *stack;
+    unsigned char        *stack; \
+    UINT_t               stackSize;
 
 #elif (POSCFG_TASKSTACKTYPE == 2)
 

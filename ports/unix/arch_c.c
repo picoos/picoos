@@ -79,6 +79,7 @@ VAR_t p_pos_initTask(POSTASK_t task,
   makecontext(&task->uexit, (void(*)(void)) posTaskExit, 0);
 
   task->stack = malloc(stk);
+  task->stackSize = stk;
 
   task->ucontext.uc_link           = &task->uexit;
   task->ucontext.uc_stack.ss_sp    = (char*)task->stack;
