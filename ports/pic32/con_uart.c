@@ -42,14 +42,18 @@ void portInitConsole(void)
 {
   U1BRG = ((PORTCFG_CRYSTAL_CLOCK) /(1 << OSCCONbits.PBDIV))/16/38400-1; // Set Baud rate
   U2STA = 0;
-  U2MODE = 1 << _U1MODE_UARTEN_POSITION;
-  U2STASET = (1 << _U2STA_UTXEN_POSITION) | 
-             (1 << _U2STA_URXEN_POSITION);
+  U2MODE = 0;
 
-  IFS1CLR = _IFS1_U2RXIF_MASK | _IFS1_U2TXIF_MASK;
-  IPC9CLR = _IPC9_U2IP_MASK | _IPC9_U2IS_MASK;
-  IPC9SET = 2 << _IPC9_U2IP_POSITION;
-  IEC1SET = (1 << _IEC1_U2RXIE_POSITION) | (1 << _IEC1_U2TXIE_POSITION);
+  U2MODEbits.UARTEN = 1;
+  U2STAbits.UTXEN = 1;
+  U2STAbits.URXEN = 1;
+
+  IFS1bits.U2RXIF = 0;
+  IFS1bits.U2TXIF = 0;
+  IPC9bits.U2IP = 2;
+  IPC9bits.U2IS = 0;
+  IEC1bits.U2RXIE = 1;
+  IEC1bits.U2TXIE = 1;
 }
 
 #if NOSCFG_FEATURE_CONOUT == 1
@@ -73,12 +77,12 @@ void  PORT_NAKED __attribute__((vector(_UART2_VECTOR))) Uart2Handler(void)
   portSaveContext();
   c_pos_intEnter();
 
-  if (IFS1 & _IFS1_U2RXIF_MASK) {
+  if (IFS1bits.U2RXIF) {
 
     IFS1CLR = _IFS1_U2RXIF_MASK;
   }
 
-  if (IFS1 & _IFS1_U2TXIF_MASK) {
+  if (IFS1bits.U2TXIF) {
 
     IFS1CLR = _IFS1_U2TXIF_MASK;
     c_nos_putcharReady();

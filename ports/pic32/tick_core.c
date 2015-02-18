@@ -41,10 +41,10 @@
 
 void portInitClock(void)
 {
-  IFS0CLR = _IFS0_CTIF_MASK; // Clear core timer interrupt flag
-  IPC0CLR = _IPC0_CTIP_MASK |  _IPC0_CTIS_MASK; // clear and set priority & subpri
-  IPC0SET = 2 << _IPC0_CTIP_POSITION;
-  IEC0SET = 1 << _IEC0_CTIE_POSITION; // enable interrupt
+  IFS0bits.CTIF = 0; // Clear core timer interrupt flag
+  IPC0bits.CTIP = 2; // timer at SPL 2
+  IPC0bits.CTIS = 0;
+  IEC0bits.CTIE = 1; // enable interrupt
 
   _CP0_SET_COUNT(0);
   _CP0_SET_COMPARE((PORTCFG_CRYSTAL_CLOCK / 2 / HZ));

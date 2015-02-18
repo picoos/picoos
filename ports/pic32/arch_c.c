@@ -240,15 +240,16 @@ void p_pos_initArch(void)
   // Enable multi-vector interrupt mode
 
   _CP0_BIS_CAUSE(1 << _CP0_CAUSE_IV_POSITION);
-  INTCONSET = _INTCON_MVEC_MASK;
+  INTCONbits.MVEC = 1;
 
   // Configure software interrupt 0 to lowest
   // IPL for delayed context switching.
 
-  IFS0CLR = _IFS0_CS0IF_MASK;
+  IFS0bits.CS0IF = 0;
   IPC0CLR = _IPC0_CS0IP_MASK | _IPC0_CS0IS_MASK;
-  IPC0SET = 1 << _IPC0_CS0IP_POSITION;
-  IEC0SET = 1 << _IEC0_CS0IE_POSITION;
+  IPC0bits.CS0IP = 1;
+  IPC0bits.CS0IS = 0;
+  IEC0bits.CS0IE = 1;
 
   portInitClock();
 
