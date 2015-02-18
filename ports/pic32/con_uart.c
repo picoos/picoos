@@ -40,7 +40,7 @@
 #if NOSCFG_FEATURE_CONOUT == 1 || NOSCFG_FEATURE_CONIN == 1
 void portInitConsole(void)
 {
-  U1BRG = ((PORTCFG_CRYSTAL_CLOCK) /(1 << OSCCONbits.PBDIV))/16/38400-1; // Set Baud rate
+  U2BRG = ((PORTCFG_CRYSTAL_CLOCK) /(1 << OSCCONbits.PBDIV))/16/38400-1; // Set Baud rate
   U2STA = 0;
   U2MODE = 0;
 
