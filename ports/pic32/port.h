@@ -251,7 +251,7 @@
  */
 
 #define POS_SCHED_LOCK          { flags = __builtin_get_isr_state(); \
-                                  __builtin_set_isr_state(flags & 1 | (PORT_MAX_IPL) << 1); }
+                                  __builtin_set_isr_state((flags & 8) | PORT_MAX_IPL); }
 #define POS_IRQ_DISABLE_ALL     { flags = __builtin_get_isr_state(); \
                                   __builtin_disable_interrupts(); }
 
