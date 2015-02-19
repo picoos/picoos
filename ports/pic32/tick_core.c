@@ -64,8 +64,13 @@ void  PORT_NAKED __attribute__((vector(_CORE_TIMER_VECTOR))) CoreTimerHandler(vo
   // for next cycle.
 
   IFS0CLR = _IFS0_CTIF_MASK;
-  _CP0_SET_COUNT(0);
-  _CP0_SET_COMPARE((PORTCFG_CRYSTAL_CLOCK / 2 / HZ));
+
+  register unsigned int newCompare;
+
+  newCompare = _CP0_GET_COMPARE();
+  newCompare += (PORTCFG_CRYSTAL_CLOCK / 2 / HZ);
+  _CP0_SET_COMPARE(newCompare);
+
   c_pos_timerInterrupt();
 
   c_pos_intExitQuick();
