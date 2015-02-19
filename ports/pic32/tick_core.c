@@ -42,7 +42,7 @@
 void portInitClock(void)
 {
   IFS0bits.CTIF = 0; // Clear core timer interrupt flag
-  IPC0bits.CTIP = 2; // timer at SPL 2
+  IPC0bits.CTIP = PORT_MAX_IPL; // timer at high irq pri to ensure clock does not drift
   IPC0bits.CTIS = 0;
   IEC0bits.CTIE = 1; // enable interrupt
 
