@@ -7,5 +7,7 @@ any hardware yet.
 
 Following features are supported:
 
-- MIPS core timer as tick source
+- Tick sources:
+  - MIPS core timer
+  - TIMER1
 - UART2 as console
