@@ -31,12 +31,10 @@
 #include <picoos.h>
 #include <string.h>
 
-#if !defined(PORTCFG_TICK_CORE_TIMER) || PORTCFG_TICK_CORE_TIMER == 1
+#if PORTCFG_TICK_CORE_TIMER == 1
 
 /*
- * Simple timer source based on MIPS core timer. This is
- * not a perfect RTOS tick source, as it will always
- * drift a little (because the way it is implemented in MIPS CPU).
+ * Simple timer source based on MIPS core timer.
  */
 
 void portInitClock(void)
