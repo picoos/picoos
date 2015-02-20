@@ -403,8 +403,9 @@ void PORT_NAKED portRestoreContextImpl(void)
 void portIdleTaskHook()
 {
   /*
-   * Put CPU to sleep. 
+   * Put CPU to idle or sleep.
    */
+  asm volatile ("wait");
 }
 
 void PORT_NAKED _general_exception_context()
