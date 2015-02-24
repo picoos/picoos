@@ -52,8 +52,9 @@ void portInitConsole(void)
   IFS1bits.U2TXIF = 0;
   IPC9bits.U2IP = 2;
   IPC9bits.U2IS = 0;
+#if NOSCFG_FEATURE_CONIN == 1
   IEC1bits.U2RXIE = 1;
-  IEC1bits.U2TXIE = 1;
+#endif
 }
 
 #if NOSCFG_FEATURE_CONOUT == 1
@@ -64,8 +65,11 @@ void portInitConsole(void)
 UVAR_t
 p_putchar(char c)
 {
-  if (U2STA & _U1STA_UTXBF_MASK)
+  if (U2STA & _U1STA_UTXBF_MASK) {
+
+    IEC1SET = _IEC1_U2TXIE_MASK;
     return 0;
+  }
 
   U2TXREG = c;
   return 1;
@@ -77,13 +81,16 @@ void  PORT_NAKED __attribute__((vector(_UART2_VECTOR))) Uart2Handler(void)
   portSaveContext();
   c_pos_intEnter();
 
+#if NOSCFG_FEATURE_CONIN == 1
   if (IFS1bits.U2RXIF) {
 
     IFS1CLR = _IFS1_U2RXIF_MASK;
   }
+#endif
 
   if (IFS1bits.U2TXIF) {
 
+    IEC1CLR = _IEC1_U2TXIE_MASK;
     IFS1CLR = _IFS1_U2TXIF_MASK;
     c_nos_putcharReady();
   }
