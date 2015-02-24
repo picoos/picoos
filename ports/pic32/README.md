@@ -2,8 +2,6 @@ pico]OS port form Microchip PIC32 CPUs
 --------------------------------------
 
 This is a port of pico]OS to Microchip PIC32 (mips architecture) chips.
-Tested currently only with MPLAB X Simulator, as I don't have
-any hardware yet.
 
 Following features are supported:
 
@@ -11,3 +9,6 @@ Following features are supported:
   - MIPS core timer
   - TIMER1
 - UART2 as console
+
+Port has been tested with breadboard setup
+using PIC32MX250F128B chip.
