@@ -37,7 +37,20 @@
  * Tick source based on PIC32 TIMER A.
  */
 
-#define PERIOD(scaler) ((PORTCFG_CRYSTAL_CLOCK / scaler) / HZ - 1)
+#define PERIOD(scaler) ((PORTCFG_CRYSTAL_CLOCK / scaler / 2) / HZ - 1)
+
+static bool setTimerPeriod(int preScaler, int tckps)
+{
+  int period;
+  
+  period = (PORTCFG_CRYSTAL_CLOCK / preScaler / (1 << OSCCONbits.PBDIV)) / HZ - 1;
+  if (period > 65535)
+    return false;
+
+  T1CONbits.TCKPS = tckps;
+  PR1 = period;
+  return true;
+}
 
 void portInitClock(void)
 {
@@ -49,30 +62,12 @@ void portInitClock(void)
     // Figure out suitable prescaler based on
     // timer input clock and HZ.
 
-#if PERIOD(1) <= 65535
+    if (!setTimerPeriod(1, 0))
+      if (!setTimerPeriod(8, 1))
+        if (!setTimerPeriod(64, 2))
+          if (!setTimerPeriod(256, 3))
+            return;
 
-    T1CONbits.TCKPS = 0;
-    PR1 = PERIOD(1);
-
-#elif PERIOD(8) <= 65535
-
-    T1CONbits.TCKPS = 1;
-    PR1 = PERIOD(8);
-
-#elif PERIOD(64) <= 65535
-
-    T1CONbits.TCKPS = 2;
-    PR1 = PERIOD(64);
-
-#elif PERIOD(256) <= 65535
-
-    T1CONbits.TCKPS = 3;
-    PR1 = PERIOD(256);
-
-#else
-#error "No suitable prescaler for timer for current HZ setting."
-#endif
-    
     T1CONbits.ON = 1;
 }
 
