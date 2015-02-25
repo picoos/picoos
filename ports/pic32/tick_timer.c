@@ -34,16 +34,19 @@
 #if PORTCFG_TICK_TIMER > 0
 
 /*
- * Tick source based on PIC32 TIMER A.
+ * Tick source based on PIC32 TIMER A. Uses SOSC as clock
+ * source if possible (to be able to keep runnning in sleep mode).
  */
-
-#define PERIOD(scaler) ((PORTCFG_CRYSTAL_CLOCK / scaler / 2) / HZ - 1)
 
 static bool setTimerPeriod(int preScaler, int tckps)
 {
   int period;
   
-  period = (PORTCFG_CRYSTAL_CLOCK / preScaler / (1 << OSCCONbits.PBDIV)) / HZ - 1;
+#if PORTCFG_SOSC_HZ > 0
+  period = (PORTCFG_SOSC_HZ) / HZ - 1;
+#else
+  period = ((PORTCFG_CRYSTAL_CLOCK / (1 << OSCCONbits.PBDIV)) / preScaler) / HZ - 1;
+#endif
   if (period > 65535)
     return false;
 
@@ -59,6 +62,10 @@ void portInitClock(void)
     IPC1bits.T1IS = 0;
     IEC0bits.T1IE = 1;
 
+#if PORTCFG_SOSC_HZ > 0
+    T1CONbits.TCS = 1;
+#endif
+    
     // Figure out suitable prescaler based on
     // timer input clock and HZ.
 
