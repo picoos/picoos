@@ -405,7 +405,8 @@ void portIdleTaskHook()
   /*
    * Put CPU to idle or sleep.
    */
-  asm volatile ("wait");
+  if (U2STAbits.TRMT)
+    asm volatile ("wait");
 }
 
 void PORT_NAKED _general_exception_context()
