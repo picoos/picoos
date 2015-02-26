@@ -84,7 +84,10 @@ void  PORT_NAKED __attribute__((vector(_UART2_VECTOR))) Uart2Handler(void)
 #if NOSCFG_FEATURE_CONIN == 1
   if (IFS1bits.U2RXIF) {
 
+    unsigned char ch;
+    ch = U2RXREG;
     IFS1CLR = _IFS1_U2RXIF_MASK;
+    c_nos_keyinput(ch);
   }
 #endif
 
