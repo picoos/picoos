@@ -398,6 +398,18 @@ void PORT_NAKED portRestoreContextImpl(void)
 }
 
 /*
+ * Check if we can sleep
+ */
+
+bool __attribute__((weak)) portCanSleep()
+{
+  if (U2STAbits.TRMT == 0)
+    return false;
+
+  return true;
+}
+
+/*
  * Nothing to do, put CPU to sleep.
  */
 void portIdleTaskHook()
@@ -405,8 +417,37 @@ void portIdleTaskHook()
   /*
    * Put CPU to idle or sleep.
    */
-  if (U2STAbits.TRMT)
-    asm volatile ("wait");
+
+  bool origSleep = OSCCONbits.SLPEN;
+
+  if (origSleep) {
+
+    // Temporarily disable sleep if so instructed
+    // (for example peripheral using PBCLK busy)
+
+    if (!portCanSleep()) {
+
+      SYSKEY = 0xAA996655;            // Write Key1 to SYSKEY
+      SYSKEY = 0x556699AA;            // Write Key2 to SYSKEY
+
+      OSCCONbits.SLPEN = 0;
+      SYSKEY = 0;                                   // Locks the pin Configurations
+    }
+  }
+
+  asm volatile ("wait");
+
+  // Restore sleep status
+  
+  if (origSleep != OSCCONbits.SLPEN) {
+
+      SYSKEY = 0xAA996655;            // Write Key1 to SYSKEY
+      SYSKEY = 0x556699AA;            // Write Key2 to SYSKEY
+
+      OSCCONbits.SLPEN = origSleep;
+      SYSKEY = 0;                                   // Locks the pin Configurations
+
+  }
 }
 
 void PORT_NAKED _general_exception_context()

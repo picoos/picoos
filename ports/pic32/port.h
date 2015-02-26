@@ -619,5 +619,6 @@ void portIdleTaskHook(void);
 
 void portInitClock(void);
 void portInitConsole(void);
+bool portCanSleep(void);
 
 #endif /* _PORT_H */
