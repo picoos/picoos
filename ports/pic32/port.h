@@ -250,18 +250,16 @@
  * the interrupts. See ::POSCFG_LOCK_FLAGSTYPE for more details.
  */
 
-#define POS_SCHED_LOCK          { flags = __builtin_get_isr_state(); \
-                                  __builtin_set_isr_state((flags & 8) | PORT_MAX_IPL); }
-#define POS_IRQ_DISABLE_ALL     { flags = __builtin_get_isr_state(); \
-                                  __builtin_disable_interrupts(); }
+#define POS_SCHED_LOCK          { flags = portSchedLock(); }
+#define POS_IRQ_DISABLE_ALL     { flags = portIRQDisableAll(); \
 
 /** Scheduler unlocking.
  * This is the counterpart macro of ::POS_SCHED_LOCK. It restores
  * the saved processor flags and reenables the interrupts this way.
  */
 
-#define POS_SCHED_UNLOCK        { __builtin_set_isr_state(flags); }
-#define POS_IRQ_ENABLE_ALL      { __builtin_set_isr_state(flags); }
+#define POS_SCHED_UNLOCK        { portSchedUnlock(flags); }
+#define POS_IRQ_ENABLE_ALL      { portIRQEnableAll(flags); }
 
 /** @} */
 
@@ -616,6 +614,11 @@ extern int portIntNesting_g;
 
 void portIdleTaskHook(void);
 #define HOOK_IDLETASK   portIdleTaskHook();
+
+uint32_t portSchedLock(void);
+void portSchedUnlock(uint32_t);
+uint32_t portIRQDisableAll(void);
+void portIRQEnableAll(uint32_t);
 
 void portInitClock(void);
 void portInitConsole(void);

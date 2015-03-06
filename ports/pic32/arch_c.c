@@ -450,6 +450,57 @@ void portIdleTaskHook()
   }
 }
 
+/*
+ * Lock scheduler interrupts by raising IPL.
+ */
+uint32_t portSchedLock()
+{
+  register uint32_t flags asm("v0");
+  register uint32_t newflags;
+
+  asm volatile("mfc0 %[oldstatus], $12" : [oldstatus]"=r"(flags));
+  newflags = (flags & ~_CP0_STATUS_IPL_MASK) | (PORT_MAX_IPL << _CP0_STATUS_IPL_POSITION);
+  asm volatile("mtc0 %[newstatus], $12\n\t"
+               "ehb" :: [newstatus]"r"(newflags));
+
+  return flags;
+}
+
+/*
+ * Unlock scheduler interrupts by restoring IPL level.
+ */
+void portSchedUnlock(uint32_t origFlags)
+{
+  register uint32_t flags;
+
+  asm volatile("mfc0 %[oldstatus], $12" : [oldstatus]"=r"(flags));
+  flags = (flags & ~_CP0_STATUS_IPL_MASK) | (origFlags & _CP0_STATUS_IPL_MASK);
+  asm volatile("mtc0 %[newstatus], $12\n\t"
+               "ehb" :: [newstatus]"r"(flags));
+}
+
+/*
+ * Disable all interrupts.
+ */
+uint32_t portIRQDisableAll()
+{
+  register uint32_t flags asm("v0");
+
+  asm volatile("di %[oldstatus] \n\t"
+               "ehb" : [oldstatus]"=r"(flags));
+  return flags;
+}
+
+/*
+ * Enable all interrupts, but only if they were enabled.
+ */
+void portIRQEnableAll(uint32_t restore)
+{
+  if (restore & _CP0_STATUS_IE_MASK)
+    asm volatile("ei \n\t"
+                 "ehb");
+}
+
 void PORT_NAKED _general_exception_context()
 {
   portSaveContext1();
