@@ -606,7 +606,7 @@ extern int portIntNesting_g;
 
 /*
  * __optimize("omit-frame-ponter") is needed to omit frame pointer in
- * naked functions. This looks like a bug in mspgcc currently.
+ * naked functions. This looks like a bug in gcc currently.
  */
 
 #define PORT_NAKED __attribute__((naked)) \
