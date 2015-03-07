@@ -251,7 +251,7 @@
  */
 
 #define POS_SCHED_LOCK          { flags = portSchedLock(); }
-#define POS_IRQ_DISABLE_ALL     { flags = portIRQDisableAll(); \
+#define POS_IRQ_DISABLE_ALL     { flags = portIRQDisableAll(); }
 
 /** Scheduler unlocking.
  * This is the counterpart macro of ::POS_SCHED_LOCK. It restores
