@@ -88,11 +88,11 @@ OPT_LD_FIRST = -Wl,--start-group
 OPT_LD_LAST  = -Wl,--end-group
 
 # Set global defines for compiler / assembler
-CDEFINES = GCC $(CMSIS_DEFINES)
+CDEFINES = GCC
 ADEFINES = GCC
 
 # Set global includes
-CINCLUDES = . $(CMSIS_INCLUDES)
+CINCLUDES = .
 AINCLUDES = .
 
 # Distinguish between build modes
@@ -144,3 +144,8 @@ LDFLAGS += -nostartfiles -Wl,-Map,$(DIR_OUT)/$(TARGET).map,--cref,--gc-sections 
 # Define archiver flags
 ARFLAGS = cr 
 
+ifneq '$(strip CMSIS_MODULES)' ''
+export CMSIS_MODULES
+endif
+
+MODULES += $(CMSIS_MODULES)
