@@ -88,8 +88,8 @@ OPT_LD_FIRST = -Wl,--start-group
 OPT_LD_LAST  = -Wl,--end-group
 
 # Set global defines for compiler / assembler
-CDEFINES = GCC
-ADEFINES = GCC
+CDEFINES += GCC
+ADEFINES += GCC
 
 # Set global includes
 CINCLUDES = .
