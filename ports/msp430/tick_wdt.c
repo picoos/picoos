@@ -39,16 +39,6 @@
 
 void timerIrqHandler(void);
 
-
-#if 0
-#ifdef HZ != 512
-#error HZ must be 512 for WDT timer
-#endif
-
-#if !defined(PORTCFG_XT1_HZ) || PORTCFG_XT1_HZ == 0
-#error need crystal for now
-#endif
-#endif
 /*
  * Initialize timer.
  */
