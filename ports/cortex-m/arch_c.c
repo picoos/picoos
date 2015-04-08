@@ -480,11 +480,13 @@ void portIdleTaskHook()
 #if __CORTEX_M < 3
   /*
    * CoreDebug is not visible in Cortex-m0.
+   * Just never sleep in debug versions.
    */
-#ifdef _DBG
+#ifndef _DBG
   SCB->SCR |= SCB_SCR_SLEEPONEXIT_Msk;
   __WFI();
 #endif
+
 #else
   if ((CoreDebug->DHCSR & CoreDebug_DHCSR_C_DEBUGEN_Msk) == 0) {
 
