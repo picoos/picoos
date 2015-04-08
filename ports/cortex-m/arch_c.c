@@ -477,6 +477,13 @@ void portIdleTaskHook()
    * Put CPU to sleep. Set SLEEPONEXIT to inhibit waking
    * back to idle task. SLEEPONEXIT is cleared if context is switched.
    */
+#if PORTCFG_SLEEP_IN_DEBUG == 1
+
+	SCB->SCR |= SCB_SCR_SLEEPONEXIT_Msk;
+    __WFI();
+
+#else
+
 #if __CORTEX_M < 3
   /*
    * CoreDebug is not visible in Cortex-m0.
@@ -491,6 +498,7 @@ void portIdleTaskHook()
     SCB->SCR |= SCB_SCR_SLEEPONEXIT_Msk;
     __WFI();
   }
+#endif
 #endif
 }
 
