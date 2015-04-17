@@ -23,7 +23,7 @@ Interrupt handlers must be declared as naked functions.
 Easiest way to do this is to use PORT_NAKED in function
 declaration (it ensures also that frame pointer is not
 allocated). Interrupt vector is set by normal
-mspgcc syntax using __attribute__((interrupt(X))).
+mspgcc syntax using \_\_attribute\_\_((interrupt(X))).
 
 Registers must be saved by calling portSaveContext at
 function entry and portRestoreContext before exit.
