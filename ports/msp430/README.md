@@ -16,3 +16,29 @@ Port includes:
   be clocked from DCO, which can be stablized with FLL (if available)
   
   
+Writing interrupt handlers
+--------------------------
+
+Interrupt handlers must be declared as naked functions.
+Easiest way to do this is to use PORT_NAKED in function
+declaration (it ensures also that frame pointer is not
+allocated). Interrupt vector is set by normal
+mspgcc syntax using __attribute((interrupt(X))).
+
+Registers must be saved by calling portSaveContext at
+function entry and portRestoreContext before exit.
+
+For example, UART handler could look like this:
+
+    void PORT_NAKED 
+    __attribute__((interrupt(USART1RX_VECTOR))) uartRxIrqHandler()
+    {
+      portSaveContext();
+      c_pos_intEnter();
+
+      // interrupt handler code here.
+
+      c_pos_intExitQuick();
+      portRestoreContext();
+    }
+
