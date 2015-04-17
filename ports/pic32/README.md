@@ -20,10 +20,9 @@ Interrupt handlers can be written as documented in
 XC32 compiler manual. However, if one wants to use
 separate interrupt handler stack same way as handlers
 in the port code do, function must be declared as naked function.
-
 Easiest way to do this is to use PORT_NAKED in function
 declaration. Interrupt vector is set by normal
-XC32 syntax using __attribute((vector(X))).
+XC32 syntax using __attribute__((vector(X))).
 
 Registers must be saved by calling portSaveContext at
 function entry and portRestoreContext before exit.
