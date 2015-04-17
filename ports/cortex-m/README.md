@@ -45,7 +45,9 @@ For example, UART handler could look like this:
     void UARTx_Handler()
     {
       c_pos_intEnter();
+
       // interrupt handler code here.
+
       c_pos_intExitQuick();
     }
 
