@@ -1,5 +1,5 @@
-pico]OS port form Microchip PIC32 CPUs
---------------------------------------
+pico]OS port for Microchip PIC32 CPUs
+-------------------------------------
 
 This is a port of pico]OS to Microchip PIC32 (mips architecture) chips.
 

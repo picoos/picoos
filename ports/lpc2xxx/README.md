@@ -1,4 +1,5 @@
-This is a port of pico]OS to NXP (formerly Philips) LPC2000 Arm cips.
+pico]OS port for NXP (formerly Philips) LPC2000 Arm chips.
+----------------------------------------------------------
 It has been tested with GCC 4.8 on following boards:
 
 - Olimex LPC-E2129 development board (see www.olimex.com)

@@ -1,5 +1,5 @@
-pico]OS port form Arm Cortex-M CPUs
------------------------------------
+pico]OS port for Arm Cortex-M CPUs
+----------------------------------
 
 This is a port of pico]OS to arm cortex-m3 and cortex-m0 chips.
 It has been tested with GCC 4.8 as compiler on following boards:

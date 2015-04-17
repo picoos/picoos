@@ -1,5 +1,5 @@
-pico]OS port form Texas Instrument MSP430 CPUs
-----------------------------------------------
+pico]OS port for Texas Instrument MSP430 CPUs
+---------------------------------------------
 
 This is a port of pico]OS to Texas Instruments MSP430 chips.
 It has been tested with MSPGCC (from sourceforge) as compiler on following boards:
