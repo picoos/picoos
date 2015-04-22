@@ -259,6 +259,35 @@ void p_pos_initArch(void)
 
 #endif
 }
+#if NOSCFG_FEATURE_CONOUT == 1
+
+/*
+ * Redirect XC32 library stdio output to nano layer console output.
+ */
+void _mon_puts(const char* s)
+{
+   nosPrint(s);
+}
+
+void _mon_putc(char c)
+{
+  nosPrintChar(c);
+}
+#endif
+
+#if NOSCFG_FEATURE_CONIN == 1
+
+/*
+ * Service XC32 library stdin from nano layer console input.
+ */
+int _mon_getc(int canblock)
+{
+   if (!canblock && !nosKeyPressed())
+      return -1;
+
+   return nosKeyGet();
+}
+#endif
 
 /*
  * Called by pico]OS to switch tasks when not serving interrupt.
