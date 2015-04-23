@@ -85,7 +85,7 @@ OPT_LD_SEP   =
 OPT_LD_PFOBJ =
 OPT_LD_PFLIB =
 OPT_LD_FIRST = -Wl,--start-group
-OPT_LD_LAST  = -Wl,--end-group
+OPT_LD_LAST  = -lc -Wl,--end-group
 
 # Set global defines for compiler / assembler
 CDEFINES += GCC
