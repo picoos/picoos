@@ -91,7 +91,7 @@ void EUSCIA0_Handler()
 
     {
       uint8_t ch;
-      ch = PORT->rRXBUF;
+      ch = PORT->rRXBUF.b.bRXBUF;
       c_nos_keyinput(ch);
     }
 
