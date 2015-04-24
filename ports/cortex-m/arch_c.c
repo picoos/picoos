@@ -32,6 +32,10 @@
 #include <picoos.h>
 #include <string.h>
 
+#if NOSCFG_MEM_MANAGER_TYPE == 0
+#include <stdlib.h>
+#endif
+
 #define SVC_START_FIRST_CONTEXT    0
 #define SVC_SOFT_CONTEXT_SWITCH    1
 
