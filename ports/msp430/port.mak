@@ -78,8 +78,10 @@ A2C2A  = 0
 # Define general options
 OPT_CC_INC   = -I
 OPT_CC_DEF   = -D
+OPT_CC_OFILE = -o
 OPT_AS_INC   = -I
 OPT_AS_DEF   = -D
+OPT_AS_OFILE = -o
 OPT_AR_ADD   =
 OPT_LD_SEP   =
 OPT_LD_PFOBJ =
@@ -116,13 +118,13 @@ CFLAGS_COMMON += -Wmissing-declarations -Wno-unused-parameter -Wno-unused-label 
 
 CFLAGS += -Wbad-function-cast -Wno-strict-prototypes -Wmissing-prototypes
 CFLAGS += $(CFLAGS_COMMON) $(EXTRA_CFLAGS)
-CFLAGS += -c -o
-CXXFLAGS += -fno-exceptions -fno-rtti $(CFLAGS_COMMON) $(EXTRA_CFLAGS) -c -o
+CFLAGS += -c 
+CXXFLAGS += -fno-exceptions -fno-rtti $(CFLAGS_COMMON) $(EXTRA_CFLAGS) -c
 
 # Define Assembler Flags
 # TODO: extract -mcpu as constant
 ASFLAGS += -c -mmcu=$(MCU) -Wa,-gstabs -Wa,-I${CURDIR}/ports/msp430
-ASFLAGS += -x assembler-with-cpp -o
+ASFLAGS += -x assembler-with-cpp
 
 
 # Define Linker Flags
