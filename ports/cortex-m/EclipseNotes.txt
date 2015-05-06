@@ -2,7 +2,14 @@
 
   - Get GCC toolchain. For Linux/FreeBSD/Unix, compile it yourself.
     For windows, this might be ok: https://launchpad.net/gcc-arm-embedded
-  - Get MinGW and MSYS for gnu make and unix-style tools
+  - Get MSYS2 for gnu make, git and unix-style tools
+    - Setup
+    - pacman -Sy
+    - pacman --needed -S bash pacman pacman-mirrors msys2-runtime
+    - pacman -Su
+    - pacman -S make
+    - pacman -S git
+
   - CMSIS library for CPU being used, usually available from
     chip vendor. CMSIS might be part of larger libary,
     for example stm32 has a "peripheral library".

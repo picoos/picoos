@@ -1,5 +1,5 @@
 - mspgcc & msp430-gdbproxy from mspgcc.sourceforge.net
-- MinGW MSYS for gnu make
+- Get MSYS2 for gnu make, git and unix-style tools
 
 - Build under Eclicpse
   - C Project/Makefile project
