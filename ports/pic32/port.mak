@@ -42,6 +42,13 @@ COMPILER = GCC
 endif
 export COMPILER
 
+#
+# Free xc32 compiler allows only -O1.
+# If you have licensed one, this can be overridden
+# in project Makefile.
+#
+CC_OPTIMIZE ?= 1
+
 ifeq '$(strip $(MCU))' ''
 $(error !!! You must specify the cpu type, example MCU=32MX250F128B)
 endif
@@ -104,7 +111,7 @@ ifeq '$(BUILD)' 'DEBUG'
   CDEFINES        += _DBG
   ADEFINES        += _DBG
 else
-  CFLAGS_COMMON   += -O2
+  CFLAGS_COMMON   += -O$(CC_OPTIMIZE)
   CDEFINES        += _REL
   ADEFINES        += _REL
 endif
