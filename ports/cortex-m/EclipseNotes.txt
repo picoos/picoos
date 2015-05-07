@@ -9,6 +9,7 @@
     - pacman -Su
     - pacman -S make
     - pacman -S git
+    - git config --global core.autocrlf true
 
   - CMSIS library for CPU being used, usually available from
     chip vendor. CMSIS might be part of larger libary,
