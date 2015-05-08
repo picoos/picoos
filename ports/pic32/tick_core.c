@@ -52,7 +52,7 @@ void portInitClock(void)
  * Timer interrupt from core timer.
  */
 
-void  PORT_NAKED __attribute__((vector(_CORE_TIMER_VECTOR))) CoreTimerHandler(void)
+void  PORT_NAKED __attribute__((vector(_CORE_TIMER_VECTOR), nomips16)) CoreTimerHandler(void)
 {
   portSaveContext();
   c_pos_intEnter();

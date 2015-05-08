@@ -76,7 +76,7 @@ p_putchar(char c)
 }
 #endif
 
-void  PORT_NAKED __attribute__((vector(_UART2_VECTOR))) Uart2Handler(void)
+void  PORT_NAKED __attribute__((vector(_UART2_VECTOR), nomips16)) Uart2Handler(void)
 {
   portSaveContext();
   c_pos_intEnter();

@@ -81,7 +81,7 @@ void portInitClock(void)
 /*
  * Timer interrupt handler.
  */
-void  PORT_NAKED __attribute__((vector(_TIMER_1_VECTOR))) TimerHandler(void)
+void  PORT_NAKED __attribute__((vector(_TIMER_1_VECTOR), nomips16)) TimerHandler(void)
 {
   portSaveContext();
   c_pos_intEnter();
