@@ -141,7 +141,11 @@ LDFLAGS += -L$(DIR_PORT)/boot  $(addprefix -T,$(LD_SCRIPTS)) -mcpu=cortex-$(CORT
 ifeq '$(strip $(CORTEX))' 'm4'
 LDFLAGS += -mfpu=fpv4-sp-d16 -mfloat-abi=hard
 endif
-LDFLAGS += --specs=nano.specs -nostartfiles -Wl,-Map,$(DIR_OUT)/$(TARGET).map,--cref,--gc-sections -o 
+#
+# Disable newlib-nano for now, there were
+# odd problems with getc().
+#LDFLAGS += --specs=nano.specs
+LDFLAGS += -nostartfiles -Wl,-Map,$(DIR_OUT)/$(TARGET).map,--cref,--gc-sections -o 
 
 # Define archiver flags
 ARFLAGS = cr 
