@@ -32,6 +32,7 @@
 #include <picoos.h>
 #include <stdbool.h>
 
+#include "inc/hw_types.h"
 #include "inc/hw_ints.h"
 #include "inc/hw_memmap.h"
 #include "driverlib/debug.h"
