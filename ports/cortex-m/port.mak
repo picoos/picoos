@@ -142,9 +142,7 @@ ifeq '$(strip $(CORTEX))' 'm4'
 LDFLAGS += -mfpu=fpv4-sp-d16 -mfloat-abi=hard
 endif
 #
-# Disable newlib-nano for now, there were
-# odd problems with getc().
-#LDFLAGS += --specs=nano.specs
+LDFLAGS += --specs=nano.specs
 LDFLAGS += -nostartfiles -Wl,-Map,$(DIR_OUT)/$(TARGET).map,--cref,--gc-sections -o 
 
 # Define archiver flags
