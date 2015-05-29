@@ -411,8 +411,6 @@ void p_pos_softContextSwitch(void)
 
 void PORT_NAKED p_pos_intContextSwitch(void)
 {
-  checkPendingFreeStack();
-
   posCurrentTask_g = posNextTask_g;
   SCB->SCR &= ~SCB_SCR_SLEEPONEXIT_Msk;
   portRestoreContext();
