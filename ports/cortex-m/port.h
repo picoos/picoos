@@ -101,7 +101,7 @@
  * If your architecture does not require memory alignment,
  * set this value to 0 or 1.
  */
-#define POSCFG_ALIGNMENT        4
+#define POSCFG_ALIGNMENT        8
 
 /** Interruptable interrupt service routines.
  * This define must be set to 1 (=enabled) when an
