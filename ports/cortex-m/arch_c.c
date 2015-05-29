@@ -266,6 +266,17 @@ static inline void constructStackFrame(POSTASK_t task, void* stackPtr, POSTASKFU
 
 #if (POSCFG_TASKSTACKTYPE == 1)
 
+static void* freeStackPending = NULL;
+
+static void checkPendingFreeStack()
+{
+  if (freeStackPending) {
+
+    NOS_MEM_FREE(freeStackPending);
+    freeStackPending = NULL;
+  }
+}
+
 VAR_t p_pos_initTask(POSTASK_t task, UINT_t stacksize, POSTASKFUNC_t funcptr, void *funcarg)
 {
 
@@ -288,7 +299,18 @@ VAR_t p_pos_initTask(POSTASK_t task, UINT_t stacksize, POSTASKFUNC_t funcptr, vo
 
 void p_pos_freeStack(POSTASK_t task)
 {
-  NOS_MEM_FREE(task->stack);
+/*
+ * Do not actually free stack yet, as current Pico]OS
+ * task is still running with this stack for short time.
+ *
+ * Just save pointer to stack to be free'd and
+ * free it later (first check that previous 
+ * pending free is already done).
+ * 
+ * Stack will be freed during context switch.
+ */
+  checkPendingFreeStack();
+  freeStackPending = task->stack;
 }
 
 #elif (POSCFG_TASKSTACKTYPE == 2)
@@ -389,6 +411,8 @@ void p_pos_softContextSwitch(void)
 
 void PORT_NAKED p_pos_intContextSwitch(void)
 {
+  checkPendingFreeStack();
+
   posCurrentTask_g = posNextTask_g;
   SCB->SCR &= ~SCB_SCR_SLEEPONEXIT_Msk;
   portRestoreContext();
@@ -520,6 +544,7 @@ void sysCall(unsigned int* args)
   switch (*svcNumber)
   {
   case SVC_SOFT_CONTEXT_SWITCH: // p_pos_softContextSwitch
+    checkPendingFreeStack();
     posCurrentTask_g = posNextTask_g;
     SCB->SCR &= ~SCB_SCR_SLEEPONEXIT_Msk; // Ensure that CPU wakes up.
     portRestoreContext();
