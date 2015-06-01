@@ -33,6 +33,12 @@
 #include <string.h>
 #include "lpc_reg.h"
 
+/*
+ * Macros for stack alignment.
+ */
+#define STACK_ALIGN_UP(a)   (((a) + PORT_STACK_ALIGNMENT - 1) & ~(PORT_STACK_ALIGNMENT - 1))
+#define STACK_ALIGN_DOWN(a) ((a) & ~(PORT_STACK_ALIGNMENT - 1))
+
 #define SYS_MODE  0x1f       // System Mode
 #define THUMB_MODE  0x20     // Thumb Mode
 #define SWI_SOFT_CONTEXT_SWITCH    1
@@ -100,12 +106,12 @@ void Reset_Handler(void)
    * Start heap after .bss segment, align it upwards.
    * Reserve IRQ stack at top of memory, heap end before it.
    */
-  portIrqStack = (void*) (((unsigned int) __stack - PORTCFG_IRQ_STACK_SIZE) & ~(POSCFG_ALIGNMENT - 1));
+  portIrqStack = (void*) STACK_ALIGN_UP((unsigned int) __stack - PORTCFG_IRQ_STACK_SIZE + 1);
 
 #if POSCFG_ENABLE_NANO != 0
 #if NOSCFG_FEATURE_MEMALLOC == 1 && NOSCFG_MEM_MANAGER_TYPE == 1
-  __heap_end = (void*) (portIrqStack - 4);
-  __heap_start = (void*) (((unsigned int) _end + POSCFG_ALIGNMENT) & ~(POSCFG_ALIGNMENT - 1));
+  __heap_end   = (void*) (portIrqStack - PORT_STACK_ALIGNMENT);
+  __heap_start = (void*) STACK_ALIGN_UP((unsigned int) _end);
 #endif
 #endif
 
@@ -154,7 +160,7 @@ static inline void constructStackFrame(POSTASK_t task, void* stackPtr, POSTASKFU
  */
 
   z = (unsigned int)stackPtr;
-  z = (z - POSCFG_ALIGNMENT) & ~(POSCFG_ALIGNMENT - 1);
+  z = STACK_ALIGN_DOWN(z);
   stk = (unsigned int *)z;
 
 /*
@@ -165,7 +171,6 @@ static inline void constructStackFrame(POSTASK_t task, void* stackPtr, POSTASKFU
  * assember files for this).
  */
 
-  *(stk) = (unsigned int)0x00000000;    /* bottom               */
   *(--stk) = (unsigned int)funcptr;     /* Entry Point          */
   *(--stk) = (unsigned int)posTaskExit; /* lr                   */
 
@@ -189,6 +194,7 @@ VAR_t p_pos_initTask(POSTASK_t task, UINT_t stacksize, POSTASKFUNC_t funcptr, vo
 
   unsigned int z;
 
+  stacksize = STACK_ALIGN_UP(stacksize);
   task->stack = NOS_MEM_ALLOC(stacksize);
   if (task->stack == NULL)
     return -1;
@@ -199,7 +205,7 @@ VAR_t p_pos_initTask(POSTASK_t task, UINT_t stacksize, POSTASKFUNC_t funcptr, vo
   nosMemSet(task->stack, PORT_STACK_MAGIC, stacksize);
 #endif
 
-  z = (unsigned int) task->stack + stacksize - 2;
+  z = (unsigned int) task->stack + stacksize;
   constructStackFrame(task, (void*) z, funcptr, funcarg);
   return 0;
 }

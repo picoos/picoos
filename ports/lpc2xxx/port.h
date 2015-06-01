@@ -398,6 +398,12 @@ void portExitCritical(unsigned int old_int);
 #define PORT_STACK_MAGIC       0x56
 
 /**
+ * Arm EABI expects that stacks are aligned
+ * at 8-byte boundaries.
+ */
+#define PORT_STACK_ALIGNMENT   8
+
+/**
  * Task stack frame.
  */
 struct PortArmStack
