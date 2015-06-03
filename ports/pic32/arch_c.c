@@ -32,6 +32,15 @@
 #include <picoos.h>
 #include <string.h>
 
+/*
+ * Macros for stack alignment.
+ */
+#define STACK_ALIGN_UP(a)   (((a) + PORT_STACK_ALIGNMENT - 1) & ~(PORT_STACK_ALIGNMENT - 1))
+#define STACK_ALIGN_DOWN(a) ((a) & ~(PORT_STACK_ALIGNMENT - 1))
+
+/*
+ * Syscall numbers.
+ */
 #define SYSCALL_START_FIRST_CONTEXT    0
 #define SYSCALL_SOFT_CONTEXT_SWITCH    1
 
@@ -57,7 +66,7 @@ extern unsigned int _splim[];
  */
 static inline void* __attribute__((always_inline)) stackBottom()
 {
-  return (void*) ((PORT_STACK_ALIGNMENT + (unsigned int) _splim) & ~(PORT_STACK_ALIGNMENT - 1));
+  return (void*) STACK_ALIGN_UP((unsigned int) _splim);
 }
 
 #if POSCFG_ARGCHECK > 1
@@ -98,8 +107,8 @@ void _on_bootstrap(void)
    siz = a - b;
 #if POSCFG_ENABLE_NANO != 0
 #if NOSCFG_FEATURE_MEMALLOC == 1 && NOSCFG_MEM_MANAGER_TYPE == 1
-  __heap_end = (void*) (portIrqStack - 4);
-  __heap_start = (void*) (((unsigned int) _end + POSCFG_ALIGNMENT) & ~(POSCFG_ALIGNMENT - 1));
+  __heap_end   = (void*) (portIrqStack - PORT_STACK_ALIGNMENT);
+  __heap_start = (void*) STACK_ALIGN_UP((unsigned int) _end);
 #endif
 #endif
 
@@ -137,7 +146,7 @@ static inline void constructStackFrame(POSTASK_t task, void* stackPtr, POSTASKFU
    */
 
   z = (unsigned int) stackPtr;
-  z = z & ~(PORT_STACK_ALIGNMENT - 1);
+  z = STACK_ALIGN_DOWN(z);
   stk = (unsigned int *) z;
 
   /*
@@ -148,7 +157,6 @@ static inline void constructStackFrame(POSTASK_t task, void* stackPtr, POSTASKFU
    * assember files for this).
    */
 
-  *(stk) = (unsigned int) 0x00000000; /* bottom           */
   *(--stk) = 0;                       /* 4 argument slots */
   *(--stk) = 0;
   *(--stk) = 0;
@@ -175,11 +183,23 @@ static inline void constructStackFrame(POSTASK_t task, void* stackPtr, POSTASKFU
 
 #if (POSCFG_TASKSTACKTYPE == 1)
 
+static void* freeStackPending = NULL;
+
+static void checkPendingFreeStack()
+{
+  if (freeStackPending) {
+
+    NOS_MEM_FREE(freeStackPending);
+    freeStackPending = NULL;
+  }
+}
+
 VAR_t p_pos_initTask(POSTASK_t task, UINT_t stacksize, POSTASKFUNC_t funcptr, void *funcarg)
 {
 
   unsigned int z;
 
+  stacksize = STACK_ALIGN_UP(stacksize);
   task->stack = NOS_MEM_ALLOC(stacksize);
   if (task->stack == NULL)
     return -1;
@@ -190,14 +210,25 @@ VAR_t p_pos_initTask(POSTASK_t task, UINT_t stacksize, POSTASKFUNC_t funcptr, vo
   nosMemSet(task->stack, PORT_STACK_MAGIC, stacksize);
 #endif
 
-  z = (unsigned int) task->stack + stacksize - 2;
+  z = (unsigned int) task->stack + stacksize;
   constructStackFrame(task, (void*) z, funcptr, funcarg);
   return 0;
 }
 
 void p_pos_freeStack(POSTASK_t task)
 {
-  NOS_MEM_FREE(task->stack);
+/*
+ * Do not actually free stack yet, as current Pico]OS
+ * task is still running with this stack for short time.
+ *
+ * Just save pointer to stack to be free'd and
+ * free it later (first check that previous 
+ * pending free is already done).
+ * 
+ * Stack will be freed during context switch.
+ */
+  checkPendingFreeStack();
+  freeStackPending = task->stack;
 }
 
 #elif (POSCFG_TASKSTACKTYPE == 2)
@@ -572,6 +603,7 @@ void sysCall(int callNum)
   switch (callNum)
   {
   case SYSCALL_SOFT_CONTEXT_SWITCH: // p_pos_softContextSwitch
+    checkPendingFreeStack();
     posCurrentTask_g = posNextTask_g;
     break;
 
