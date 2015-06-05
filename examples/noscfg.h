@@ -108,6 +108,15 @@ extern void *__heap_end;
  */
 #define NOSCFG_MEM_USER_MALLOC       mymalloc
 
+/** User defined memory realloc function.
+ * The user may supply its own memory allocator functions.
+ * This define is set to the function name of the user's
+ * memory realloc function.
+ * @note ::NOSCFG_MEM_MANAGER_TYPE must be set to type 2
+ *       to enable the use of a user supplied memory allocator.
+ */
+#define NOSCFG_MEM_USER_REALLOC       myrealloc
+
 /** User defined memory free function.
  * The user may supply its own memory allocator functions.
  * This define is set to the function name of the user's
