@@ -32,7 +32,7 @@
 #include <picoos.h>
 #include <string.h>
 
-#if NOSCFG_MEM_MANAGER_TYPE == 0
+#if NOSCFG_MEM_MANAGER_TYPE != 1
 #include <stdlib.h>
 #endif
 
@@ -52,7 +52,7 @@ static inline void constructStackFrame(POSTASK_t task, void* stackPtr, POSTASKFU
 void timerIrqHandler(void);
 
 #if POSCFG_ENABLE_NANO != 0
-#if NOSCFG_FEATURE_MEMALLOC == 1 && NOSCFG_MEM_MANAGER_TYPE <= 1
+#if NOSCFG_FEATURE_MEMALLOC == 1
 void *__heap_start;
 void *__heap_end;
 #endif
@@ -194,7 +194,7 @@ void Reset_Handler(void)
   portIrqStack = stackBottom();
 
 #if POSCFG_ENABLE_NANO != 0
-#if NOSCFG_FEATURE_MEMALLOC == 1 && NOSCFG_MEM_MANAGER_TYPE <= 1
+#if NOSCFG_FEATURE_MEMALLOC == 1
   __heap_end   = (void*) (portIrqStack - PORT_STACK_ALIGNMENT);
   __heap_start = (void*) STACK_ALIGN_UP((unsigned int) _end);
 #endif
@@ -205,7 +205,7 @@ void Reset_Handler(void)
   fillStackWithDebugPattern();
 
 #if POSCFG_ENABLE_NANO != 0
-#if NOSCFG_FEATURE_MEMALLOC == 1 && NOSCFG_MEM_MANAGER_TYPE <= 1
+#if NOSCFG_FEATURE_MEMALLOC == 1
 
   register unsigned char* s;
 
