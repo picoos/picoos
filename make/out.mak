@@ -131,6 +131,10 @@ LINKLIST+=$(addprefix $(OPT_LD_PFLIB),$(subst $(space),$(replace),$(strip $(LIBL
 LINKLIST+=$(addprefix $(OPT_LD_PFLIB),$(subst $(space),$(replace),$(strip $(PICOOS_LIB))))
 LINKLIST+=$(OPT_LD_LAST)
 
+ifneq '$(strip $(OPT_LD_OFILE))' ''
+LDFLAGS += $(OPT_LD_OFILE)
+endif
+
 $(TARGETOUT): $(ALL_MODULES) $(PICOOS_LIB) $(OBJLIST) $(COMMONDEP) | $(DIR_OUT)
 	$(PRELINK1)
 	$(PRELINK2)
