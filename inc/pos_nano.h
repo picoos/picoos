@@ -148,6 +148,9 @@
 #ifndef NOSCFG_MEM_USER_MALLOC
 #error  NOSCFG_MEM_USER_MALLOC not defined
 #endif
+#ifndef NOSCFG_MEM_USER_REALLOC
+#error  NOSCFG_MEM_USER_REALLOC not defined
+#endif
 #ifndef NOSCFG_MEM_USER_FREE
 #error  NOSCFG_MEM_USER_FREE not defined
 #endif
@@ -345,16 +348,20 @@ NANOEXT void POSCALL *nosMemRealloc(void *memblock, UINT_t size);
 #else /* NANOINTERNAL */
 /* internal malloc/free, used by OS core and platform ports */
 #if NOSCFG_MEM_MANAGER_TYPE == 0
-#define NOS_MEM_ALLOC(x)   malloc((size_t)(x))
-#define NOS_MEM_FREE(x)    free(x)
+#define NOS_MEM_ALLOC(x)     malloc((size_t)(x))
+#define NOS_MEM_REALLOC(p,x) realloc(p, (size_t)(x))
+#define NOS_MEM_FREE(x)      free(x)
 #elif   NOSCFG_MEM_MANAGER_TYPE == 1
 void*   nos_malloc(UINT_t size);
+void*   nos_realloc(void* ptr, UINT_t size);
 void    nos_free(void *mp);
-#define NOS_MEM_ALLOC(x)   nos_malloc(x)
-#define NOS_MEM_FREE(x)    nos_free(x)
+#define NOS_MEM_ALLOC(x)     nos_malloc(x)
+#define NOS_MEM_REALLOC(p,x) nos_realloc(p, x)
+#define NOS_MEM_FREE(x)      nos_free(x)
 #elif   NOSCFG_MEM_MANAGER_TYPE == 2
-#define NOS_MEM_ALLOC(x)   NOSCFG_MEM_USER_MALLOC(x)
-#define NOS_MEM_FREE(x)    NOSCFG_MEM_USER_FREE(x)
+#define NOS_MEM_ALLOC(x)     NOSCFG_MEM_USER_MALLOC(x)
+#define NOS_MEM_REALLOC(p,x) NOSCFG_MEM_USER_REALLOC(p,x)
+#define NOS_MEM_FREE(x)      NOSCFG_MEM_USER_FREE(x)
 #endif
 #endif /* NANOINTERNAL */
 

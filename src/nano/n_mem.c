@@ -534,7 +534,7 @@ void* POSCALL nosMemRealloc(void *memblock, UINT_t size)
 {
   void *p;
   posTaskSchedLock();
-  p = nos_realloc(memblock, size);
+  p = NOS_MEM_REALLOC(memblock, size);
   posTaskSchedUnlock();
   return p;
 }
