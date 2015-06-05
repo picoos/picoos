@@ -32,6 +32,14 @@
 #include <picoos.h>
 #include <string.h>
 
+#if NOSCFG_MEM_MANAGER_TYPE == 0
+/*
+ * To use newlib malloc/free, set memory manager type to 2
+ * which allows calls to got through thread-safe wrappers.
+ */
+#error Currently using newlib malloc/realloc/free directly is not supported.
+#endif
+
 #if NOSCFG_MEM_MANAGER_TYPE != 1
 #include <stdlib.h>
 #endif
