@@ -148,7 +148,7 @@ endif
 # odd problems with malloc'ed memory.
 # But to try it, uncomment following line:
 #LDFLAGS += --specs=nano.specs
-LDFLAGS += -Wl,--wrap=malloc,--wrap=free,--wrap=realloc,--wrap=__sfp_lock_acquire,--wrap=__sfp_lock_release
+LDFLAGS += -Wl,--wrap=malloc,--wrap=free,--wrap=realloc,--wrap=__sfp_lock_acquire,--wrap=__sfp_lock_release,--wrap=fopen
 LDFLAGS += -nostartfiles -Wl,-Map,$(DIR_OUT)/$(TARGET).map,--cref,--gc-sections
 
 # Define archiver flags
