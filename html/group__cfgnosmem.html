@@ -55,6 +55,8 @@ Macros</h2></td></tr>
 <tr class="separator:ga9dcc9bbb9ee1ffe25d7cbc9f11b7f476"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga1fac4bb74deb7416ca6d740ae4c44971"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__cfgnosmem.html#ga1fac4bb74deb7416ca6d740ae4c44971">NOSCFG_MEM_USER_MALLOC</a>&#160;&#160;&#160;mymalloc</td></tr>
 <tr class="separator:ga1fac4bb74deb7416ca6d740ae4c44971"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaafd541a4462793da09eb1c76b4cf73f4"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__cfgnosmem.html#gaafd541a4462793da09eb1c76b4cf73f4">NOSCFG_MEM_USER_REALLOC</a>&#160;&#160;&#160;myrealloc</td></tr>
+<tr class="separator:gaafd541a4462793da09eb1c76b4cf73f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gad64c5d2259737e78e99baa1308a6ae8f"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__cfgnosmem.html#gad64c5d2259737e78e99baa1308a6ae8f">NOSCFG_MEM_USER_FREE</a>&#160;&#160;&#160;myfree</td></tr>
 <tr class="separator:gad64c5d2259737e78e99baa1308a6ae8f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga6e30f640b95b8d51bbce5c0bd069f6ee"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__cfgnosmem.html#ga6e30f640b95b8d51bbce5c0bd069f6ee">NOSCFG_STKMEM_RESERVE</a>&#160;&#160;&#160;0</td></tr>
@@ -201,6 +203,19 @@ Variables</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="gaafd541a4462793da09eb1c76b4cf73f4"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define NOSCFG_MEM_USER_REALLOC&#160;&#160;&#160;myrealloc</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>User defined memory realloc function. The user may supply its own memory allocator functions. This define is set to the function name of the user's memory realloc function. </p><dl class="section note"><dt>Note</dt><dd><a class="el" href="group__cfgnosmem.html#ga05cceb76450818d8eb7a05e0416092cc">NOSCFG_MEM_MANAGER_TYPE</a> must be set to type 2 to enable the use of a user supplied memory allocator. </dd></dl>
+
+</div>
+</div>
 <a class="anchor" id="ga6e30f640b95b8d51bbce5c0bd069f6ee"></a>
 <div class="memitem">
 <div class="memproto">
@@ -244,7 +259,7 @@ Variables</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon May 25 2015 22:50:10 for pico]OS by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Jun 5 2015 19:48:26 for pico]OS by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.9.1
 </small></address>
