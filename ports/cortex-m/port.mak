@@ -88,6 +88,7 @@ OPT_LD_PFOBJ =
 OPT_LD_PFLIB =
 OPT_LD_FIRST = -Wl,--start-group
 OPT_LD_LAST  = -lc -Wl,--end-group
+OPT_LD_OFILE = -o
 
 # Set global defines for compiler / assembler
 CDEFINES += GCC
@@ -147,7 +148,8 @@ endif
 # odd problems with malloc'ed memory.
 # But to try it, uncomment following line:
 #LDFLAGS += --specs=nano.specs
-LDFLAGS += -nostartfiles -Wl,-Map,$(DIR_OUT)/$(TARGET).map,--cref,--gc-sections -o 
+LDFLAGS += -Wl,--wrap=malloc,--wrap=free,--wrap=realloc,--wrap=__sfp_lock_acquire,--wrap=__sfp_lock_release
+LDFLAGS += -nostartfiles -Wl,-Map,$(DIR_OUT)/$(TARGET).map,--cref,--gc-sections
 
 # Define archiver flags
 ARFLAGS = cr 

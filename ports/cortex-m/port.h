@@ -48,6 +48,7 @@
 #include "pos_cmsis.h"
 #include <stdint.h>
 #include <stdbool.h>
+#include <stdlib.h>
 
 /*---------------------------------------------------------------------------
  *  ARCHITECTURE / CPU SPECIFIC SETTINGS
@@ -601,5 +602,15 @@ void SysTick_Handler(void);
 void HardFault_Handler(void);
 void UsageFault_Handler(void);
 void Uart_Handler(void);
+
+// Prototypes for malloc wrapping.
+
+void* __wrap_malloc(size_t s);
+void* __wrap_realloc(void* p, size_t s);
+void  __wrap_free(void* p);
+
+void* __real_malloc(size_t s);
+void* __real_realloc(void* p, size_t s);
+void  __real_free(void* p);
 
 #endif /* _PORT_H */
