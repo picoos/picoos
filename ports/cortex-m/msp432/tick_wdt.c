@@ -62,6 +62,7 @@ void portInitClock(void)
 
   default:
     P_ASSERT("WDT cannot produce requested HZ", false);
+    div = 0;
     break;
   }
 
