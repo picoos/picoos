@@ -35,14 +35,25 @@
  * Initialize STM32 usart console.
  */
 
+#if PORTCFG_CON_USART > 0
+
 #if PORTCFG_CON_USART == 2
+
+#define CON_USART         USART2
+#define CON_IRQ_HANDLER   USART2_IRQHandler
+#define CON_CLOCK_ENABLE  RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2, ENABLE)
+#define CON_IRQ_VECTOR    USART2_IRQn
+
+#else
+#error Unsupported USART selected for console
+#endif
 
 #if NOSCFG_FEATURE_CONOUT == 1 || NOSCFG_FEATURE_CONIN == 1
 void portInitConsole(void)
 {
   USART_InitTypeDef init;
 
-  RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2, ENABLE);
+  CON_CLOCK_ENABLE;
 
   init.USART_BaudRate = PORTCFG_CONSOLE_SPEED;
   init.USART_WordLength = USART_WordLength_8b;
@@ -51,34 +62,34 @@ void portInitConsole(void)
   init.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
   init.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
 
-  USART_Init(USART2, &init);
-  USART_Cmd(USART2, ENABLE);
+  USART_Init(CON_USART, &init);
+  USART_Cmd(CON_USART, ENABLE);
 
 #if NOSCFG_FEATURE_CONIN == 1
 
   // Enable receive data interrupt.
-  USART_ITConfig(USART2, USART_IT_RXNE, ENABLE);
+  USART_ITConfig(CON_USART, USART_IT_RXNE, ENABLE);
 
 #endif
 
   // Console shouldn't be realtime-critical,
   // use low interrupt priority for it.
-  NVIC_SetPriority(USART2_IRQn, PORT_PENDSV_PRI - 1);
-  NVIC_EnableIRQ(USART2_IRQn);
+  NVIC_SetPriority(CON_IRQ_VECTOR, PORT_PENDSV_PRI - 1);
+  NVIC_EnableIRQ(CON_IRQ_VECTOR);
 }
 
 /*
  * Uart interrupt handler.
  */
 
-void USART2_IRQHandler()
+void CON_IRQ_HANDLER()
 {
   c_pos_intEnter();
 
 #if NOSCFG_FEATURE_CONOUT == 1
-  if (USART_GetITStatus(USART2, USART_IT_TXE) == SET) {
+  if (USART_GetITStatus(CON_USART, USART_IT_TXE) == SET) {
 
-    USART_ITConfig (USART2, USART_IT_TXE, DISABLE);
+    USART_ITConfig (CON_USART, USART_IT_TXE, DISABLE);
     c_nos_putcharReady();
   }
 #endif
@@ -87,9 +98,9 @@ void USART2_IRQHandler()
 
   unsigned char ch;
 
-  if (USART_GetITStatus(USART2, USART_IT_RXNE) == SET) {
+  if (USART_GetITStatus(CON_USART, USART_IT_RXNE) == SET) {
 
-    ch = USART_ReceiveData(USART2);
+    ch = USART_ReceiveData(CON_USART);
     c_nos_keyinput(ch);
   }
 
@@ -106,11 +117,11 @@ void USART2_IRQHandler()
 UVAR_t
 p_putchar(char c)
 {
-  if (USART_GetFlagStatus(USART2, USART_FLAG_TXE) == RESET)
+  if (USART_GetFlagStatus(CON_USART, USART_FLAG_TXE) == RESET)
     return 0;
 
-  USART_SendData(USART2, c);
-  USART_ITConfig (USART2, USART_IT_TXE, ENABLE);
+  USART_SendData(CON_USART, c);
+  USART_ITConfig (CON_USART, USART_IT_TXE, ENABLE);
   return 1;
 }
 #endif
