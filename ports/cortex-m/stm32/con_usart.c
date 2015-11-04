@@ -35,7 +35,7 @@
  * Initialize STM32 usart console.
  */
 
-#if PORTCFG_CON_USART == 1
+#if PORTCFG_CON_USART == 2
 
 #if NOSCFG_FEATURE_CONOUT == 1 || NOSCFG_FEATURE_CONIN == 1
 void portInitConsole(void)
