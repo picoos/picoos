@@ -37,23 +37,17 @@
 
 #if PORTCFG_CON_USART > 0
 
-#if PORTCFG_CON_USART == 2
+#define TOKENPASTE(x, y) x ## y
+#define TOKENPASTE2(x, y) TOKENPASTE(x, y)
 
-#define CON_USART         USART2
-#define CON_IRQ_HANDLER   USART2_IRQHandler
-#define CON_CLOCK_ENABLE  RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2, ENABLE)
-#define CON_IRQ_VECTOR    USART2_IRQn
-
-#else
-#error Unsupported USART selected for console
-#endif
+#define USARTx	           TOKENPASTE2(USART, PORTCFG_CON_USART)
+#define USARTx_IRQHandler  TOKENPASTE2(USART, TOKENPASTE2(PORTCFG_CON_USART, _IRQHandler))
+#define USARTx_IRQn        TOKENPASTE2(USART, TOKENPASTE2(PORTCFG_CON_USART, _IRQn))
 
 #if NOSCFG_FEATURE_CONOUT == 1 || NOSCFG_FEATURE_CONIN == 1
 void portInitConsole(void)
 {
   USART_InitTypeDef init;
-
-  CON_CLOCK_ENABLE;
 
   init.USART_BaudRate = PORTCFG_CONSOLE_SPEED;
   init.USART_WordLength = USART_WordLength_8b;
@@ -62,34 +56,34 @@ void portInitConsole(void)
   init.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
   init.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
 
-  USART_Init(CON_USART, &init);
-  USART_Cmd(CON_USART, ENABLE);
+  USART_Init(USARTx, &init);
+  USART_Cmd(USARTx, ENABLE);
 
 #if NOSCFG_FEATURE_CONIN == 1
 
   // Enable receive data interrupt.
-  USART_ITConfig(CON_USART, USART_IT_RXNE, ENABLE);
+  USART_ITConfig(USARTx, USART_IT_RXNE, ENABLE);
 
 #endif
 
   // Console shouldn't be realtime-critical,
   // use low interrupt priority for it.
-  NVIC_SetPriority(CON_IRQ_VECTOR, PORT_PENDSV_PRI - 1);
-  NVIC_EnableIRQ(CON_IRQ_VECTOR);
+  NVIC_SetPriority(USARTx_IRQn, PORT_PENDSV_PRI - 1);
+  NVIC_EnableIRQ(USARTx_IRQn);
 }
 
 /*
  * Uart interrupt handler.
  */
 
-void CON_IRQ_HANDLER()
+void USARTx_IRQHandler()
 {
   c_pos_intEnter();
 
 #if NOSCFG_FEATURE_CONOUT == 1
-  if (USART_GetITStatus(CON_USART, USART_IT_TXE) == SET) {
+  if (USART_GetITStatus(USARTx, USART_IT_TXE) == SET) {
 
-    USART_ITConfig (CON_USART, USART_IT_TXE, DISABLE);
+    USART_ITConfig (USARTx, USART_IT_TXE, DISABLE);
     c_nos_putcharReady();
   }
 #endif
@@ -98,9 +92,9 @@ void CON_IRQ_HANDLER()
 
   unsigned char ch;
 
-  if (USART_GetITStatus(CON_USART, USART_IT_RXNE) == SET) {
+  if (USART_GetITStatus(USARTx, USART_IT_RXNE) == SET) {
 
-    ch = USART_ReceiveData(CON_USART);
+    ch = USART_ReceiveData(USARTx);
     c_nos_keyinput(ch);
   }
 
@@ -117,11 +111,11 @@ void CON_IRQ_HANDLER()
 UVAR_t
 p_putchar(char c)
 {
-  if (USART_GetFlagStatus(CON_USART, USART_FLAG_TXE) == RESET)
+  if (USART_GetFlagStatus(USARTx, USART_FLAG_TXE) == RESET)
     return 0;
 
-  USART_SendData(CON_USART, c);
-  USART_ITConfig (CON_USART, USART_IT_TXE, ENABLE);
+  USART_SendData(USARTx, c);
+  USART_ITConfig (USARTx, USART_IT_TXE, ENABLE);
   return 1;
 }
 #endif
