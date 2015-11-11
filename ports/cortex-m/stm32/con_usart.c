@@ -30,6 +30,7 @@
 
 #define NANOINTERNAL
 #include <picoos.h>
+#include "port_irq.h"
 
 /*
  * Initialize STM32 usart console.
@@ -68,7 +69,7 @@ void portInitConsole(void)
 
   // Console shouldn't be realtime-critical,
   // use low interrupt priority for it.
-  NVIC_SetPriority(USARTx_IRQn, PORT_PENDSV_PRI - 1);
+  NVIC_SetPriority(USARTx_IRQn, PORT_CON_PRI);
   NVIC_EnableIRQ(USARTx_IRQn);
 }
 

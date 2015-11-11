@@ -28,61 +28,42 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define NANOINTERNAL
-
-#include <picoos.h>
-#include "port_irq.h"
-#include "driverlib.h"
-
-#if PORTCFG_TICK_WDT == 1
+#ifndef _PORT_IRQ_H
+#define _PORT_IRQ_H
 
 /*
- * Initialize wdt as tick source.
+ * Define IRQ priorities. Use defaults from port.h if
+ * not overridden in poscfg.h
  */
 
-void portInitClock(void)
-{
-  uint16_t div;
-
-  switch (CS_getBCLK() / HZ) {
-  case 32768:
-    div = WDT_A_CLOCKITERATIONS_32K;
-    break;
-
-  case 8192:
-    div = WDT_A_CLOCKITERATIONS_8192;
-    break;
-
-  case 512:
-    div = WDT_A_CLOCKITERATIONS_512;
-    break;
-
-  case 64:
-    div = WDT_A_CLOCKITERATIONS_64;
-    break;
-
-  default:
-    P_ASSERT("WDT cannot produce requested HZ", false);
-    div = 0;
-    break;
-  }
-
-  MAP_WDT_A_initIntervalTimer(WDT_A_CLOCKSOURCE_XCLK, div);
-
-  NVIC_EnableIRQ(WDT_A_IRQn);
-  NVIC_SetPriority(WDT_A_IRQn, PORT_SYSTICK_PRI);
-
-  MAP_WDT_A_startTimer();
-}
-
-/*
- * Timer interrupt from WDT.
- */
-void WDT_Handler(void)
-{
-  c_pos_intEnter();
-  c_pos_timerInterrupt();
-  c_pos_intExitQuick();
-}
-
+#ifdef PORTCFG_API_MAX_PRI
+#define PORT_API_MAX_PRI PORTCFG_API_MAX_PRI
+#else
+#define PORT_API_MAX_PRI PORT_DEFAULT_API_MAX_PRI
 #endif
+
+#ifdef PORTCFG_SVCALL_PRI
+#define PORT_SVCALL_PRI PORTCFG_SVCALL_PRI
+#else
+#define PORT_SVCALL_PRI PORT_DEFAULT_SVCALL_PRI
+#endif
+
+#ifdef PORTCFG_SYSTICK_PRI
+#define PORT_SYSTICK_PRI PORTCFG_SYSTICK_PRI
+#else
+#define PORT_SYSTICK_PRI PORT_DEFAULT_SYSTICK_PRI
+#endif
+
+#ifdef PORTCFG_PENDSV_PRI
+#define PORT_PENDSV_PRI PORTCFG_PENDSV_PRI
+#else
+#define PORT_PENDSV_PRI PORT_DEFAULT_PENDSV_PRI
+#endif
+
+#ifdef PORTCFG_CON_PRI
+#define PORT_CON_PRI PORTCFG_CON_PRI
+#else
+#define PORT_CON_PRI PORT_DEFAULT_CON_PRI
+#endif
+
+#endif /* _PORT_IRQ_H */

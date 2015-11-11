@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2013, Ari Suutari <ari@stonepile.fi>.
+ * Copyright (c) 2011-2015, Ari Suutari <ari@stonepile.fi>.
  * Copyright (c) 2004,      Dennis Kuschel.
  * All rights reserved. 
  * 
@@ -250,7 +250,9 @@
 
 #if __CORTEX_M >= 3
 
-#define POS_SCHED_LOCK          { flags = __get_BASEPRI(); __set_BASEPRI(portCmsisPrio2HW(PORT_SVCALL_PRI + 1)); }
+POSCFG_LOCK_FLAGSTYPE portEnterCritical(void);
+
+#define POS_SCHED_LOCK          { flags = portEnterCritical(); }
 #define POS_IRQ_DISABLE_ALL     { flags = __get_PRIMASK(); __disable_irq(); }
 
 #else
@@ -266,7 +268,9 @@
 
 #if __CORTEX_M >= 3
 
-#define POS_SCHED_UNLOCK        { __set_BASEPRI(flags); }
+void portExitCritical(POSCFG_LOCK_FLAGSTYPE);
+
+#define POS_SCHED_UNLOCK        { portExitCritical(flags); }
 #define POS_IRQ_ENABLE_ALL      { if (!flags) __enable_irq(); }
 
 #else
@@ -274,6 +278,7 @@
 #define POS_SCHED_UNLOCK        { if (!flags) __enable_irq(); }
 
 #endif
+
 
 /** @} */
 
@@ -545,19 +550,25 @@ extern unsigned char *portIrqStack;
 #define portLowPriority() ((1<<__NVIC_PRIO_BITS) - 1)
 
 /*
- * Calculate suitable priorities for SVCall, SysTick and PendSV.
- * PendSV is always lowest possible. SVCall priority
+ * Calculate maximum interrupt priority that is allowed to
+ * make Pico]OS API calls. Derive suitable priorities for SVCall,
+ * SysTick and PendSV from that.
+ *
+ * PendSV is always lowest possible. Max API call priority
  * is set to halfway of available priority range to
  * leave room for high-speed interrupts that don't need
- * Pico[OS access. Systick is priority is always
- * one step lower than SVCall (to ensure that
- * timekeeping is done correctly.
+ * Pico]OS access. To ensure that timekeeping is
+ * done accurately, set Systick priority to max API call
+ * priority. SVCall priority is one step higher than 
+ * max API call priority (to keep it unblocked by 
+ * POS_SCHED_LOCK).
  * 
  * For systems that have 4 or 2 implemented priority bits
  * this results in:
  * 
  * Exception    Priority with 4 bits      Priority with 2 bits
  * SVCall                7                         1
+ * Max API               8                         2
  * SysTick               8                         2
  * PendSV                15                        3
  *
@@ -569,9 +580,12 @@ extern unsigned char *portIrqStack;
  * in Cortex-M3 (In -M0 primask is used to enable/disable interrupts).
  */
 
-#define PORT_SVCALL_PRI       (portLowPriority() / 2)
-#define PORT_SYSTICK_PRI      (PORT_SVCALL_PRI + 1)
-#define PORT_PENDSV_PRI       (portLowPriority())
+#define PORT_DEFAULT_API_MAX_PRI      (portLowPriority() / 2 + 1)
+#define PORT_DEFAULT_SVCALL_PRI       (PORT_API_MAX_PRI - 1)
+#define PORT_DEFAULT_SYSTICK_PRI      (PORT_API_MAX_PRI)
+#define PORT_DEFAULT_PENDSV_PRI       (portLowPriority())
+#define PORT_DEFAULT_CON_PRI          (PORT_PENDSV_PRI - 1)
+
 /*
  * __optimize("omit-frame-ponter") is needed to omit frame pointer in
  * naked functions. This looks like a bug in gcc currently.

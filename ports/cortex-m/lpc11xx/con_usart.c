@@ -30,6 +30,7 @@
 
 #define NANOINTERNAL
 #include <picoos.h>
+#include "port_irq.h"
 
 /*
  * Initialize NXP/LPC uart console.
@@ -57,7 +58,7 @@ void portInitConsole(void)
 
   // Console shouldn't be realtime-critical,
   // use low interrupt priority for it.
-  NVIC_SetPriority(UART0_IRQn, PORT_PENDSV_PRI - 1);
+  NVIC_SetPriority(UART0_IRQn, PORT_CON_PRI);
   NVIC_EnableIRQ(UART0_IRQn);
 }
 

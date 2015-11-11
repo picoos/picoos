@@ -30,6 +30,7 @@
 
 #include <picoos.h>
 #include <string.h>
+#include "port_irq.h"
 
 #if PORTCFG_TICK_RTC == 1
 

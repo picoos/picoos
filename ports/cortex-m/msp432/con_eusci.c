@@ -30,6 +30,7 @@
 
 #define NANOINTERNAL
 #include <picoos.h>
+#include "port_irq.h"
 #include <stdbool.h>
 
 #include "driverlib.h"
@@ -66,7 +67,7 @@ void portInitConsole(void)
   // Console shouldn't be realtime-critical,
   // use low interrupt priority for it.
   NVIC_ClearPendingIRQ(EUSCIA0_IRQn);
-  NVIC_SetPriority(EUSCIA0_IRQn, PORT_PENDSV_PRI - 1);
+  NVIC_SetPriority(EUSCIA0_IRQn, PORT_CON_PRI);
   NVIC_EnableIRQ(EUSCIA0_IRQn);
 
 #if NOSCFG_FEATURE_CONIN == 1

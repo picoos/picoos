@@ -30,6 +30,7 @@
 
 #define NANOINTERNAL
 #include <picoos.h>
+#include "port_irq.h"
 
 #include "em_usart.h"
 #include "em_cmu.h"
@@ -66,7 +67,7 @@ void portInitConsole(void)
 
   // Console shouldn't be realtime-critical,
   // use low interrupt priority for it.
-  NVIC_SetPriority(USART1_TX_IRQn, PORT_PENDSV_PRI - 1);
+  NVIC_SetPriority(USART1_TX_IRQn, PORT_CON_PRI);
   NVIC_EnableIRQ(USART1_TX_IRQn);
 
 #if NOSCFG_FEATURE_CONIN == 1
@@ -74,7 +75,7 @@ void portInitConsole(void)
   USART_IntEnable(USART1, USART_IF_RXDATAV);
 
   NVIC_ClearPendingIRQ(USART1_RX_IRQn);
-  NVIC_SetPriority(USART1_RX_IRQn, PORT_PENDSV_PRI - 1);
+  NVIC_SetPriority(USART1_RX_IRQn, PORT_CON_PRI);
   NVIC_EnableIRQ(USART1_RX_IRQn);
 
   #endif

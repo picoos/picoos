@@ -31,6 +31,8 @@
 #define NANOINTERNAL
 #include <picoos.h>
 #include <string.h>
+#include "port_irq.h"
+
 
 #if NOSCFG_MEM_MANAGER_TYPE == 0
 /*
@@ -386,7 +388,7 @@ void p_pos_initArch(void)
 #endif
 
 #if __CORTEX_M >= 3
-  __set_BASEPRI(portCmsisPrio2HW(PORT_SVCALL_PRI + 1)); // Allow SVCall, but no Timer/PendSV
+  __set_BASEPRI(portCmsisPrio2HW(PORT_API_MAX_PRI)); // Allow SVCall, but no Timer/PendSV
 #else
   __disable_irq();
 #endif
@@ -667,6 +669,24 @@ void PORT_NAKED PendSV_Handler()
   c_pos_intExit();
   portRestoreContext();
 }
+
+#if __CORTEX_M >= 3
+
+POSCFG_LOCK_FLAGSTYPE portEnterCritical(void)
+{
+  register POSCFG_LOCK_FLAGSTYPE flags;
+
+  flags = __get_BASEPRI();
+  __set_BASEPRI(portCmsisPrio2HW(PORT_API_MAX_PRI));
+  return flags;
+}
+
+void portExitCritical(POSCFG_LOCK_FLAGSTYPE flags)
+{
+  __set_BASEPRI(flags);
+}
+
+#endif
 
 #ifdef HAVE_PLATFORM_ASSERT
 void p_pos_assert(const char* text, const char *file, int line)
