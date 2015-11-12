@@ -105,6 +105,7 @@ DIR_SRC6 = $(strip $(word 6,$(SRCDIRS)))
 DIR_SRC7 = $(strip $(word 7,$(SRCDIRS)))
 DIR_SRC8 = $(strip $(word 8,$(SRCDIRS)))
 DIR_SRC9 = $(strip $(word 9,$(SRCDIRS)))
+DIR_SRC10 = $(strip $(word 10,$(SRCDIRS)))
 
 # define something for the nano layer
 ifeq '$(strip $(NANO))' '1'
@@ -262,6 +263,8 @@ $(DIR_OBJ)/%$(EXT_OBJ) : $(DIR_SRC8)%$(EXT_CXX) $(COMMONDEP) | $(DIR_OBJ)
 	$(CXX) $(call make_cxxflags,$@) $(CINCS) $(CDEFS) $(call adjpath,$<)
 $(DIR_OBJ)/%$(EXT_OBJ) : $(DIR_SRC9)%$(EXT_CXX) $(COMMONDEP) | $(DIR_OBJ)
 	$(CXX) $(call make_cxxflags,$@) $(CINCS) $(CDEFS) $(call adjpath,$<)
+$(DIR_OBJ)/%$(EXT_OBJ) : $(DIR_SRC10)%$(EXT_CXX) $(COMMONDEP) | $(DIR_OBJ)
+	$(CXX) $(call make_cxxflags,$@) $(CINCS) $(CDEFS) $(call adjpath,$<)
 
 ifeq '$(strip $(CC2ASM))' '1'
 
@@ -303,6 +306,10 @@ $(DIR_OBJ)/%$(EXT_OBJ): $(DIR_SRC9)%$(EXT_C) $(COMMONDEP) | $(DIR_OBJ)
 	$(CC) $(call make_cflags,$(subst $(EXT_OBJ)**,$(EXT_INT),$@**)) $(CINCS) $(CDEFS) $(call adjpath,$<)
 	$(AS) $(call make_asflags,$@) $(AINCS) $(ADEFS) $(call adjpath,$(subst $(EXT_OBJ)**,$(EXT_INT),$@**))
 	-$(REMOVE) $(call adjpath,$(subst $(EXT_OBJ)**,$(EXT_INT),$@**))
+$(DIR_OBJ)/%$(EXT_OBJ): $(DIR_SRC10)%$(EXT_C) $(COMMONDEP) | $(DIR_OBJ)
+	$(CC) $(call make_cflags,$(subst $(EXT_OBJ)**,$(EXT_INT),$@**)) $(CINCS) $(CDEFS) $(call adjpath,$<)
+	$(AS) $(call make_asflags,$@) $(AINCS) $(ADEFS) $(call adjpath,$(subst $(EXT_OBJ)**,$(EXT_INT),$@**))
+	-$(REMOVE) $(call adjpath,$(subst $(EXT_OBJ)**,$(EXT_INT),$@**))
 
 else
 
@@ -324,6 +331,8 @@ $(DIR_OBJ)/%$(EXT_OBJ) : $(DIR_SRC7)%$(EXT_C) $(COMMONDEP) | $(DIR_OBJ)
 $(DIR_OBJ)/%$(EXT_OBJ) : $(DIR_SRC8)%$(EXT_C) $(COMMONDEP) | $(DIR_OBJ)
 	$(CC) $(call make_cflags,$@) $(CINCS) $(CDEFS) $(call adjpath,$<)
 $(DIR_OBJ)/%$(EXT_OBJ) : $(DIR_SRC9)%$(EXT_C) $(COMMONDEP) | $(DIR_OBJ)
+	$(CC) $(call make_cflags,$@) $(CINCS) $(CDEFS) $(call adjpath,$<)
+$(DIR_OBJ)/%$(EXT_OBJ) : $(DIR_SRC10)%$(EXT_C) $(COMMONDEP) | $(DIR_OBJ)
 	$(CC) $(call make_cflags,$@) $(CINCS) $(CDEFS) $(call adjpath,$<)
 
 endif
@@ -371,6 +380,10 @@ $(DIR_OBJ)/%$(EXT_OBJ) : $(DIR_SRC9)%$(EXT_ASM) $(COMMONDEP) | $(DIR_OBJ)
 	$(CC) $(CAFLAGS)$(call adjpath,$@) $(CAINCS) $(CADEFS) $(call adjpath,$<)
 	$(AS) $(call make_asflags,$@) $(AINCS) $(ADEFS) $(call adjpath,$*$(EXT_INT))
 	-$(RM) $*$(EXT_INT)
+$(DIR_OBJ)/%$(EXT_OBJ) : $(DIR_SRC10)%$(EXT_ASM) $(COMMONDEP) | $(DIR_OBJ)
+	$(CC) $(CAFLAGS)$(call adjpath,$@) $(CAINCS) $(CADEFS) $(call adjpath,$<)
+	$(AS) $(call make_asflags,$@) $(AINCS) $(ADEFS) $(call adjpath,$*$(EXT_INT))
+	-$(RM) $*$(EXT_INT)
 
 else
 
@@ -392,6 +405,8 @@ $(DIR_OBJ)/%$(EXT_OBJ) : $(DIR_SRC7)%$(EXT_ASM) $(COMMONDEP) | $(DIR_OBJ)
 $(DIR_OBJ)/%$(EXT_OBJ) : $(DIR_SRC8)%$(EXT_ASM) $(COMMONDEP) | $(DIR_OBJ)
 	$(AS) $(call make_asflags,$@) $(AINCS) $(ADEFS) $(call adjpath,$<)
 $(DIR_OBJ)/%$(EXT_OBJ) : $(DIR_SRC9)%$(EXT_ASM) $(COMMONDEP) | $(DIR_OBJ)
+	$(AS) $(call make_asflags,$@) $(AINCS) $(ADEFS) $(call adjpath,$<)
+$(DIR_OBJ)/%$(EXT_OBJ) : $(DIR_SRC10)%$(EXT_ASM) $(COMMONDEP) | $(DIR_OBJ)
 	$(AS) $(call make_asflags,$@) $(AINCS) $(ADEFS) $(call adjpath,$<)
 
 endif
