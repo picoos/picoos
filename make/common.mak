@@ -103,7 +103,7 @@ endif
 endif
 
 # Define commands. DOS users will use the commands in the tools/ directory.
-MKDIR  = $(SHCMDPATH)mkdir$(EEXT)
+MKDIR  = $(SHCMDPATH)mkdir$(EEXT) -p
 REMOVE = $(SHCMDPATH)rm$(EEXT) -f
 RMDIR  = $(SHCMDPATH)rm$(EEXT) -f
 ifeq '$(strip $(DOS))' ''
