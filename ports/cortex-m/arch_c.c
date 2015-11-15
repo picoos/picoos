@@ -195,7 +195,7 @@ void Reset_Handler(void)
   while (dst < __bss_end)
     *dst++ = 0;
 
-  SystemInit();
+  portSystemInit();
 
   /*
    * Start heap after .bss segment, align it upwards.
@@ -230,6 +230,16 @@ void Reset_Handler(void)
   main();
   while (1)
     ;
+}
+
+/*
+ * Make portSystemInit a weak symbol, so application
+ * can replace it in causes where it is not desired
+ * to call CMSIS's SystemInit().
+ */
+void __attribute__((weak)) portSystemInit()
+{
+  SystemInit();
 }
 
 #endif

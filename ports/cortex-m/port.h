@@ -599,6 +599,7 @@ void portIdleTaskHook(void);
 
 void portInitClock(void);
 void portInitConsole(void);
+void portSystemInit(void);
 
 typedef void (* const PortExcHandlerFunc)(void);
 
