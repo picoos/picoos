@@ -236,7 +236,8 @@
  * "register VAR_t flags;" would be added to each function
  * using the macros ::POS_SCHED_LOCK and ::POS_SCHED_UNLOCK.
  */
-#define POSCFG_LOCK_FLAGSTYPE    register unsigned int
+#define PORTCFG_LOCK_FLAGS_BASETYPE	unsigned int
+#define POSCFG_LOCK_FLAGSTYPE    register PORTCFG_LOCK_FLAGS_BASETYPE
 
 /** Scheduler locking.
  * Locking the scheduler for a short time is done by
