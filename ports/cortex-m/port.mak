@@ -115,7 +115,7 @@ LDFLAGS        += -mthumb
 
 # Define Compiler Flags
 # TODO: extract -mcpu as constant
-CFLAGS_COMMON += -fno-common -mcpu=cortex-$(CORTEX) -ffunction-sections
+CFLAGS_COMMON += -fno-common -mcpu=cortex-$(CORTEX) -ffunction-sections -fdata-sections
 CFLAGS_COMMON += -Wcast-align -Wall -Wextra -Wshadow -Wpointer-arith -Waggregate-return
 CFLAGS_COMMON += -Wmissing-prototypes -Wno-unused-parameter -Wno-unused-label -Wno-unused-but-set-variable
 
