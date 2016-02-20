@@ -680,6 +680,37 @@ void PORT_NAKED PendSV_Handler()
   portRestoreContext();
 }
 
+#if (POSCFG_ROUNDROBIN == 0)
+
+UVAR_t POSCALL p_pos_findbit(const UVAR_t bitfield)
+{
+  int bit;
+
+  asm volatile ("rbit %[bit], %[bitField]   \n"
+      "          clz  %[bit], %[bitField]"
+               : [bit]"=r"(bit) : [bitField]"r"(bitfield));
+
+  return bit;
+}
+
+#else /* POSCFG_ROUNDROBIN */
+
+UVAR_t POSCALL p_pos_findbit(const UVAR_t bitfield, UVAR_t rrOffset)
+{
+  UVAR_t bf;
+  UVAR_t bit;
+
+  bf = (bitfield << (MVAR_BITS - rrOffset)) | (bitfield >> rrOffset);
+
+  asm volatile ("rbit %[bit], %[bitField]   \n"
+      "          clz  %[bit], %[bitField]"
+               : [bit]"=r"(bit) : [bitField]"r"(bf));
+
+  return (bit + rrOffset) & (MVAR_BITS - 1);
+}
+
+#endif
+
 #if __CORTEX_M >= 3
 
 POSCFG_LOCK_FLAGSTYPE portEnterCritical(void)
