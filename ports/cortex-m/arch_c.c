@@ -680,6 +680,7 @@ void PORT_NAKED PendSV_Handler()
   portRestoreContext();
 }
 
+#if __CORTEX_M >= 3
 #if (POSCFG_ROUNDROBIN == 0)
 
 UVAR_t POSCALL p_pos_findbit(const UVAR_t bitfield)
@@ -709,6 +710,7 @@ UVAR_t POSCALL p_pos_findbit(const UVAR_t bitfield, UVAR_t rrOffset)
   return (bit + rrOffset) & (MVAR_BITS - 1);
 }
 
+#endif
 #endif
 
 #if __CORTEX_M >= 3

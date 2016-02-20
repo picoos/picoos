@@ -47,7 +47,11 @@ CORTEX=m3
 endif
 
 # Set to 1 to include generic pico]OS "findbit" function
+ifeq '$(strip $(CORTEX))' 'm0'
+GENERIC_FINDBIT = 1
+else
 GENERIC_FINDBIT = 0
+endif
 
 # Define extensions
 EXT_C   = .c
