@@ -318,7 +318,11 @@ VAR_t p_pos_initTask(POSTASK_t task, UINT_t stacksize, POSTASKFUNC_t funcptr, vo
   task->stackSize = stacksize;
 
 #if POSCFG_ARGCHECK > 1
+#if NOSCFG_FEATURE_MEMSET == 1
   nosMemSet(task->stack, PORT_STACK_MAGIC, stacksize);
+#else
+  memset(task->stack, PORT_STACK_MAGIC, stacksize);
+#endif
 #endif
 
   z = (unsigned int) task->stack + stacksize;
