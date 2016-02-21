@@ -17,6 +17,12 @@ ports I have been writing:
 
 There is some information about these in [my blogs][2].
 
+Other small changes are:
+
+- stdarg support for nano layer printf-functions
+- Makefile system uses GNU make pattern rules for source directory handling (otherwise projects that had many directories run into troubles)
+
+
 Updated doxygen manual is available [here][3].
 
 [1]: http://picoos.sf.net
