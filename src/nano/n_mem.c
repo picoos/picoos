@@ -67,7 +67,7 @@
 void POSCALL nos_initMem(void);
 
 /* we need nosMemCopy for nosRealloc */
-#if (NOSCFG_FEATURE_REALLOC != 0) && (NOSCFG_FEATURE_MEMCOPY == 0)
+#if (NOSCFG_FEATURE_REALLOC != 0) && (NOSCFG_FEATURE_MEMCOPY == 0) && (NOSCFG_MEM_MANAGER_TYPE == 1)
 #undef NOSCFG_FEATURE_MEMCOPY
 #define NOSCFG_FEATURE_MEMCOPY  1
 void nosMemCopy(void *dst, void *src, UINT_t count);
