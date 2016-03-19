@@ -127,6 +127,9 @@ p_pos_initArch(void)
   
   memset(&timer, '\0', sizeof(timer));
   timer.it_interval.tv_usec = (1000 * 1000) / HZ;
+  timer.it_interval.tv_sec = timer.it_interval.tv_usec / 1000000;
+  timer.it_interval.tv_usec = timer.it_interval.tv_usec % 1000000;
+  timer.it_value.tv_sec = timer.it_interval.tv_sec;
   timer.it_value.tv_usec = timer.it_interval.tv_usec;
   setitimer(ITIMER_REAL, &timer, NULL);
 }
