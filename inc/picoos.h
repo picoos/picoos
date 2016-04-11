@@ -164,6 +164,7 @@
  * @section license License
  *
  *  Copyright (c) 2004-2012, Dennis Kuschel. @n
+ *  Copyright (c) 2011-2016, Ari Suutari. @n
  *  All rights reserved. @n
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -201,7 +202,12 @@
  * mail: dennis_k@freenet.de @n
  * web:  http://picoos.sourceforge.net @n
  *
- * (C) 2004-2012 Dennis Kuschel
+ * (C) 2004-2012 Dennis Kuschel @n @n
+ *  
+ * Ari Suutari @n
+ * mail: ari@stonepile.fi @n
+ * web: http://stonepile.fi @n
+ * (C) 2011-2016 Ari Suutari
  */
 
 /** @defgroup intro     Introduction */
@@ -256,9 +262,11 @@
 #define _PICOOS_H
 
 
-#define POS_VER_N           0x0104
-#define POS_VER_S           "1.0.4a"
-#define POS_COPYRIGHT       "(c) 2004-2012, D.Kuschel"
+#define POS_VER_N           0x0110
+#define POS_VER_S           "1.1.0a"
+#define POS_COPYRIGHT       "(c) 2004-2012, Dennis Kuschel\n" \
+                            "(c) 2011-2016, Ari Suutari"
+
 #define POS_STARTUPSTRING   "pico]OS " POS_VER_S "  " POS_COPYRIGHT
 
 #ifndef NULL
