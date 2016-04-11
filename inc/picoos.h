@@ -115,16 +115,16 @@
  *
  * Currently, ports to the following platforms are available:
  *
+ *  - ARM: Cortex-Mx, Philips LPC ARM chips
+ *  - Texas Instruments MSP430 family
+ *  - Microchip PIC32
+ *  - Unix (using setcontext/getcontext), for development and testing purpose only)
  *  - Intel 80x86 in real mode, the executable is loadable from DOS
  *  - MS Windows 32bit port, usefull for software development and debugging
  *  - 6502 / 65c02 / 6510 series, port for Commodore 64 available.
  *    Minimum configuration (4 tasks): 4.6kb code, 4.7kb data
  *  - PowerPC: IBM PPC440  (GNU C and MetaWare compiler supported)
  *  - AVR (ATMega, GNU C compiler supported)
- *  - ARM: SAMSUNG S3C2510A CPU (ARM940T core), Philips LPC ARM chips,
- *         Cortex-M0 and Cortex-M3
- *  - Texas Instruments MSP430 family
- *  - Unix (using setcontext/getcontext), for development and testing purpose only)
  *  - MyCPU (see http://www.mycpu.eu)
  *
  * @n@n
