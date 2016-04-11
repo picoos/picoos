@@ -279,7 +279,8 @@ extern void *__heap_end;
 
 /** Enable generic printf functions.
  * The nano layer supports a set of really generic printf functions.
- * This functions are not variadic, that means they do not support
+ * This functions are not variadic unless NOSCFG_FEATURE_USE_STDARG is
+ * defined. That means they do not support
  * a variable parameter list, thus they can be compiled without having
  * a runtime library linked (the header file <stdarg.h> is not needed).
  * @sa    ::nosPrintf1, ::NOSCFG_FEATURE_SPRINTF
@@ -288,12 +289,19 @@ extern void *__heap_end;
 
 /** Enable generic string printf ('sprintf') functions.
  * The nano layer supports a set of really generic sprintf functions.
- * This functions are not variadic, that means they do not support
+ * This functions are not variadic unless NOSCFG_FEATURE_USE_STDARG is
+ * defined. That means they do not support
  * a variable parameter list, thus they can be compiled without having
  * a runtime library linked (the header file <stdarg.h> is not needed).
  * @sa    ::nosSPrintf1, ::NOSCFG_FEATURE_PRINTF
  */
 #define NOSCFG_FEATURE_SPRINTF       1
+
+/** Enable stdarg.h in printf/sprintf functinos
+ * Compile nosPrintf and nosSPrintf versions that accept stdarg.h -style
+ * argument lists.
+ */
+#define NOSCFG_FEATURE_USE_STDARG      1
 
 /** @} */
 
