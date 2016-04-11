@@ -18,7 +18,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">pico]OS
-   &#160;<span id="projectnumber">1.0.4a</span>
+   &#160;<span id="projectnumber">1.1.0a</span>
    </div>
   </td>
  </tr>
@@ -56,6 +56,8 @@ Macros</h2></td></tr>
 <tr class="separator:gaf5207b42fb1412ff721b4f8b83987486"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga48ae024a3b98d758f80429c66ab14299"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__cfgnoscio.html#ga48ae024a3b98d758f80429c66ab14299">NOSCFG_FEATURE_SPRINTF</a>&#160;&#160;&#160;1</td></tr>
 <tr class="separator:ga48ae024a3b98d758f80429c66ab14299"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga8bf0075a555e7358a58740bf0271d044"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__cfgnoscio.html#ga8bf0075a555e7358a58740bf0271d044">NOSCFG_FEATURE_USE_STDARG</a>&#160;&#160;&#160;1</td></tr>
+<tr class="separator:ga8bf0075a555e7358a58740bf0271d044"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <h2 class="groupheader">Macro Definition Documentation</h2>
@@ -107,7 +109,7 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Enable generic printf functions. The nano layer supports a set of really generic printf functions. This functions are not variadic, that means they do not support a variable parameter list, thus they can be compiled without having a runtime library linked (the header file &lt;stdarg.h&gt; is not needed). </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="group__conio.html#ga4024115718a7f213fda78d38b5f3a766">nosPrintf1</a>, <a class="el" href="group__cfgnoscio.html#ga48ae024a3b98d758f80429c66ab14299">NOSCFG_FEATURE_SPRINTF</a> </dd></dl>
+<p>Enable generic printf functions. The nano layer supports a set of really generic printf functions. This functions are not variadic unless NOSCFG_FEATURE_USE_STDARG is defined. That means they do not support a variable parameter list, thus they can be compiled without having a runtime library linked (the header file &lt;stdarg.h&gt; is not needed). </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="group__conio.html#ga4024115718a7f213fda78d38b5f3a766">nosPrintf1</a>, <a class="el" href="group__cfgnoscio.html#ga48ae024a3b98d758f80429c66ab14299">NOSCFG_FEATURE_SPRINTF</a> </dd></dl>
 
 </div>
 </div>
@@ -120,7 +122,20 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Enable generic string printf ('sprintf') functions. The nano layer supports a set of really generic sprintf functions. This functions are not variadic, that means they do not support a variable parameter list, thus they can be compiled without having a runtime library linked (the header file &lt;stdarg.h&gt; is not needed). </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="group__conio.html#gaa9858e5d5fd803b29f53e8463e2e1faf">nosSPrintf1</a>, <a class="el" href="group__cfgnoscio.html#gaf5207b42fb1412ff721b4f8b83987486">NOSCFG_FEATURE_PRINTF</a> </dd></dl>
+<p>Enable generic string printf ('sprintf') functions. The nano layer supports a set of really generic sprintf functions. This functions are not variadic unless NOSCFG_FEATURE_USE_STDARG is defined. That means they do not support a variable parameter list, thus they can be compiled without having a runtime library linked (the header file &lt;stdarg.h&gt; is not needed). </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="group__conio.html#gaa9858e5d5fd803b29f53e8463e2e1faf">nosSPrintf1</a>, <a class="el" href="group__cfgnoscio.html#gaf5207b42fb1412ff721b4f8b83987486">NOSCFG_FEATURE_PRINTF</a> </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ga8bf0075a555e7358a58740bf0271d044"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define NOSCFG_FEATURE_USE_STDARG&#160;&#160;&#160;1</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Enable stdarg.h in printf/sprintf functinos Compile nosPrintf and nosSPrintf versions that accept stdarg.h -style argument lists. </p>
 
 </div>
 </div>

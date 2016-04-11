@@ -18,7 +18,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">pico]OS
-   &#160;<span id="projectnumber">1.0.4a</span>
+   &#160;<span id="projectnumber">1.1.0a</span>
    </div>
   </td>
  </tr>
@@ -136,7 +136,9 @@
 <li>
 <a class="el" href="group__task.html">Task Control Functions</a> </li>
 <li>
-<a class="el" href="group__timer.html">Timer Functions</a> </li>
+<a class="el" href="group__timer.html">Timer Functions</a>  </li>
+<li>
+<a class="el" href="group__power.html">Power Management Functions</a> </li>
 </ul>
 </li>
 <li>
@@ -213,6 +215,10 @@ Features</h2>
 <li>up to 256 simulated software interrupts on 8 bit processors</li>
 <li>can be used to interface fast hardware interrupts outside the scope of pico]OS to the operating system</li>
 </ul>
+<p><b>Power Management:</b></p><ul>
+<li>idle system placed into sleep to save power</li>
+<li>optional support for filtering out wakeups that won't result in task activation</li>
+</ul>
 <p><b>Miscellaneous:</b></p><ul>
 <li>atomic variables</li>
 <li>blocking and nonblocking lists</li>
@@ -235,14 +241,15 @@ The optional <b>nano-layer</b> supports:</p>
 Available Ports</h2>
 <p>Currently, ports to the following platforms are available:</p>
 <ul>
+<li>ARM: Cortex-Mx, Philips LPC ARM chips</li>
+<li>Texas Instruments MSP430 family</li>
+<li>Microchip PIC32</li>
+<li>Unix (using setcontext/getcontext), for development and testing purpose only)</li>
 <li>Intel 80x86 in real mode, the executable is loadable from DOS</li>
 <li>MS Windows 32bit port, usefull for software development and debugging</li>
 <li>6502 / 65c02 / 6510 series, port for Commodore 64 available. Minimum configuration (4 tasks): 4.6kb code, 4.7kb data</li>
 <li>PowerPC: IBM PPC440 (GNU C and MetaWare compiler supported)</li>
 <li>AVR (ATMega, GNU C compiler supported)</li>
-<li>ARM: SAMSUNG S3C2510A CPU (ARM940T core), Philips LPC ARM chips, Cortex-M0 and Cortex-M3</li>
-<li>Texas Instruments MSP430 family</li>
-<li>Unix (using setcontext/getcontext), for development and testing purpose only)</li>
 <li>MyCPU (see <a href="http://www.mycpu.eu">http://www.mycpu.eu</a>)</li>
 </ul>
 <p><br />
@@ -295,6 +302,7 @@ Files</h2>
 <h1><a class="anchor" id="license"></a>
 License</h1>
 <p>Copyright (c) 2004-2012, Dennis Kuschel. <br />
+ Copyright (c) 2011-2016, Ari Suutari. <br />
  All rights reserved. <br />
  Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met: <br />
 </p><ol type="1">
@@ -314,7 +322,12 @@ Kurt-Georg-Kiesinger-Allee 14 <br />
 GERMANY <br />
  mail: <a href="#" onclick="location.href='mai'+'lto:'+'den'+'ni'+'s_k'+'@f'+'ree'+'ne'+'t.d'+'e'; return false;">denni<span style="display: none;">.nosp@m.</span>s_k@<span style="display: none;">.nosp@m.</span>freen<span style="display: none;">.nosp@m.</span>et.d<span style="display: none;">.nosp@m.</span>e</a> <br />
 web: <a href="http://picoos.sourceforge.net">http://picoos.sourceforge.net</a> <br />
- (C) 2004-2012 Dennis Kuschel </p>
+ (C) 2004-2012 Dennis Kuschel <br />
+ <br />
+ Ari Suutari <br />
+mail: <a href="#" onclick="location.href='mai'+'lto:'+'ari'+'@s'+'ton'+'ep'+'ile'+'.f'+'i'; return false;">ari@s<span style="display: none;">.nosp@m.</span>tone<span style="display: none;">.nosp@m.</span>pile.<span style="display: none;">.nosp@m.</span>fi</a> <br />
+web: <a href="http://stonepile.fi">http://stonepile.fi</a> <br />
+(C) 2011-2016 Ari Suutari </p>
 </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

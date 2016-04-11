@@ -18,7 +18,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">pico]OS
-   &#160;<span id="projectnumber">1.0.4a</span>
+   &#160;<span id="projectnumber">1.1.0a</span>
    </div>
   </td>
  </tr>
@@ -98,6 +98,12 @@
 </li>
 <li>p_pos_lock()
 : <a class="el" href="group__port.html#gaa332a78292bc10867826e247361cc130">picoos.h</a>
+</li>
+<li>p_pos_powerSleep()
+: <a class="el" href="group__port.html#ga2b1ee080cddd8e448fbb989028366ca3">picoos.h</a>
+</li>
+<li>p_pos_powerWakeup()
+: <a class="el" href="group__port.html#ga8fb243ddf4d890cdbaf91c0d37f1ee06">picoos.h</a>
 </li>
 <li>p_pos_softContextSwitch()
 : <a class="el" href="group__port.html#ga29774435bfbbb74fd003a0e3c5332af0">picoos.h</a>
@@ -257,6 +263,12 @@
 </li>
 <li>POSCFG_FEATURE_MUTEXTRYLOCK
 : <a class="el" href="group__feature.html#ga97d5ca7576f3db9ef256461bb5eae051">poscfg.h</a>
+</li>
+<li>POSCFG_FEATURE_POWER
+: <a class="el" href="group__feature.html#ga3a443b2273a93c8489a61e55e553d494">poscfg.h</a>
+</li>
+<li>POSCFG_FEATURE_POWER_WAKEUP
+: <a class="el" href="group__feature.html#gad1f8c6f887659c0a14157fd825a9f4df">poscfg.h</a>
 </li>
 <li>POSCFG_FEATURE_SEMADESTROY
 : <a class="el" href="group__feature.html#gaba45028573a2028c529ad4a83de09c1e">poscfg.h</a>
@@ -492,6 +504,18 @@
 <li>posNextTask_g
 : <a class="el" href="picoos_8h.html#a2233e39d0b5f16537a13f910653dd0a1">picoos.h</a>
 </li>
+<li>POSPOWERCB_t
+: <a class="el" href="picoos_8h.html#afb437fba8b1cc097ae53c81a39b1f439">picoos.h</a>
+</li>
+<li>posPowerDisableSleep()
+: <a class="el" href="group__power.html#gab1d6bec78b50d5dab118004b4c38c6b8">picoos.h</a>
+</li>
+<li>posPowerEnableSleep()
+: <a class="el" href="group__power.html#gab2d38018c395fcc2179b4fdc5c8ef2b6">picoos.h</a>
+</li>
+<li>posPowerSetCallback()
+: <a class="el" href="group__power.html#gaca810e0156b56d606956460373abfe27">picoos.h</a>
+</li>
 <li>posRunning_g
 : <a class="el" href="picoos_8h.html#a492a4358cee590c1969413bc23abafb7">picoos.h</a>
 </li>
@@ -526,7 +550,7 @@
 : <a class="el" href="picoos_8h.html#a4529d202a1c8363a8d29cd9e1606438d">picoos.h</a>
 </li>
 <li>posTaskCreate()
-: <a class="el" href="group__task.html#ga608268d439375453aa19f53b055e714a">picoos.h</a>
+: <a class="el" href="group__task.html#ga41b8f6dc4247f0a7552586ac87c85447">picoos.h</a>
 </li>
 <li>posTaskExit()
 : <a class="el" href="group__task.html#gaf06b58618b7cd328a435796b0af9f71c">picoos.h</a>
@@ -542,9 +566,6 @@
 </li>
 <li>posTaskGetUserspace()
 : <a class="el" href="group__task.html#ga116209e51714b8a643d366676d617967">picoos.h</a>
-</li>
-<li>posTaskNextWakeup()
-: <a class="el" href="group__task.html#ga08e3053aee554faa0de599961846d577">picoos.h</a>
 </li>
 <li>posTaskSchedLock()
 : <a class="el" href="group__task.html#ga0511f30ba8f08f0b5ef1d78a631b7a4c">picoos.h</a>

@@ -18,7 +18,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">pico]OS
-   &#160;<span id="projectnumber">1.0.4a</span>
+   &#160;<span id="projectnumber">1.1.0a</span>
    </div>
   </td>
  </tr>
@@ -80,6 +80,10 @@ Functions</h2></td></tr>
 <tr class="separator:ga5192c53a3d925629b7946b165fa5a47b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga03edcb67afad4d0afae09a8a1bf45fd0"><td class="memItemLeft" align="right" valign="top">POSEXTERN void POSCALL&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__port.html#ga03edcb67afad4d0afae09a8a1bf45fd0">c_pos_timerInterrupt</a> (void)</td></tr>
 <tr class="separator:ga03edcb67afad4d0afae09a8a1bf45fd0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga2b1ee080cddd8e448fbb989028366ca3"><td class="memItemLeft" align="right" valign="top">POSFROMEXT void POSCALL&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__port.html#ga2b1ee080cddd8e448fbb989028366ca3">p_pos_powerSleep</a> (void)</td></tr>
+<tr class="separator:ga2b1ee080cddd8e448fbb989028366ca3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga8fb243ddf4d890cdbaf91c0d37f1ee06"><td class="memItemLeft" align="right" valign="top">POSFROMEXT void POSCALL&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__port.html#ga8fb243ddf4d890cdbaf91c0d37f1ee06">p_pos_powerWakeup</a> (void)</td></tr>
+<tr class="separator:ga8fb243ddf4d890cdbaf91c0d37f1ee06"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <h3>General Information</h3>
@@ -536,6 +540,42 @@ It is possible to implement the findbit mechanism as look up table. For this pur
       </table>
 </div><div class="memdoc">
 <p>Port lock. In some really special cases it may be required that Pico]OS must acquire a mutex before it can call the functions <a class="el" href="group__port.html#ga3f92fe5d53d8cd3b5b9526baff168c11">p_pos_initTask</a> and <a class="el" href="group__port.html#ga090da72a97048dbb2067d6b221b96c0e">p_pos_freeStack</a>. If you need such a mutex for your port, please define <a class="el" href="group__arch.html#ga2a9f848214e56f69075e1dd798c0a717">POSCFG_PORTMUTEX</a> to 1. Then implement the both functions <a class="el" href="group__port.html#gaa332a78292bc10867826e247361cc130">p_pos_lock</a> and p_pos_unlock in your arch_c.c file. </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="group__port.html#gadbbcc1b0e31b3fce379f6457e6335399">p_pos_unlock</a>, <a class="el" href="group__arch.html#ga2a9f848214e56f69075e1dd798c0a717">POSCFG_PORTMUTEX</a> </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ga2b1ee080cddd8e448fbb989028366ca3"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">POSFROMEXT void POSCALL p_pos_powerSleep </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Called by idle task when system should fall in sleep. </p><dl class="section note"><dt>Note</dt><dd>This function is not part of the pico]OS. It must be provided by the user, since it is architecture specific. The processor interrupts are disabled when this function is called. </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="group__port.html#ga8fb243ddf4d890cdbaf91c0d37f1ee06">p_pos_powerWakeup</a> </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ga8fb243ddf4d890cdbaf91c0d37f1ee06"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">POSFROMEXT void POSCALL p_pos_powerWakeup </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Called by p_pos_intExit when system should wake up from sleep. </p><dl class="section note"><dt>Note</dt><dd>This function is not part of the pico]OS. It must be provided by the user, since it is architecture specific. </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="group__port.html#ga2b1ee080cddd8e448fbb989028366ca3">p_pos_powerSleep</a>, <a class="el" href="group__port.html#gad290f0d4a1eecd5f09cfeded7829e187">c_pos_intExit</a> </dd></dl>
 
 </div>
 </div>

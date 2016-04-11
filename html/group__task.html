@@ -18,7 +18,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">pico]OS
-   &#160;<span id="projectnumber">1.0.4a</span>
+   &#160;<span id="projectnumber">1.1.0a</span>
    </div>
   </td>
  </tr>
@@ -80,8 +80,6 @@ Functions</h2></td></tr>
 <tr class="separator:ga116209e51714b8a643d366676d617967"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gac57fb0f35429cd8ebeab78cfeb89f6ad"><td class="memItemLeft" align="right" valign="top">POSEXTERN <a class="el" href="picoos_8h.html#a0d609d3581bd477714ed15eefa61b47c">POSIDLEFUNC_t</a> POSCALL&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__task.html#gac57fb0f35429cd8ebeab78cfeb89f6ad">posInstallIdleTaskHook</a> (<a class="el" href="picoos_8h.html#a0d609d3581bd477714ed15eefa61b47c">POSIDLEFUNC_t</a> idlefunc)</td></tr>
 <tr class="separator:gac57fb0f35429cd8ebeab78cfeb89f6ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga08e3053aee554faa0de599961846d577"><td class="memItemLeft" align="right" valign="top">POSEXTERN <a class="el" href="picoos_8h.html#a17133269bf6f77fd6b3523d894076dbe">UINT_t</a> POSCALL&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__task.html#ga08e3053aee554faa0de599961846d577">posTaskNextWakeup</a> (void)</td></tr>
-<tr class="separator:ga08e3053aee554faa0de599961846d577"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <h2 class="groupheader">Function Documentation</h2>
@@ -480,23 +478,6 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>Task function. Returns a pointer to the user memory in the current task control block. </p><dl class="section note"><dt>Note</dt><dd><a class="el" href="group__coreset.html#ga615da872278475e3bed3c4dd253b2b9a">POSCFG_TASKCB_USERSPACE</a> must be defined to a nonzero value to have this function compiled in. <a class="el" href="group__coreset.html#ga615da872278475e3bed3c4dd253b2b9a">POSCFG_TASKCB_USERSPACE</a> is also used to set the size of the user memory (in bytes). </dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>pointer to user memory space. </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="ga08e3053aee554faa0de599961846d577"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">POSEXTERN <a class="el" href="picoos_8h.html#a17133269bf6f77fd6b3523d894076dbe">UINT_t</a> POSCALL posTaskNextWakeup </td>
-          <td>(</td>
-          <td class="paramtype">void&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Task function. Return ticks until next task should wake up. </p><dl class="section return"><dt>Returns</dt><dd>Number of ticks we can safely sleep or INFINITE. </dd></dl>
 
 </div>
 </div>
