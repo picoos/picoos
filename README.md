@@ -17,10 +17,11 @@ ports I have been writing:
 
 There is some information about these in [my blogs][2].
 
-Other small changes are:
+Other changes are:
 
 - stdarg support for nano layer printf-functions
 - Makefile system uses GNU make pattern rules for source directory handling (otherwise projects that had many directories run into troubles)
+- Power management API to provide framework for MCU power saving / sleeping features
 
 
 Updated doxygen manual is available [here][3].

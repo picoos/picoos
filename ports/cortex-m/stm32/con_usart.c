@@ -85,6 +85,7 @@ void USARTx_IRQHandler()
   if (USART_GetITStatus(USARTx, USART_IT_TXE) == SET) {
 
     USART_ITConfig (USARTx, USART_IT_TXE, DISABLE);
+    posPowerEnableSleep();
     c_nos_putcharReady();
   }
 #endif
@@ -115,6 +116,7 @@ p_putchar(char c)
   if (USART_GetFlagStatus(USARTx, USART_FLAG_TXE) == RESET)
     return 0;
 
+  posPowerDisableSleep();
   USART_SendData(USARTx, c);
   USART_ITConfig (USARTx, USART_IT_TXE, ENABLE);
   return 1;

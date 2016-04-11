@@ -204,6 +204,12 @@ static UVAR_t    posCtxCombineCtr_g;
 static UVAR_t    posInhibitSched_g;
 #endif
 
+#if POSCFG_FEATURE_POWER != 0
+static VAR_t     posPowerMode_g = 0;
+static UVAR_t    posPowerSleepDisable_g = 1;
+static POSPOWERCB_t posPowerCallback = NULL;
+#endif
+
 #if POSCFG_FEATURE_IDLETASKHOOK != 0
 static POSIDLEFUNC_t  posIdleTaskFuncHook_g;
 #endif
@@ -565,6 +571,9 @@ static void POSCALL pos_listRemove(POSLIST_t *listelem)
 static void pos_idletask(void *arg)
 {
   POS_LOCKFLAGS;
+#if POSCFG_FEATURE_POWER != 0
+  int sleepDisabled;
+#endif
 
   (void) arg;
 
@@ -584,6 +593,30 @@ static void pos_idletask(void *arg)
     if (posIdleTaskFuncHook_g != NULL)
       (posIdleTaskFuncHook_g)();
 #endif
+#if POSCFG_FEATURE_POWER != 0
+
+    POS_SCHED_LOCK;
+    sleepDisabled = posPowerSleepDisable_g;
+    POS_SCHED_UNLOCK;
+
+    if (sleepDisabled == 0) 
+    {
+      POS_SCHED_LOCK;
+
+      if (posPowerCallback != NULL)
+        posPowerCallback(POSPOWER_EVENT_SLEEP);
+
+      posPowerMode_g = 1;
+      p_pos_powerSleep();
+      posPowerMode_g = 0;
+
+      if (posPowerCallback != NULL)
+        posPowerCallback(POSPOWER_EVENT_WAKEUP);
+
+      POS_SCHED_UNLOCK;
+    }
+#endif
+
   }
 }
 
@@ -801,46 +834,90 @@ void POSCALL c_pos_intExit(void)
 #endif
       if (posMustSchedule_g != 0)
       {
-        posMustSchedule_g = 0;
+#if POSCFG_FEATURE_POWER != 0 && POSCFG_FEATURE_POWER_WAKEUP == 0
+
+        /*
+         * If system is sleeping in powersave mode and an interrupt will wake it
+         * up (without any extra operations), just adjust state to show
+         * that system is waking up and skip task scheduling. Idle
+         * task will call pos_schedule after wakeup.
+         */
+        if (posPowerMode_g != 0)
+        {
+          posPowerMode_g = -1;
+        }
+        else {
+#endif
+          posMustSchedule_g = 0;
 #if POSCFG_CTXSW_COMBINE > 1
-        posCtxCombineCtr_g = 0;
+          posCtxCombineCtr_g = 0;
 #endif
 
 #if SYS_TASKTABSIZE_Y > 1
-        ym = POS_FINDBIT(posReadyTasks_g.ymask);
+          ym = POS_FINDBIT(posReadyTasks_g.ymask);
 #else
-        ym = 0;
+          ym = 0;
 #endif
-        xt = POS_FINDBIT_EX(posReadyTasks_g.xtable[ym],
-                            POS_NEXTROUNDROBIN(ym));
+          xt = POS_FINDBIT_EX(posReadyTasks_g.xtable[ym],
+                              POS_NEXTROUNDROBIN(ym));
+
+          posNextTask_g = posTaskTable_g[(ym * SYS_TASKTABSIZE_X) + xt];
+
+#if POSCFG_FEATURE_POWER != 0 && POSCFG_FEATURE_POWER_WAKEUP != 0
+
+          /*
+           * If system is sleeping in powersave mode wake it up by calling
+           * p_pos_powerWakeup() if it looks like task scheduling is required.
+           * Don't schedule task here (as wakeup usually requires extra operations
+           * with system peripheral re-setup), idle task will call pos_schedule after wakeup.
+           */
+          if (posPowerMode_g != 0)
+          {
+            if (posPowerMode_g > 0 && posCurrentTask_g != posNextTask_g)
+            {
+              posPowerMode_g = -1;
+              p_pos_powerWakeup();
+            }
+
+#ifdef POS_DEBUGHELP
+            pos_taskHistory(&posCurrentTask_g->deb);
+#endif
+
+#if POSCFG_ISR_INTERRUPTABLE != 0
+            POS_SCHED_UNLOCK;
+#endif
+            return;
+          }
+#endif
 
 #if (SYS_TASKTABSIZE_X > 1) && (POSCFG_ROUNDROBIN != 0)
-        posNextRoundRobin_g[ym] = (xt + 1) & (SYS_TASKTABSIZE_X - 1);
+          posNextRoundRobin_g[ym] = (xt + 1) & (SYS_TASKTABSIZE_X - 1);
 #endif
 
-        posNextTask_g = posTaskTable_g[(ym * SYS_TASKTABSIZE_X) + xt];
-
-        if (posCurrentTask_g != posNextTask_g)
-        {
+          if (posCurrentTask_g != posNextTask_g)
+          {
 #if POSCFG_ISR_INTERRUPTABLE == 0
-          /* all ctx switch functions need to be called with lock acquired */
-          POS_SCHED_LOCK;
+            /* all ctx switch functions need to be called with lock acquired */
+            POS_SCHED_LOCK;
 #endif
 #ifdef POS_DEBUGHELP
-          posCurrentTask_g->deb.state = task_suspended;
-          posNextTask_g->deb.state = task_running;
-          pos_taskHistory(&posNextTask_g->deb);
+            posCurrentTask_g->deb.state = task_suspended;
+            posNextTask_g->deb.state = task_running;
+            pos_taskHistory(&posNextTask_g->deb);
 #endif
-          /* Note:
-           * The processor does not return from this function call. When
-           * this function returns anyway, the architecture port is buggy.
-           */
-          p_pos_intContextSwitch();
+            /* Note:
+             * The processor does not return from this function call. When
+             * this function returns anyway, the architecture port is buggy.
+             */
+            p_pos_intContextSwitch();
 #if POSCFG_ISR_INTERRUPTABLE != 0
-          POS_SCHED_UNLOCK;
+            POS_SCHED_UNLOCK;
 #endif
-          return; /* needed for the thread based ports, eg. x86w32 */
+            return; /* needed for the thread based ports, eg. x86w32 */
+          }
+#if POSCFG_FEATURE_POWER != 0 && POSCFG_FEATURE_POWER_WAKEUP == 0
         }
+#endif
       }
 #if POSCFG_FEATURE_INHIBITSCHED != 0
     }
@@ -1468,7 +1545,48 @@ void* POSCALL posTaskGetUserspace(void)
 
 #endif  /* POSCFG_TASKCB_USERSPACE */
 
+/*---------------------------------------------------------------------------
+ * EXPORTED FUNCTIONS:  POWER MANAGEMENT
+ *-------------------------------------------------------------------------*/
 
+#if POSCFG_FEATURE_POWER != 0
+
+void POSCALL posPowerDisableSleep(void)
+{
+  POS_LOCKFLAGS;
+
+  POS_SCHED_LOCK;
+  ++posPowerSleepDisable_g;
+  POS_SCHED_UNLOCK;
+}
+
+/*-------------------------------------------------------------------------*/
+
+void POSCALL posPowerEnableSleep(void)
+{
+  POS_LOCKFLAGS;
+
+  POS_SCHED_LOCK;
+  --posPowerSleepDisable_g;
+  POS_SCHED_UNLOCK;
+}
+
+/*-------------------------------------------------------------------------*/
+
+POSPOWERCB_t POSCALL posPowerSetCallback(POSPOWERCB_t callback)
+{
+  POS_LOCKFLAGS;
+  POSPOWERCB_t old;
+
+  POS_SCHED_LOCK;
+  old = posPowerCallback;
+  posPowerCallback = callback;
+  POS_SCHED_UNLOCK;
+
+  return old;
+}
+
+#endif  /* POSCFG_FEATURE_POWER */
 
 /*---------------------------------------------------------------------------
  * EXPORTED FUNCTIONS:  SEMAPHORES

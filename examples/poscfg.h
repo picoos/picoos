@@ -519,6 +519,19 @@
  */
 #define POSCFG_FEATURE_DEBUGHELP     0
 
+/** Enable power management api.
+ * If this definition is set to 1, pico]OS power management functions
+ * are included into kernel. Note that architecture port must support
+ * power management.
+ */
+#define POSCFG_FEATURE_POWER         0
+
+/** Enable interrupt wakeup support in power management.
+ * If this definition is set to 1, pico]OS allows system to
+ * stay in sleep until a interrupt causes context switch away
+ * from idle task.
+ */
+#define POSCFG_FEATURE_POWER_WAKEUP  1
 /** @} */
 
 

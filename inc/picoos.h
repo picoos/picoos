@@ -40,7 +40,8 @@
  *     <li> @ref flag     </li><li> @ref lists    </li>
  *     <li> @ref msg      </li><li> @ref mutex    </li>
  *     <li> @ref sema     </li><li> @ref sint     </li>
- *     <li> @ref task     </li><li> @ref timer    </li></ul></li>
+ *     <li> @ref task     </li><li> @ref timer    </li>
+ *     <li> @ref power    </li></ul></li>
  *   <li><b>Nano Layer</b><ul><li> @ref absfunc <ul>
  *       <li> @ref nanoflag </li><li> @ref nanomsg  </li>
  *       <li> @ref nanomutex</li><li> @ref nanosema </li>
@@ -88,6 +89,11 @@
  *  - up to 256 simulated software interrupts on 8 bit processors
  *  - can be used to interface fast hardware interrupts outside the scope of
  *    pico]OS to the operating system
+ *
+ * <b>Power Management:</b>
+ *  - idle system placed into sleep to save power
+ *  - optional support for filtering out wakeups that won't result
+ *    in task activation
  *
  * <b>Miscellaneous:</b>
  *  - atomic variables
@@ -220,6 +226,7 @@
  *      - Timers
  *      - Lists
  *      - Atomic Variables
+ *      - Power management
  *
  *   - The nano layer contains features that are based on the pico layer:
  *      - Bottom Halfs
@@ -498,6 +505,12 @@
 #endif
 #ifndef POSCFG_INT_EXIT_QUICK
 #define POSCFG_INT_EXIT_QUICK 0
+#endif
+#ifndef POSCFG_FEATURE_POWER
+#define POSCFG_FEATURE_POWER 0
+#endif
+#ifndef POSCFG_FEATURE_POWER_WAKEUP
+#define POSCFG_FEATURE_POWER_WAKEUP 0
 #endif
 
 /* parameter range checking */
@@ -827,6 +840,15 @@ typedef void (*POSINTFUNC_t)(UVAR_t arg);
 #if (DOX!=0) ||(POSCFG_FEATURE_IDLETASKHOOK != 0)
 /** @brief  Idle task function pointer */
 typedef void (*POSIDLEFUNC_t)(void);
+#endif
+
+#if (DOX!=0) ||(POSCFG_FEATURE_POWER != 0)
+/** @brief  Power management callback function pointer */
+typedef void (*POSPOWERCB_t)(UVAR_t event);
+
+#define POSPOWER_EVENT_SLEEP    0
+#define POSPOWER_EVENT_WAKEUP   1
+
 #endif
 
 /* forward declarations (just dummies) */
@@ -1482,6 +1504,31 @@ POSEXTERN void POSCALL c_pos_intExitQuick(void);      /* picoos.c */
  */
 POSEXTERN void POSCALL c_pos_timerInterrupt(void);      /* picoos.c */
 
+#if (DOX!=0) || POSCFG_FEATURE_POWER == 1
+
+/**
+ * Called by idle task when system should fall in sleep.
+ * @note    This function is not part of the pico]OS. It must be
+ *          provided by the user, since it is architecture specific.
+ *          The processor interrupts are disabled when this function
+ *          is called.
+ * @sa      p_pos_powerWakeup
+ */
+POSFROMEXT void POSCALL p_pos_powerSleep(void);    /* arch_c.c */
+
+#if (DOX!=0) || POSCFG_FEATURE_POWER_WAKEUP == 1
+
+/**
+ * Called by p_pos_intExit when system should wake up from sleep.
+ * @note    This function is not part of the pico]OS. It must be
+ *          provided by the user, since it is architecture specific.
+ * @sa      p_pos_powerSleep, c_pos_intExit
+ */
+POSFROMEXT void POSCALL p_pos_powerWakeup(void);    /* arch_c.c */
+
+#endif
+#endif
+
 /** @} */
 
 
@@ -1774,6 +1821,51 @@ POSEXTERN void* POSCALL posTaskGetUserspace(void);
  *          to have this function compiled in.
  */
 POSEXTERN POSIDLEFUNC_t POSCALL posInstallIdleTaskHook(POSIDLEFUNC_t idlefunc);
+#endif
+
+/** @} */
+
+/*-------------------------------------------------------------------------*/
+
+/** @defgroup power Power Management Functions
+ * @ingroup userapip
+ * @{
+ */
+
+#if (DOX!=0) || POSCFG_FEATURE_POWER == 1
+/**
+ * Power management function.
+ * Disable sleeping temporarily.
+ * @note    ::POSCFG_FEATURE_POWER must be defined to 1 
+ *          to have this function compiled in.
+ * @sa      posPowerEnableSleep
+ */
+POSEXTERN void POSCALL posPowerDisableSleep(void);
+
+/**
+ * Power management function.
+ * Enable sleeping. At startup, sleeping is disabled by default.
+ * @note    ::POSCFG_FEATURE_POWER must be defined to 1 
+ *          to have this function compiled in.
+ * @sa      posPowerDisableSleep
+ */
+POSEXTERN void POSCALL posPowerEnableSleep(void);
+
+/**
+ * Power management function.
+ * Install or remove an optional power management event callback function.
+ * The hook function is called every time when power management event 
+ * (sleep or wakeup) occurs. Callback function can be used
+ * for example to restore system clocks after sleep.
+ * @param   callback  function pointer to callback function.
+ * @return  This function may return a pointer to the last callback
+ *          function set. If so (pointer is not NULL), the previous
+ *          callback function should be called from within your
+ *          callback. This enables chaining of callback functions.
+ * @note    ::POSCFG_FEATURE_POWER must be defined to 1 
+ *          to have this function compiled in.
+ */
+POSEXTERN POSPOWERCB_t POSCALL posPowerSetCallback(POSPOWERCB_t callback);
 #endif
 
 /** @} */

@@ -33,7 +33,6 @@
 #include <string.h>
 #include "port_irq.h"
 
-
 #if NOSCFG_MEM_MANAGER_TYPE == 0
 /*
  * To use newlib malloc/free, set memory manager type to 2
@@ -527,41 +526,79 @@ void PORT_NAKED portRestoreContextImpl(void)
 #endif
 }
 
+#if POSCFG_FEATURE_POWER != 0
+#if POSCFG_FEATURE_POWER_WAKEUP != 0
+
+/*
+ * Wakup up CPU.
+ */
+void p_pos_powerWakeup()
+{
+  SCB->SCR &= ~SCB_SCR_SLEEPONEXIT_Msk;
+}
+
+#endif
+
 /*
  * Nothing to do, put CPU to sleep.
  */
-void portIdleTaskHook()
+void p_pos_powerSleep()
 {
-  /*
-   * Put CPU to sleep. Set SLEEPONEXIT to inhibit waking
-   * back to idle task. SLEEPONEXIT is cleared if context is switched.
-   */
-#if PORTCFG_SLEEP_IN_DEBUG == 1
+#if !PORTCFG_SLEEP_IN_DEBUG
 
-	SCB->SCR |= SCB_SCR_SLEEPONEXIT_Msk;
-    __WFI();
+/*
+ * If debugging, don't sleep as debuggers usually
+ * get upset.
+ */
+#if __CORTEX_M < 3
+#ifdef _DBG
 
+  return;
+
+#endif
 #else
+
+  if ((CoreDebug->DHCSR & CoreDebug_DHCSR_C_DEBUGEN_Msk))
+    return;
+
+#endif
+#endif
+
+#if POSCFG_FEATURE_POWER_WAKEUP != 0
+
+/*
+ * If wakeup function is configured, it is ok to stay
+ * sleeping at end of interrupt that doesnt result in
+ * context switch.
+ */
+  SCB->SCR |= SCB_SCR_SLEEPONEXIT_Msk; // Sleep after interrupt
+#endif
+
+  uint32_t oldStatus;
+
+  // Ensure flag that __WFE waits for is not set yet
+  __SEV();
+  __WFE();
 
 #if __CORTEX_M < 3
-  /*
-   * CoreDebug is not visible in Cortex-m0.
-   * Just never sleep in debug versions.
-   */
-#ifndef _DBG
-  SCB->SCR |= SCB_SCR_SLEEPONEXIT_Msk;
-  __WFI();
-#endif
+
+  oldStatus = __get_PRIMASK();
+  __disable_irq();
+  __WFE();
+  if (oldStatus)
+    __enable_irq();
 
 #else
-  if ((CoreDebug->DHCSR & CoreDebug_DHCSR_C_DEBUGEN_Msk) == 0) {
 
-    SCB->SCR |= SCB_SCR_SLEEPONEXIT_Msk;
-    __WFI();
-  }
-#endif
+  oldStatus = __get_BASEPRI();
+  __set_BASEPRI(0);
+  __WFE();
+  __set_BASEPRI(oldStatus);
+
 #endif
 }
+
+#endif
 
 /*
  * Handle SVC (System call). Used for starting first task and soft context switch.

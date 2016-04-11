@@ -594,9 +594,6 @@ extern unsigned char *portIrqStack;
 #define PORT_NAKED __attribute__((naked)) \
                    __attribute__ ((__optimize__("omit-frame-pointer")))
 
-void portIdleTaskHook(void);
-#define HOOK_IDLETASK   portIdleTaskHook();
-
 void portInitClock(void);
 void portInitConsole(void);
 void portSystemInit(void);
