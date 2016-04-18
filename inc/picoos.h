@@ -94,6 +94,7 @@
  *  - idle system placed into sleep to save power
  *  - optional support for filtering out wakeups that won't result
  *    in task activation
+ *  - tickless idle support
  *
  * <b>Miscellaneous:</b>
  *  - atomic variables
@@ -1512,8 +1513,32 @@ POSEXTERN void POSCALL c_pos_intExitQuick(void);      /* picoos.c */
  */
 POSEXTERN void POSCALL c_pos_timerInterrupt(void);      /* picoos.c */
 
-#if (DOX!=0) || POSCFG_FEATURE_POWER == 1
+#if (DOX!=0) || POSCFG_FEATURE_TICKLESS == 1
 
+/**
+ * Timer interrupt control function.
+ * This function can be called instead of ::c_pos_timerInterrupt when
+ * using dynamic tick rate (0 <= tick rate < HZ)to save power. Inside ::p_pos_powerSleep,
+ * ::c_pos_nextWakeup() can be used to obtain expected amount of idle time.
+ * Tick rate can then be slowed down or completely suspended until
+ * idle time has expired. Processor is then put into sleep. After wakeup, 
+ * number of ticks spent in sleep should be calculated and
+ * passed to pico]OS kernel with this function.
+ *
+ * @sa      p_pos_powerSleep, c_pos_nextWakeup
+ */
+POSEXTERN void POSCALL c_pos_timerStep(UVAR_t ticks);      /* picoos.c */
+
+/**
+ * Task function.
+ * Return number of ticks until next task should wake up.
+ * @return  Number of ticks system can safely sleep or INFINITE.
+ */
+POSEXTERN UINT_t POSCALL c_pos_nextWakeup(void);
+
+#endif
+
+#if (DOX!=0) || POSCFG_FEATURE_POWER == 1
 /**
  * Called by idle task when system should fall in sleep.
  * @note    This function is not part of the pico]OS. It must be
@@ -1535,6 +1560,30 @@ POSFROMEXT void POSCALL p_pos_powerSleep(void);    /* arch_c.c */
 POSFROMEXT void POSCALL p_pos_powerWakeup(void);    /* arch_c.c */
 
 #endif
+#endif
+
+#if (DOX!=0) || POSCFG_FEATURE_TICKLESS == 1
+/**
+ * Called by p_pos_powerSleep to begin tickless idle period. Function
+ * should disable periodic timer interrupt and initialize a timer
+ * that wakes system up from sleep after given time has passed.
+ * @note    This function is not part of the pico]OS. It must be
+ *          provided by the user, since it is architecture specific.
+ * @sa      p_pos_powerSleep, p_pos_powerTickResume
+ */
+POSFROMEXT void POSCALL p_pos_powerTickSuspend(UVAR_t ticks);
+
+/**
+ * Called by p_pos_powerSleep to end tickless idle period. Function
+ * should cancel possible wakeup timer and update system tick count
+ * by calling c_pos_timerStep with amount of time slept. After that
+ * periodic timer tick must be re-enabled.
+ * @note    This function is not part of the pico]OS. It must be
+ *          provided by the user, since it is architecture specific.
+ * @sa      p_pos_powerSleep, p_pos_powerTickSuspend
+ */
+POSFROMEXT void POSCALL p_pos_powerTickResume(void);
+
 #endif
 
 /** @} */

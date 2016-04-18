@@ -60,6 +60,11 @@ void portInitConsole(void)
   USART_Init(USARTx, &init);
   USART_Cmd(USARTx, ENABLE);
 
+#if POSCFG_FEATURE_POWER
+
+  // Enable transmission complete interrupt
+#endif
+
 #if NOSCFG_FEATURE_CONIN == 1
 
   // Enable receive data interrupt.
@@ -73,6 +78,10 @@ void portInitConsole(void)
   NVIC_EnableIRQ(USARTx_IRQn);
 }
 
+#if POSCFG_FEATURE_POWER
+static bool busy = false;
+#endif
+
 /*
  * Uart interrupt handler.
  */
@@ -82,10 +91,22 @@ void USARTx_IRQHandler()
   c_pos_intEnter();
 
 #if NOSCFG_FEATURE_CONOUT == 1
+
+#if POSCFG_FEATURE_POWER
+  if (USART_GetITStatus(USARTx, USART_IT_TC) == SET) {
+
+    USART_ITConfig(USARTx, USART_IT_TC, DISABLE);
+    if (busy) {
+
+      posPowerEnableSleep();
+      busy = false;
+    }
+  }
+#endif
+
   if (USART_GetITStatus(USARTx, USART_IT_TXE) == SET) {
 
     USART_ITConfig (USARTx, USART_IT_TXE, DISABLE);
-    posPowerEnableSleep();
     c_nos_putcharReady();
   }
 #endif
@@ -116,9 +137,20 @@ p_putchar(char c)
   if (USART_GetFlagStatus(USARTx, USART_FLAG_TXE) == RESET)
     return 0;
 
-  posPowerDisableSleep();
   USART_SendData(USARTx, c);
   USART_ITConfig (USARTx, USART_IT_TXE, ENABLE);
+
+#if POSCFG_FEATURE_POWER
+
+  if (!busy) {
+
+    USART_ITConfig(USARTx, USART_IT_TC, ENABLE);
+    posPowerDisableSleep();
+    busy = true;
+  }
+
+#endif
+
   return 1;
 }
 #endif

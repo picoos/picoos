@@ -597,6 +597,7 @@ extern unsigned char *portIrqStack;
 void portInitClock(void);
 void portInitConsole(void);
 void portSystemInit(void);
+void portRestoreClocksAfterWakeup(void);
 
 typedef void (* const PortExcHandlerFunc)(void);
 

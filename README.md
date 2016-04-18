@@ -19,9 +19,10 @@ There is some information about these in [my blogs][2].
 
 Other changes are:
 
+- Power management API to provide framework for MCU power saving / sleeping features
+- Suppression of timer interrupts during idle mode (tickless idle). Complete implementation is available in cortex-m/stm32 port.
 - stdarg support for nano layer printf-functions
 - Makefile system uses GNU make pattern rules for source directory handling (otherwise projects that had many directories run into troubles)
-- Power management API to provide framework for MCU power saving / sleeping features
 
 
 Updated doxygen manual is available [here][3].

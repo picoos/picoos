@@ -1,5 +1,6 @@
 /*
  *  Copyright (c) 2004-2012, Dennis Kuschel.
+ *  Copyright (c) 2015-2016, Ari Suutari.
  *  All rights reserved. 
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -1052,7 +1053,152 @@ void POSCALL c_pos_timerInterrupt(void)
 #endif
 }
 
+/*-------------------------------------------------------------------------*/
 
+#if POSCFG_FEATURE_TICKLESS != 0
+
+void POSCALL c_pos_timerStep(UVAR_t ticks)
+{
+  register POSTASK_t  task;
+#if SYS_TASKDOUBLELINK == 0
+  register POSTASK_t  last = NULL;
+#endif
+#if POSCFG_FEATURE_TIMER != 0
+  register TIMER_t   *tmr;
+#endif
+
+  POS_LOCKFLAGS;
+
+  if (posRunning_g == 0)
+    return;
+
+  POS_SCHED_LOCK;
+
+#if POSCFG_FEATURE_JIFFIES != 0
+#if POSCFG_FEATURE_LARGEJIFFIES == 0
+  jiffies += ticks;
+#else
+  pos_jiffies_g += ticks;
+#endif
+#endif
+
+#if POSCFG_FEATURE_TIMER != 0
+
+  register UVAR_t     ticksLeft;
+
+  tmr = posActiveTimers_g;
+  while (tmr != NULL)
+  {
+    ticksLeft = ticks;
+
+    do {
+
+      if (ticksLeft > tmr->counter) {
+
+        ticksLeft -= tmr->counter;
+        tmr->counter = 0;
+      }
+      else {
+
+        tmr->counter -= ticksLeft;
+        ticksLeft = 0;
+      }
+
+      if (tmr->counter == 0)
+      {
+        posSemaSignal(tmr->sema);
+#if POSCFG_FEATURE_TIMERFIRED != 0
+        tmr->fired = 1;
+#endif
+        if (tmr->reload != 0)
+        {
+          tmr->counter = tmr->reload;
+        }
+        else
+        {
+          pos_removeFromTimerList(tmr);
+        }
+      }
+    } while (ticksLeft > 0 && tmr->reload != 0);
+
+    tmr = tmr->next;
+  }
+#endif
+
+  task = posSleepingTasks_g;
+  while (task != NULL)
+  {
+    if (ticks > tasktimerticks(task))
+      tasktimerticks(task) = 0;
+    else
+      tasktimerticks(task) -= ticks;
+
+    if (tasktimerticks(task) == 0)
+    {
+      pos_enableTask(task);
+#if SYS_TASKDOUBLELINK != 0
+      pos_removeFromSleepList(task);
+      task->prev = task;
+    }
+    task = task->next;
+#else
+      task = task->next;
+      if (last == NULL)
+      {
+        posSleepingTasks_g = task;
+      }
+      else
+      {
+        last->next = task;
+      }
+    }
+    else
+    {
+      last = task;
+      task = task->next;
+    }
+#endif
+  }
+
+  POS_SCHED_UNLOCK;
+}
+/*-------------------------------------------------------------------------*/
+
+UINT_t POSCALL c_pos_nextWakeup(void)
+{
+  register POSTASK_t  task;
+#if POSCFG_FEATURE_TIMER != 0
+  register TIMER_t   *tmr;
+#endif
+  UINT_t wake = INFINITE;
+  POS_LOCKFLAGS;
+
+  POS_SCHED_LOCK;
+
+#if POSCFG_FEATURE_TIMER != 0
+  tmr = posActiveTimers_g;
+  while (tmr != NULL)
+  {
+    if (wake == INFINITE || tmr->counter < wake)
+      wake = tasktimerticks(task);
+
+    tmr = tmr->next;
+  }
+#endif
+
+  task = posSleepingTasks_g;
+  while (task != NULL)
+  {
+    if (wake == INFINITE || tasktimerticks(task) < wake)
+      wake = tasktimerticks(task);
+
+    task = task->next;
+  }
+
+  POS_SCHED_UNLOCK;
+  return wake;
+}
+#endif
 
 /*---------------------------------------------------------------------------
  * EXPORTED FUNCTIONS:  TASK CONTROL

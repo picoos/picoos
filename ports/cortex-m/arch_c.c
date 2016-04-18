@@ -564,6 +564,31 @@ void p_pos_powerSleep()
 #endif
 #endif
 
+  uint32_t oldStatus;
+
+  // Ensure flag that __WFE waits for is not set yet
+  __SEV();
+  __WFE();
+
+#if POSCFG_FEATURE_TICKLESS
+
+  UVAR_t nextWake = c_pos_nextWakeup();
+  bool restoreTick = false;
+  bool restoreDeepSleep = false;
+
+  if (nextWake < MS(100)) {
+
+    restoreDeepSleep = SCB->SCR & SCB_SCR_SLEEPDEEP_Msk;
+    SCB->SCR &= ~SCB_SCR_SLEEPDEEP_Msk;
+  }
+  else {
+
+    p_pos_powerTickSuspend(nextWake);
+    restoreTick = true;
+  }
+
+#endif
+
 #if POSCFG_FEATURE_POWER_WAKEUP != 0
 
 /*
@@ -574,28 +599,40 @@ void p_pos_powerSleep()
   SCB->SCR |= SCB_SCR_SLEEPONEXIT_Msk; // Sleep after interrupt
 #endif
 
-  uint32_t oldStatus;
-
-  // Ensure flag that __WFE waits for is not set yet
-  __SEV();
-  __WFE();
-
 #if __CORTEX_M < 3
 
-  oldStatus = __get_PRIMASK();
-  __disable_irq();
-  __WFE();
-  if (oldStatus)
-    __enable_irq();
+  __enable_irq();
 
 #else
 
   oldStatus = __get_BASEPRI();
   __set_BASEPRI(0);
+
+#endif
+
+  __DSB();
   __WFE();
+
+#if __CORTEX_M < 3
+
+  __disableirq();
+
+#else
+
   __set_BASEPRI(oldStatus);
 
 #endif
+
+#if POSCFG_FEATURE_TICKLESS
+
+  if (restoreDeepSleep)
+    SCB->SCR |= SCB_SCR_SLEEPDEEP_Msk;
+
+  if (restoreTick)
+    p_pos_powerTickResume();
+
+#endif
+
 }
 
 #endif
