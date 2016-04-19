@@ -114,6 +114,8 @@ Macros</h2></td></tr>
 <tr class="separator:ga3a443b2273a93c8489a61e55e553d494"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gad1f8c6f887659c0a14157fd825a9f4df"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__feature.html#gad1f8c6f887659c0a14157fd825a9f4df">POSCFG_FEATURE_POWER_WAKEUP</a>&#160;&#160;&#160;1</td></tr>
 <tr class="separator:gad1f8c6f887659c0a14157fd825a9f4df"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga88010dcacf1a7ac6363b0deca0e10814"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__feature.html#ga88010dcacf1a7ac6363b0deca0e10814">POSCFG_FEATURE_TICKLESS</a>&#160;&#160;&#160;1</td></tr>
+<tr class="separator:ga88010dcacf1a7ac6363b0deca0e10814"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <h2 class="groupheader">Macro Definition Documentation</h2>
@@ -386,7 +388,7 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Enable power management api. If this definition is set to 1, pico]OS power management functions are included into kernel. Note that architecture port must support power management. </p>
+<p>Enable power management api. If this definition is set to 1, pico]OS power management functions are included into kernel. Note that architecture port must support power management. Architecture port is expected to provide implementation for <a class="el" href="group__port.html#ga2b1ee080cddd8e448fbb989028366ca3">p_pos_powerSleep</a>. </p>
 
 </div>
 </div>
@@ -399,7 +401,7 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Enable interrupt wakeup support in power management. If this definition is set to 1, pico]OS allows system to stay in sleep until a interrupt causes context switch away from idle task. </p>
+<p>Enable interrupt wakeup support in power management. If this definition is set to 1, pico]OS allows system to stay in sleep until a interrupt causes context switch away from idle task. If not enabled, it is assumed that interrupt will wake up a sleeping system. Architecture port is expected to privide implementation for <a class="el" href="group__port.html#ga8fb243ddf4d890cdbaf91c0d37f1ee06">p_pos_powerWakeup</a>. </p>
 
 </div>
 </div>
@@ -504,6 +506,19 @@ Macros</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>Include function <a class="el" href="group__task.html#ga6fba46f372e936bed6722a28b2e9de1c">posTaskUnused</a>. If this definition is set to 1, the function <a class="el" href="group__task.html#ga6fba46f372e936bed6722a28b2e9de1c">posTaskUnused</a> will be included into the pico]OS kernel. </p>
+
+</div>
+</div>
+<a class="anchor" id="ga88010dcacf1a7ac6363b0deca0e10814"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define POSCFG_FEATURE_TICKLESS&#160;&#160;&#160;1</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Enable supression of periodic timer interrupt when when system is sleeping to save power. Architecture port is expected to provide implementations for <a class="el" href="group__port.html#ga1a3e5fd4257e0480cd5f1c05c223bac7">p_pos_powerTickSuspend</a> and <a class="el" href="group__port.html#gac6886c436c831709d998773633137a89">p_pos_powerTickResume</a>. </p>
 
 </div>
 </div>

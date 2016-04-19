@@ -80,10 +80,18 @@ Functions</h2></td></tr>
 <tr class="separator:ga5192c53a3d925629b7946b165fa5a47b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga03edcb67afad4d0afae09a8a1bf45fd0"><td class="memItemLeft" align="right" valign="top">POSEXTERN void POSCALL&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__port.html#ga03edcb67afad4d0afae09a8a1bf45fd0">c_pos_timerInterrupt</a> (void)</td></tr>
 <tr class="separator:ga03edcb67afad4d0afae09a8a1bf45fd0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga89e03e381c552755d2f4112bf064de64"><td class="memItemLeft" align="right" valign="top">POSEXTERN void POSCALL&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__port.html#ga89e03e381c552755d2f4112bf064de64">c_pos_timerStep</a> (<a class="el" href="picoos_8h.html#a560fb7bf8dc2f316e50c0b8d8196d26c">UVAR_t</a> ticks)</td></tr>
+<tr class="separator:ga89e03e381c552755d2f4112bf064de64"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga31bcc569e11032975b83c67a6217598e"><td class="memItemLeft" align="right" valign="top">POSEXTERN <a class="el" href="picoos_8h.html#a17133269bf6f77fd6b3523d894076dbe">UINT_t</a> POSCALL&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__port.html#ga31bcc569e11032975b83c67a6217598e">c_pos_nextWakeup</a> (void)</td></tr>
+<tr class="separator:ga31bcc569e11032975b83c67a6217598e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga2b1ee080cddd8e448fbb989028366ca3"><td class="memItemLeft" align="right" valign="top">POSFROMEXT void POSCALL&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__port.html#ga2b1ee080cddd8e448fbb989028366ca3">p_pos_powerSleep</a> (void)</td></tr>
 <tr class="separator:ga2b1ee080cddd8e448fbb989028366ca3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga8fb243ddf4d890cdbaf91c0d37f1ee06"><td class="memItemLeft" align="right" valign="top">POSFROMEXT void POSCALL&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__port.html#ga8fb243ddf4d890cdbaf91c0d37f1ee06">p_pos_powerWakeup</a> (void)</td></tr>
 <tr class="separator:ga8fb243ddf4d890cdbaf91c0d37f1ee06"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga1a3e5fd4257e0480cd5f1c05c223bac7"><td class="memItemLeft" align="right" valign="top">POSFROMEXT void POSCALL&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__port.html#ga1a3e5fd4257e0480cd5f1c05c223bac7">p_pos_powerTickSuspend</a> (<a class="el" href="picoos_8h.html#a560fb7bf8dc2f316e50c0b8d8196d26c">UVAR_t</a> ticks)</td></tr>
+<tr class="separator:ga1a3e5fd4257e0480cd5f1c05c223bac7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gac6886c436c831709d998773633137a89"><td class="memItemLeft" align="right" valign="top">POSFROMEXT void POSCALL&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__port.html#gac6886c436c831709d998773633137a89">p_pos_powerTickResume</a> (void)</td></tr>
+<tr class="separator:gac6886c436c831709d998773633137a89"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <h3>General Information</h3>
@@ -142,7 +150,11 @@ It is possible to implement the findbit mechanism as look up table. For this pur
 <img src="../pic/portfc3.png"  align="middle" border="0"/>
 </div>
 <p><br />
-</p>
+ </p><h3>Save energy on battery-powered systems</h3>
+<p>Pico]OS power management API can be enabled by setting <a class="el" href="group__feature.html#ga3a443b2273a93c8489a61e55e553d494">POSCFG_FEATURE_POWER</a> to 1. When enabled, architecture port must provide some additional functions that are called to manage system sleep and wake-up. <br />
+ Simplest mode requres only implementation for <a class="el" href="group__port.html#ga2b1ee080cddd8e448fbb989028366ca3">p_pos_powerSleep</a>. It is called by Pico]OS idle task when there is nothing to do and application tasks allow sleeping (by use of ::posPowerSleepEnable &amp; ::posPowerSleepDisable API). Implementation of p_pos_powerSleep should put CPU into sleep state (for example Arm Cortex-M might use WFE instruction, MSP430 might put processor into LPM3 state). If processor wakes up automatically when interrupt occurs, this is all that is needed. If something special is needed for wake-up (for example clear sleep bit in status register), ::POSCFG_FEATURE_POWER_WAKE must be set 1. This makes Pico]OS call p_pos_powerWakeup when it has detected that task other than idle must be scheduled.<br />
+ Simple power saving mode can enough for some applications. However, it still wastes some energy because periodic timer interrupt wakes system up (1000 times in second if HZ is 1000) even when there is nothing else to do except updating system time. Further savings can be obtained by setting <a class="el" href="group__feature.html#ga88010dcacf1a7ac6363b0deca0e10814">POSCFG_FEATURE_TICKLESS</a> to 1, which allows stopping timer interrupt during sleep periods. Architecture port must provide implementations for <a class="el" href="group__port.html#ga1a3e5fd4257e0480cd5f1c05c223bac7">p_pos_powerTickSuspend</a> and <a class="el" href="group__port.html#gac6886c436c831709d998773633137a89">p_pos_powerTickResume</a>. <a class="el" href="group__port.html#ga1a3e5fd4257e0480cd5f1c05c223bac7">p_pos_powerTickSuspend</a> is expected to turn of timer interrupt and schedule a hardware wakeup interrupt after given sleep time (passed as parameter) has expired. <a class="el" href="group__port.html#gac6886c436c831709d998773633137a89">p_pos_powerTickResume</a> must first take care that all hardware is woken up (this might require re-setup for system clocks on some platforms). After that it determines how long sleep actually was (as system might wake up earlier because of an interrupt) and calls c_pos_timerStep to update Pico]OS time.<br />
+ Please note that on most hardware stopping to periodic timer interrupt and programming it (the same or other hardware timer) to wake up system after sleep time &lt;u&gt;might introduce jitter to task scheduling&lt;/u&gt;. If good quality realtime scheduling is important to application, it should use ::posPowerSleepDisable to disable sleeping during critical actions or leave tickless mode off. </p>
 <h2 class="groupheader">Function Documentation</h2>
 <a class="anchor" id="ga859935a2e7752b7144a470e9e3dcdbb0"></a>
 <div class="memitem">
@@ -196,6 +208,23 @@ It is possible to implement the findbit mechanism as look up table. For this pur
 
 </div>
 </div>
+<a class="anchor" id="ga31bcc569e11032975b83c67a6217598e"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">POSEXTERN <a class="el" href="picoos_8h.html#a17133269bf6f77fd6b3523d894076dbe">UINT_t</a> POSCALL c_pos_nextWakeup </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Task function. Return number of ticks until next task should wake up. </p><dl class="section return"><dt>Returns</dt><dd>Number of ticks system can safely sleep or INFINITE. </dd></dl>
+
+</div>
+</div>
 <a class="anchor" id="ga03edcb67afad4d0afae09a8a1bf45fd0"></a>
 <div class="memitem">
 <div class="memproto">
@@ -226,6 +255,24 @@ It is possible to implement the findbit mechanism as look up table. For this pur
  Dependent on the platform port, it can be necessary to evaluate the variable <a class="el" href="picoos_8h.html#a492a4358cee590c1969413bc23abafb7" title="Global flag variable. This variable is nonzero when the operating system is initialized and running...">posRunning_g</a> to ensure that the timer interrupt is not triggered when the OS is not yet running.<br />
  To avoid this race condintions, it is better to initialize the timer interrupt in the function <a class="el" href="group__port.html#gaad73879e76ac6a794b48f424fec5b201">p_pos_startFirstContext</a>. </dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="group__port.html#ga859935a2e7752b7144a470e9e3dcdbb0">c_pos_intEnter</a>, <a class="el" href="group__port.html#gad290f0d4a1eecd5f09cfeded7829e187">c_pos_intExit</a> </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ga89e03e381c552755d2f4112bf064de64"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">POSEXTERN void POSCALL c_pos_timerStep </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="picoos_8h.html#a560fb7bf8dc2f316e50c0b8d8196d26c">UVAR_t</a>&#160;</td>
+          <td class="paramname"><em>ticks</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Timer interrupt control function. This function can be called instead of <a class="el" href="group__port.html#ga03edcb67afad4d0afae09a8a1bf45fd0">c_pos_timerInterrupt</a> when using dynamic tick rate (0 &lt;= tick rate &lt; HZ)to save power. Inside <a class="el" href="group__port.html#ga2b1ee080cddd8e448fbb989028366ca3">p_pos_powerSleep</a>, <a class="el" href="group__port.html#ga31bcc569e11032975b83c67a6217598e">c_pos_nextWakeup()</a> can be used to obtain expected amount of idle time. Tick rate can then be slowed down or completely suspended until idle time has expired. Processor is then put into sleep. After wakeup, number of ticks spent in sleep should be calculated and passed to pico]OS kernel with this function.</p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="group__port.html#ga2b1ee080cddd8e448fbb989028366ca3">p_pos_powerSleep</a>, <a class="el" href="group__port.html#ga31bcc569e11032975b83c67a6217598e">c_pos_nextWakeup</a> </dd></dl>
 
 </div>
 </div>
@@ -558,6 +605,42 @@ It is possible to implement the findbit mechanism as look up table. For this pur
 </div><div class="memdoc">
 <p>Called by idle task when system should fall in sleep. </p><dl class="section note"><dt>Note</dt><dd>This function is not part of the pico]OS. It must be provided by the user, since it is architecture specific. The processor interrupts are disabled when this function is called. </dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="group__port.html#ga8fb243ddf4d890cdbaf91c0d37f1ee06">p_pos_powerWakeup</a> </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="gac6886c436c831709d998773633137a89"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">POSFROMEXT void POSCALL p_pos_powerTickResume </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Called by p_pos_powerSleep to end tickless idle period. Function should cancel possible wakeup timer and update system tick count by calling c_pos_timerStep with amount of time slept. After that periodic timer tick must be re-enabled. </p><dl class="section note"><dt>Note</dt><dd>This function is not part of the pico]OS. It must be provided by the user, since it is architecture specific. </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="group__port.html#ga2b1ee080cddd8e448fbb989028366ca3">p_pos_powerSleep</a>, <a class="el" href="group__port.html#ga1a3e5fd4257e0480cd5f1c05c223bac7">p_pos_powerTickSuspend</a> </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ga1a3e5fd4257e0480cd5f1c05c223bac7"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">POSFROMEXT void POSCALL p_pos_powerTickSuspend </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="picoos_8h.html#a560fb7bf8dc2f316e50c0b8d8196d26c">UVAR_t</a>&#160;</td>
+          <td class="paramname"><em>ticks</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Called by p_pos_powerSleep to begin tickless idle period. Function should disable periodic timer interrupt and initialize a timer that wakes system up from sleep after given time has passed. </p><dl class="section note"><dt>Note</dt><dd>This function is not part of the pico]OS. It must be provided by the user, since it is architecture specific. </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="group__port.html#ga2b1ee080cddd8e448fbb989028366ca3">p_pos_powerSleep</a>, <a class="el" href="group__port.html#gac6886c436c831709d998773633137a89">p_pos_powerTickResume</a> </dd></dl>
 
 </div>
 </div>
