@@ -1179,6 +1179,50 @@ POSEXTERN VAR_t* _errno_p(void);
  *
  * <p><img src="../pic/portfc3.png" align="middle" border=0></p>@n
  *
+ * <h3>Save energy on battery-powered systems</h3>
+ * Pico]OS power management API can be enabled by setting
+ * ::POSCFG_FEATURE_POWER to 1. When enabled, architecture port
+ * must provide some additional functions that are called to
+ * manage system sleep and wake-up. @n
+ *
+ * Simplest mode requres only implementation for ::p_pos_powerSleep.
+ * It is called by Pico]OS idle task when there is nothing to do
+ * and application tasks allow sleeping (by use of ::posPowerSleepEnable &
+ * ::posPowerSleepDisable API). Implementation of p_pos_powerSleep should
+ * put CPU into sleep state (for example Arm Cortex-M might use WFE instruction,
+ * MSP430 might put processor into LPM3 state). If processor wakes
+ * up automatically when interrupt occurs, this is all that is needed.
+ * If something special is needed for wake-up (for example clear sleep
+ * bit in status register), ::POSCFG_FEATURE_POWER_WAKE must be set 1.
+ * This makes Pico]OS call p_pos_powerWakeup when it has detected
+ * that task other than idle must be scheduled.@n
+ *
+ * Simple power saving mode can enough for some applications. However,
+ * it still wastes some energy because periodic timer interrupt wakes
+ * system up (1000 times in second if HZ is 1000) even when there
+ * is nothing else to do except updating system time.
+ * Further savings can be obtained by setting ::POSCFG_FEATURE_TICKLESS
+ * to 1, which allows stopping timer interrupt during sleep periods.
+ * Architecture port must provide implementations for
+ * ::p_pos_powerTickSuspend and ::p_pos_powerTickResume.
+ * ::p_pos_powerTickSuspend is expected to turn of timer interrupt and
+ * schedule a hardware wakeup interrupt after given sleep time
+ * (passed as parameter) has expired. ::p_pos_powerTickResume must
+ * first take care that all hardware is woken up (this might require
+ * re-setup for system clocks on some platforms). After that it
+ * determines how long sleep actually was (as system might wake
+ * up earlier because of an interrupt) and calls c_pos_timerStep
+ * to update Pico]OS time.@n
+ * 
+ * Please note that on most hardware stopping to periodic timer
+ * interrupt and programming it (the same or other hardware timer) to
+ * wake up system after sleep time <u>might introduce jitter to
+ * task scheduling</u>. If good quality realtime scheduling is
+ * important to application, it should use ::posPowerSleepDisable
+ * to disable sleeping during critical actions or leave
+ * tickless mode off.
+ *
+ *  
  * @{
  */
 
