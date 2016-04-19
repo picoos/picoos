@@ -1183,7 +1183,7 @@ POSEXTERN VAR_t* _errno_p(void);
  * Pico]OS power management API can be enabled by setting
  * ::POSCFG_FEATURE_POWER to 1. When enabled, architecture port
  * must provide some additional functions that are called to
- * manage system sleep and wake-up. @n
+ * manage system sleep and wake-up. @n@n
  *
  * Simplest mode requres only implementation for ::p_pos_powerSleep.
  * It is called by Pico]OS idle task when there is nothing to do
@@ -1195,7 +1195,7 @@ POSEXTERN VAR_t* _errno_p(void);
  * If something special is needed for wake-up (for example clear sleep
  * bit in status register), ::POSCFG_FEATURE_POWER_WAKEUP must be set 1.
  * This makes Pico]OS call p_pos_powerWakeup when it has detected
- * that task other than idle must be scheduled.@n
+ * that task other than idle must be scheduled.@n@n
  *
  * Simple power saving mode can enough for some applications. However,
  * it still wastes some energy because periodic timer interrupt wakes
@@ -1212,12 +1212,12 @@ POSEXTERN VAR_t* _errno_p(void);
  * re-setup for system clocks on some platforms). After that it
  * determines how long sleep actually was (as system might wake
  * up earlier because of an interrupt) and calls c_pos_timerStep
- * to update Pico]OS time.@n
+ * to update Pico]OS time.@n@n
  * 
  * Please note that on most hardware stopping to periodic timer
  * interrupt and programming it (the same or other hardware timer) to
- * wake up system after sleep time <u>might introduce jitter to
- * task scheduling</u>. If good quality realtime scheduling is
+ * wake up system after sleep time _might introduce jitter to
+ * task scheduling_. If good quality realtime scheduling is
  * important to application, it should use ::posPowerSleepDisable
  * to disable sleeping during critical actions or leave
  * tickless mode off.
