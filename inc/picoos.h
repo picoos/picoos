@@ -1193,7 +1193,7 @@ POSEXTERN VAR_t* _errno_p(void);
  * MSP430 might put processor into LPM3 state). If processor wakes
  * up automatically when interrupt occurs, this is all that is needed.
  * If something special is needed for wake-up (for example clear sleep
- * bit in status register), ::POSCFG_FEATURE_POWER_WAKE must be set 1.
+ * bit in status register), ::POSCFG_FEATURE_POWER_WAKEUP must be set 1.
  * This makes Pico]OS call p_pos_powerWakeup when it has detected
  * that task other than idle must be scheduled.@n
  *
