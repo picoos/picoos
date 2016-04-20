@@ -207,7 +207,7 @@ static UVAR_t    posInhibitSched_g;
 
 #if POSCFG_FEATURE_POWER != 0
 static VAR_t     posPowerMode_g = 0;
-static UVAR_t    posPowerSleepDisable_g = 1;
+static UVAR_t    posPowerSleepDisable_g = 0;
 static POSPOWERCB_t posPowerCallback = NULL;
 #endif
 
