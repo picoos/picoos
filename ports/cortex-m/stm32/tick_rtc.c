@@ -160,6 +160,10 @@ static long rtcTimeNow()
   return 1000 * secs + msecs;
 }
 
+#ifndef PORTCFG_POWER_TICKLESS_SAFETY_MARGIN
+#define PORTCFG_POWER_TICKLESS_SAFETY_MARGIN MS(3)
+#endif
+
 /*
  * Turn of timer tick and schedule wakeup
  * after given ticks.
@@ -177,7 +181,7 @@ void p_pos_powerTickSuspend(UVAR_t ticks)
   if (ticks == INFINITE)
     return;
 
-  ticks -= MS(3); // oscillator starts up 2 ms
+  ticks -= PORTCFG_POWER_TICKLESS_SAFETY_MARGIN; // oscillator starts up 2 ms
   if (ticks / HZ > 65536) // max 18 hours
     ticks = 65536 * HZ;
 

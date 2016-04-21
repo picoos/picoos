@@ -539,6 +539,10 @@ void p_pos_powerWakeup()
 
 #endif
 
+#ifndef PORTCFG_POWER_TICKLESS_MIN
+#define PORTCFG_POWER_TICKLESS_MIN MS(100)
+#endif
+
 /*
  * Nothing to do, put CPU to sleep.
  */
@@ -576,7 +580,7 @@ void p_pos_powerSleep()
   bool restoreTick = false;
   bool restoreDeepSleep = false;
 
-  if (nextWake < MS(100)) {
+  if (nextWake < PORTCFG_POWER_TICKLESS_MIN) {
 
     restoreDeepSleep = SCB->SCR & SCB_SCR_SLEEPDEEP_Msk;
     SCB->SCR &= ~SCB_SCR_SLEEPDEEP_Msk;
