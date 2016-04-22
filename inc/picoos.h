@@ -264,7 +264,7 @@
 
 
 #define POS_VER_N           0x0110
-#define POS_VER_S           "1.1.0a"
+#define POS_VER_S           "1.1.0"
 #define POS_COPYRIGHT       "(c) 2004-2012, Dennis Kuschel\n" \
                             "(c) 2011-2016, Ari Suutari"
 
