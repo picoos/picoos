@@ -157,6 +157,11 @@ It is possible to implement the findbit mechanism as look up table. For this pur
 <br />
  Simple power saving mode can enough for some applications. However, it still wastes some energy because periodic timer interrupt wakes system up (1000 times in second if HZ is 1000) even when there is nothing else to do except updating system time. Further savings can be obtained by setting <a class="el" href="group__feature.html#ga88010dcacf1a7ac6363b0deca0e10814">POSCFG_FEATURE_TICKLESS</a> to 1, which allows stopping timer interrupt during sleep periods. Architecture port must provide implementations for <a class="el" href="group__port.html#ga1a3e5fd4257e0480cd5f1c05c223bac7">p_pos_powerTickSuspend</a> and <a class="el" href="group__port.html#gac6886c436c831709d998773633137a89">p_pos_powerTickResume</a>. <a class="el" href="group__port.html#ga1a3e5fd4257e0480cd5f1c05c223bac7">p_pos_powerTickSuspend</a> is expected to turn of timer interrupt and schedule a hardware wakeup interrupt after given sleep time (passed as parameter) has expired. <a class="el" href="group__port.html#gac6886c436c831709d998773633137a89">p_pos_powerTickResume</a> must first take care that all hardware is woken up (this might require re-setup for system clocks on some platforms). After that it determines how long sleep actually was (as system might wake up earlier because of an interrupt) and calls c_pos_timerStep to update Pico]OS time.<br />
 <br />
+ </p>
+<div class="image">
+<img src="../pic/tickless.png"  align="middle" border="0"/>
+</div>
+<p><br />
  Please note that on most hardware stopping to periodic timer interrupt and programming it (the same or other hardware timer) to wake up system after sleep time <em>might introduce jitter to task scheduling</em>. If good quality realtime scheduling is important to application, it should use ::posPowerSleepDisable to disable sleeping during critical actions or leave tickless mode off. </p>
 <h2 class="groupheader">Function Documentation</h2>
 <a class="anchor" id="ga859935a2e7752b7144a470e9e3dcdbb0"></a>
