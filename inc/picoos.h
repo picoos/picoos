@@ -1213,6 +1213,8 @@ POSEXTERN VAR_t* _errno_p(void);
  * determines how long sleep actually was (as system might wake
  * up earlier because of an interrupt) and calls c_pos_timerStep
  * to update Pico]OS time.@n@n
+ *
+ * <p><img src="../pic/tickless.png" align="middle" border=0></p>@n
  * 
  * Please note that on most hardware stopping to periodic timer
  * interrupt and programming it (the same or other hardware timer) to
