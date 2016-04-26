@@ -249,7 +249,6 @@ void PORT_NAKED p_pos_softContextSwitch(void)
 
   portSaveContext();
   posCurrentTask_g = posNextTask_g;
-  posCurrentTask_g->stackptr->sr &= ~LPM4_bits; // Ensure CPU is active for next task
   portRestoreContext();
 }
 
@@ -265,7 +264,6 @@ void PORT_NAKED p_pos_softContextSwitch(void)
 void PORT_NAKED p_pos_intContextSwitch(void)
 {
   posCurrentTask_g = posNextTask_g;
-  posCurrentTask_g->stackptr->sr &= ~LPM4_bits; // Ensure CPU is active for next task
   portRestoreContext();
 }
 
@@ -310,12 +308,18 @@ void PORT_NAKED portRestoreContextImpl(void)
   asm volatile("reti");
 }
 
-void portIdleTaskHook()
+void p_pos_powerWakeup()
+{
+  posCurrentTask_g->stackptr->sr &= ~LPM4_bits; // Ensure CPU is active for next task
+}
+
+void p_pos_powerSleep()
 {
 #if defined(__MSP430_HAS_UART1__) && (PORTCFG_CON_PERIPH == 2)
   if (!(U1TCTL & TXEPT) || !(U1TCTL & SSEL0)) { // Cannot stop SMCLK if USART is working
 
-    __bis_status_register(LPM0_bits);
+    __bis_status_register(LPM0_bits | GIE);
+    __dint();
     return;
   }
 #endif
@@ -331,7 +335,8 @@ void portIdleTaskHook()
 #endif
 #endif
 
-  __bis_status_register(LPM3_bits);
+  __bis_status_register(LPM3_bits | GIE);
+  __dint();
 }
 
 #ifdef HAVE_PLATFORM_ASSERT
