@@ -345,15 +345,6 @@ void PORT_NAKED p_pos_startFirstContext()
   asm volatile ("bl portRestoreContextImpl");
 }
 
-
-/*
- * Nothing to do, put CPU to sleep.
- */
-void portIdleTaskHook()
-{
-  // __bis_status_register(LPM3_bits);
-}
-
 /*
  * Handle SVC (System call). Used for starting first task and soft context switch.
  */
