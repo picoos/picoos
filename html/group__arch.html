@@ -56,6 +56,8 @@ Macros</h2></td></tr>
 <tr class="separator:ga492dbf6b43911554974e585a6327caab"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga2a4f762889db3bdaa628427e388a2848"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__arch.html#ga2a4f762889db3bdaa628427e388a2848">POSCFG_ISR_INTERRUPTABLE</a>&#160;&#160;&#160;0</td></tr>
 <tr class="separator:ga2a4f762889db3bdaa628427e388a2848"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga0df73303bf7f11e97d55812365f0f1b1"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__arch.html#ga0df73303bf7f11e97d55812365f0f1b1">POSCFG_POWER_WAKEUP</a>&#160;&#160;&#160;1</td></tr>
+<tr class="separator:ga0df73303bf7f11e97d55812365f0f1b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga9def726397493144392e7b945c996475"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__arch.html#ga9def726397493144392e7b945c996475">POSCFG_TASKSTACKTYPE</a>&#160;&#160;&#160;0</td></tr>
 <tr class="separator:ga9def726397493144392e7b945c996475"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga5e1c3a7349532e1e6cb02daf41e2d6e9"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__arch.html#ga5e1c3a7349532e1e6cb02daf41e2d6e9">POSCFG_CALLINITARCH</a>&#160;&#160;&#160;1</td></tr>
@@ -202,6 +204,19 @@ Macros</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>Enable the call of the functions <a class="el" href="group__port.html#gaa332a78292bc10867826e247361cc130">p_pos_lock</a> and <a class="el" href="group__port.html#gadbbcc1b0e31b3fce379f6457e6335399">p_pos_unlock</a>. In some really rare and special cases it may be required that Pico]OS must acquire a mutex before it can call the functions <a class="el" href="group__port.html#ga1de30cecad661746434d0dbd870d1c71">p_pos_initTask</a> and <a class="el" href="group__port.html#ga090da72a97048dbb2067d6b221b96c0e">p_pos_freeStack</a>. If you need such a mutex for your port please define this option to 1 and implement the appropriate functions. </p>
+
+</div>
+</div>
+<a class="anchor" id="ga0df73303bf7f11e97d55812365f0f1b1"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define POSCFG_POWER_WAKEUP&#160;&#160;&#160;1</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Enable interrupt wakeup support in power management. If this definition is set to 1, pico]OS allows system to stay in sleep until a interrupt causes context switch away from idle task. If not enabled, it is assumed that interrupt will wake up a sleeping system. Architecture port is expected to privide implementation for <a class="el" href="group__port.html#ga8fb243ddf4d890cdbaf91c0d37f1ee06">p_pos_powerWakeup</a>. </p>
 
 </div>
 </div>

@@ -112,8 +112,6 @@ Macros</h2></td></tr>
 <tr class="separator:gaec190b44ef2667567bb7d56360db74a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga3a443b2273a93c8489a61e55e553d494"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__feature.html#ga3a443b2273a93c8489a61e55e553d494">POSCFG_FEATURE_POWER</a>&#160;&#160;&#160;0</td></tr>
 <tr class="separator:ga3a443b2273a93c8489a61e55e553d494"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gad1f8c6f887659c0a14157fd825a9f4df"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__feature.html#gad1f8c6f887659c0a14157fd825a9f4df">POSCFG_FEATURE_POWER_WAKEUP</a>&#160;&#160;&#160;1</td></tr>
-<tr class="separator:gad1f8c6f887659c0a14157fd825a9f4df"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga88010dcacf1a7ac6363b0deca0e10814"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__feature.html#ga88010dcacf1a7ac6363b0deca0e10814">POSCFG_FEATURE_TICKLESS</a>&#160;&#160;&#160;1</td></tr>
 <tr class="separator:ga88010dcacf1a7ac6363b0deca0e10814"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
@@ -389,19 +387,6 @@ Macros</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>Enable power management api. If this definition is set to 1, pico]OS power management functions are included into kernel. Note that architecture port must support power management. Architecture port is expected to provide implementation for <a class="el" href="group__port.html#ga2b1ee080cddd8e448fbb989028366ca3">p_pos_powerSleep</a>. </p>
-
-</div>
-</div>
-<a class="anchor" id="gad1f8c6f887659c0a14157fd825a9f4df"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define POSCFG_FEATURE_POWER_WAKEUP&#160;&#160;&#160;1</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>Enable interrupt wakeup support in power management. If this definition is set to 1, pico]OS allows system to stay in sleep until a interrupt causes context switch away from idle task. If not enabled, it is assumed that interrupt will wake up a sleeping system. Architecture port is expected to privide implementation for <a class="el" href="group__port.html#ga8fb243ddf4d890cdbaf91c0d37f1ee06">p_pos_powerWakeup</a>. </p>
 
 </div>
 </div>

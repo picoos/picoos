@@ -320,8 +320,8 @@
 <div class="line"><a name="l00518"></a><span class="lineno">  518</span>&#160;<span class="preprocessor">#ifndef POSCFG_FEATURE_POWER</span></div>
 <div class="line"><a name="l00519"></a><span class="lineno">  519</span>&#160;<span class="preprocessor">#define POSCFG_FEATURE_POWER 0</span></div>
 <div class="line"><a name="l00520"></a><span class="lineno">  520</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00521"></a><span class="lineno">  521</span>&#160;<span class="preprocessor">#ifndef POSCFG_FEATURE_POWER_WAKEUP</span></div>
-<div class="line"><a name="l00522"></a><span class="lineno">  522</span>&#160;<span class="preprocessor">#define POSCFG_FEATURE_POWER_WAKEUP 0</span></div>
+<div class="line"><a name="l00521"></a><span class="lineno">  521</span>&#160;<span class="preprocessor">#ifndef POSCFG_POWER_WAKEUP</span></div>
+<div class="line"><a name="l00522"></a><span class="lineno">  522</span>&#160;<span class="preprocessor">#define POSCFG_POWER_WAKEUP 0</span></div>
 <div class="line"><a name="l00523"></a><span class="lineno">  523</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="line"><a name="l00524"></a><span class="lineno">  524</span>&#160;</div>
 <div class="line"><a name="l00525"></a><span class="lineno">  525</span>&#160;<span class="comment">/* parameter range checking */</span></div>
@@ -794,7 +794,7 @@
 <div class="line"><a name="l01588"></a><span class="lineno"> 1588</span>&#160;</div>
 <div class="line"><a name="l01596"></a><span class="lineno"> 1596</span>&#160;POSFROMEXT <span class="keywordtype">void</span> POSCALL <a class="code" href="group__port.html#ga2b1ee080cddd8e448fbb989028366ca3">p_pos_powerSleep</a>(<span class="keywordtype">void</span>);    <span class="comment">/* arch_c.c */</span></div>
 <div class="line"><a name="l01597"></a><span class="lineno"> 1597</span>&#160;</div>
-<div class="line"><a name="l01598"></a><span class="lineno"> 1598</span>&#160;<span class="preprocessor">#if (DOX!=0) || POSCFG_FEATURE_POWER_WAKEUP == 1</span></div>
+<div class="line"><a name="l01598"></a><span class="lineno"> 1598</span>&#160;<span class="preprocessor">#if (DOX!=0) || POSCFG_POWER_WAKEUP == 1</span></div>
 <div class="line"><a name="l01599"></a><span class="lineno"> 1599</span>&#160;</div>
 <div class="line"><a name="l01606"></a><span class="lineno"> 1606</span>&#160;POSFROMEXT <span class="keywordtype">void</span> POSCALL <a class="code" href="group__port.html#ga8fb243ddf4d890cdbaf91c0d37f1ee06">p_pos_powerWakeup</a>(<span class="keywordtype">void</span>);    <span class="comment">/* arch_c.c */</span></div>
 <div class="line"><a name="l01607"></a><span class="lineno"> 1607</span>&#160;</div>
@@ -1526,7 +1526,7 @@
 <div class="ttc" id="group__port_html_gadbbcc1b0e31b3fce379f6457e6335399"><div class="ttname"><a href="group__port.html#gadbbcc1b0e31b3fce379f6457e6335399">p_pos_unlock</a></div><div class="ttdeci">POSFROMEXT void POSCALL p_pos_unlock(void)</div></div>
 <div class="ttc" id="group__atomic_html_ga333612b6ef135a4ce3c9f465734630b4"><div class="ttname"><a href="group__atomic.html#ga333612b6ef135a4ce3c9f465734630b4">posAtomicGet</a></div><div class="ttdeci">POSEXTERN INT_t POSCALL posAtomicGet(POSATOMIC_t *var)</div></div>
 <div class="ttc" id="group__msg_html_ga4130e9cee77af967aacf28e2322dcc4a"><div class="ttname"><a href="group__msg.html#ga4130e9cee77af967aacf28e2322dcc4a">posMessageAvailable</a></div><div class="ttdeci">POSEXTERN VAR_t POSCALL posMessageAvailable(void)</div></div>
-<div class="ttc" id="port_8h_html_a358f2af7587dc9e3d97019a8331dee1f"><div class="ttname"><a href="port_8h.html#a358f2af7587dc9e3d97019a8331dee1f">POS_USERTASKDATA</a></div><div class="ttdeci">#define POS_USERTASKDATA</div><div class="ttdef"><b>Definition:</b> port.h:402</div></div>
+<div class="ttc" id="port_8h_html_a358f2af7587dc9e3d97019a8331dee1f"><div class="ttname"><a href="port_8h.html#a358f2af7587dc9e3d97019a8331dee1f">POS_USERTASKDATA</a></div><div class="ttdeci">#define POS_USERTASKDATA</div><div class="ttdef"><b>Definition:</b> port.h:411</div></div>
 <div class="ttc" id="group__debug_html_gga60121548f8512d1ce216ad71867356aaa2b5a778785e5f75c52f72fd18c08d562"><div class="ttname"><a href="group__debug.html#gga60121548f8512d1ce216ad71867356aaa2b5a778785e5f75c52f72fd18c08d562">task_waitingForMessageWithTimeout</a></div><div class="ttdef"><b>Definition:</b> picoos.h:3091</div></div>
 <div class="ttc" id="structPICOEVENT_html"><div class="ttname"><a href="structPICOEVENT.html">PICOEVENT</a></div><div class="ttdoc">Event info structure. </div><div class="ttdef"><b>Definition:</b> picoos.h:3117</div></div>
 <div class="ttc" id="group__debug_html_gga6c8a5d9837d553c0117e7fc356d656baaa39015d7db4bd259c719e5c342c01944"><div class="ttname"><a href="group__debug.html#gga6c8a5d9837d553c0117e7fc356d656baaa39015d7db4bd259c719e5c342c01944">event_mutex</a></div><div class="ttdef"><b>Definition:</b> picoos.h:3103</div></div>
