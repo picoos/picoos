@@ -181,9 +181,10 @@ void p_pos_powerTickSuspend(UVAR_t ticks)
   if (ticks == INFINITE)
     return;
 
-  ticks -= PORTCFG_POWER_TICKLESS_SAFETY_MARGIN; // oscillator starts up 2 ms
   if (ticks / HZ > 65536) // max 18 hours
     ticks = 65536 * HZ;
+
+  ticks -= PORTCFG_POWER_TICKLESS_SAFETY_MARGIN; // oscillator starts up 2 ms
 
   RTC_WakeUpCmd(DISABLE);
   if (ticks <= MS(10000)) {
