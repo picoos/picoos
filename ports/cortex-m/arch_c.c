@@ -444,7 +444,6 @@ void p_pos_softContextSwitch(void)
 void PORT_NAKED p_pos_intContextSwitch(void)
 {
   posCurrentTask_g = posNextTask_g;
-  SCB->SCR &= ~SCB_SCR_SLEEPONEXIT_Msk;
   portRestoreContext();
 }
 
@@ -644,7 +643,6 @@ void sysCall(unsigned int* args)
   case SVC_SOFT_CONTEXT_SWITCH: // p_pos_softContextSwitch
     checkPendingFreeStack();
     posCurrentTask_g = posNextTask_g;
-    SCB->SCR &= ~SCB_SCR_SLEEPONEXIT_Msk; // Ensure that CPU wakes up.
     portRestoreContext();
     break;
 
