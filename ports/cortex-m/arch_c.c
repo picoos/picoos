@@ -527,7 +527,6 @@ void PORT_NAKED portRestoreContextImpl(void)
 }
 
 #if POSCFG_FEATURE_POWER != 0
-#if POSCFG_FEATURE_POWER_WAKEUP != 0
 
 /*
  * Wakup up CPU.
@@ -536,8 +535,6 @@ void p_pos_powerWakeup()
 {
   SCB->SCR &= ~SCB_SCR_SLEEPONEXIT_Msk;
 }
-
-#endif
 
 #ifndef PORTCFG_POWER_TICKLESS_MIN
 #define PORTCFG_POWER_TICKLESS_MIN MS(100)
@@ -593,15 +590,7 @@ void p_pos_powerSleep()
 
 #endif
 
-#if POSCFG_FEATURE_POWER_WAKEUP != 0
-
-/*
- * If wakeup function is configured, it is ok to stay
- * sleeping at end of interrupt that doesnt result in
- * context switch.
- */
   SCB->SCR |= SCB_SCR_SLEEPONEXIT_Msk; // Sleep after interrupt
-#endif
 
 #if __CORTEX_M < 3
 

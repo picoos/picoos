@@ -835,7 +835,7 @@ void POSCALL c_pos_intExit(void)
 #endif
       if (posMustSchedule_g != 0)
       {
-#if POSCFG_FEATURE_POWER != 0 && POSCFG_FEATURE_POWER_WAKEUP == 0
+#if POSCFG_FEATURE_POWER != 0 && POSCFG_POWER_WAKEUP == 0
 
         /*
          * If system is sleeping in powersave mode and an interrupt will wake it
@@ -864,7 +864,7 @@ void POSCALL c_pos_intExit(void)
 
           posNextTask_g = posTaskTable_g[(ym * SYS_TASKTABSIZE_X) + xt];
 
-#if POSCFG_FEATURE_POWER != 0 && POSCFG_FEATURE_POWER_WAKEUP != 0
+#if POSCFG_FEATURE_POWER != 0 && POSCFG_POWER_WAKEUP != 0
 
           /*
            * If system is sleeping in powersave mode wake it up by calling
@@ -916,7 +916,7 @@ void POSCALL c_pos_intExit(void)
 #endif
             return; /* needed for the thread based ports, eg. x86w32 */
           }
-#if POSCFG_FEATURE_POWER != 0 && POSCFG_FEATURE_POWER_WAKEUP == 0
+#if POSCFG_FEATURE_POWER != 0 && POSCFG_POWER_WAKEUP == 0
         }
 #endif
       }

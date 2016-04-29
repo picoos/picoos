@@ -527,15 +527,6 @@
  */
 #define POSCFG_FEATURE_POWER         0
 
-/** Enable interrupt wakeup support in power management.
- * If this definition is set to 1, pico]OS allows system to
- * stay in sleep until a interrupt causes context switch away
- * from idle task. If not enabled, it is assumed that
- * interrupt will wake up a sleeping system. Architecture port
- * is expected to privide implementation for ::p_pos_powerWakeup.
- */
-#define POSCFG_FEATURE_POWER_WAKEUP  1
-
 /** Enable supression of periodic timer interrupt when
  * when system is sleeping to save power. Architecture port
  * is expected to provide implementations for ::p_pos_powerTickSuspend and

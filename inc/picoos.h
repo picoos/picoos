@@ -518,8 +518,8 @@
 #ifndef POSCFG_FEATURE_POWER
 #define POSCFG_FEATURE_POWER 0
 #endif
-#ifndef POSCFG_FEATURE_POWER_WAKEUP
-#define POSCFG_FEATURE_POWER_WAKEUP 0
+#ifndef POSCFG_POWER_WAKEUP
+#define POSCFG_POWER_WAKEUP 0
 #endif
 
 /* parameter range checking */
@@ -1193,7 +1193,7 @@ POSEXTERN VAR_t* _errno_p(void);
  * MSP430 might put processor into LPM3 state). If processor wakes
  * up automatically when interrupt occurs, this is all that is needed.
  * If something special is needed for wake-up (for example clear sleep
- * bit in status register), ::POSCFG_FEATURE_POWER_WAKEUP must be set 1.
+ * bit in status register), ::POSCFG_POWER_WAKEUP must be set 1.
  * This makes Pico]OS call p_pos_powerWakeup when it has detected
  * that task other than idle must be scheduled.@n@n
  *
@@ -1595,7 +1595,7 @@ POSEXTERN UINT_t POSCALL c_pos_nextWakeup(void);
  */
 POSFROMEXT void POSCALL p_pos_powerSleep(void);    /* arch_c.c */
 
-#if (DOX!=0) || POSCFG_FEATURE_POWER_WAKEUP == 1
+#if (DOX!=0) || POSCFG_POWER_WAKEUP == 1
 
 /**
  * Called by p_pos_intExit when system should wake up from sleep.
