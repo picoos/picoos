@@ -11,7 +11,7 @@ I decided to pick up the maintenance and developent of it.
 Compared to latest sf.net release (1.0.4) it has following updates:
 
 - Power management API to provide framework for MCU power saving / sleeping features
-- Suppression of timer interrupts during idle mode (tickless idle). Complete implementation is available in cortex-m/stm32 port.
+- Suppression of timer interrupts during idle mode (tickless idle). Implementations are available for cortex-m/stm32 and MSP430 ports.
 - stdarg support for nano layer printf-functions
 - Makefile system uses GNU make pattern rules for source directory handling (otherwise projects that had many directories run into troubles)
 - Pico & nano layers are augmented by [micro-layer][4], which contains support for filesystems (and some other things)
