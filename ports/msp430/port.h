@@ -112,6 +112,15 @@
  */
 #define POSCFG_ISR_INTERRUPTABLE 0
 
+/** Enable interrupt wakeup support in power management.
+ * If this definition is set to 1, pico]OS allows system to
+ * stay in sleep until a interrupt causes context switch away
+ * from idle task. If not enabled, it is assumed that
+ * interrupt will wake up a sleeping system. Architecture port
+ * is expected to privide implementation for ::p_pos_powerWakeup.
+ */
+#define POSCFG_POWER_WAKEUP  1
+
 /** Set the mechanism of stack memory handling.
  * There are three types of stack memory handling defined.<br>
  *

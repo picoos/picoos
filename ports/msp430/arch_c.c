@@ -33,6 +33,7 @@
 #include <msp430.h>
 #include <in430.h>
 #include <string.h>
+#include <stdbool.h>
 
 static inline void constructStackFrame(POSTASK_t task, void* stackPtr, POSTASKFUNC_t funcptr, void *funcarg);
 
@@ -308,10 +309,16 @@ void PORT_NAKED portRestoreContextImpl(void)
   asm volatile("reti");
 }
 
+#if POSCFG_FEATURE_POWER != 0
+
 void p_pos_powerWakeup()
 {
   posCurrentTask_g->stackptr->sr &= ~LPM4_bits; // Ensure CPU is active for next task
 }
+
+#ifndef PORTCFG_POWER_TICKLESS_MIN
+#define PORTCFG_POWER_TICKLESS_MIN MS(100)
+#endif
 
 void p_pos_powerSleep()
 {
@@ -324,6 +331,22 @@ void p_pos_powerSleep()
   }
 #endif
 
+#if POSCFG_FEATURE_TICKLESS
+
+  UVAR_t nextWake = c_pos_nextWakeup();
+  bool restoreTick = false;
+
+  if (nextWake >= PORTCFG_POWER_TICKLESS_MIN) {
+
+    p_pos_powerTickSuspend(nextWake);
+    restoreTick = true;
+  }
+
+#endif
+
+  __bis_status_register(LPM3_bits | GIE);
+  __dint();
+
 #if defined(__MSP430_HAS_UCS_RF__) || defined(__MSP430_HAS_UCS__)
 
   // UCS7 Errata workaround, FLL must be on for 3 * refclk cycles
@@ -335,9 +358,16 @@ void p_pos_powerSleep()
 #endif
 #endif
 
-  __bis_status_register(LPM3_bits | GIE);
-  __dint();
+#if POSCFG_FEATURE_TICKLESS
+
+  if (restoreTick)
+    p_pos_powerTickResume();
+
+#endif
+
 }
+
+#endif
 
 #ifdef HAVE_PLATFORM_ASSERT
 void p_pos_assert(const char* text, const char *file, int line)
