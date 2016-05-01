@@ -1180,7 +1180,7 @@ UINT_t POSCALL c_pos_nextWakeup(void)
   while (tmr != NULL)
   {
     if (wake == INFINITE || tmr->counter < wake)
-      wake = tasktimerticks(task);
+      wake = tmr->counter;
 
     tmr = tmr->next;
   }
