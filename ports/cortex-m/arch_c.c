@@ -757,7 +757,7 @@ UVAR_t POSCALL p_pos_findbit(const UVAR_t bitfield)
   int bit;
 
   asm volatile ("rbit %[bit], %[bitField]   \n"
-      "          clz  %[bit], %[bitField]"
+      "          clz  %[bit], %[bit]"
                : [bit]"=r"(bit) : [bitField]"r"(bitfield));
 
   return bit;
@@ -773,7 +773,7 @@ UVAR_t POSCALL p_pos_findbit(const UVAR_t bitfield, UVAR_t rrOffset)
   bf = (bitfield << (MVAR_BITS - rrOffset)) | (bitfield >> rrOffset);
 
   asm volatile ("rbit %[bit], %[bitField]   \n"
-      "          clz  %[bit], %[bitField]"
+      "          clz  %[bit], %[bit]"
                : [bit]"=r"(bit) : [bitField]"r"(bf));
 
   return (bit + rrOffset) & (MVAR_BITS - 1);
