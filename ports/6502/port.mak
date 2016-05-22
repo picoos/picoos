@@ -70,7 +70,7 @@ OPT_AR_ADD   =
 OPT_LD_SEP   = 
 OPT_LD_PFOBJ = 
 OPT_LD_PFLIB = 
-OPT_LD_FIRST = $(TG).o
+OPT_LD_FIRST = 
 OPT_LD_LAST  = $(TG).lib
 
 # Set global defines for compiler / assembler
