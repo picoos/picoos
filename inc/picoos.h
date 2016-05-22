@@ -268,7 +268,7 @@
 #define POS_COPYRIGHT       "(c) 2004-2012, Dennis Kuschel\n" \
                             "(c) 2011-2016, Ari Suutari"
 
-#define POS_STARTUPSTRING   "pico]OS " POS_VER_S "  " POS_COPYRIGHT
+#define POS_STARTUPSTRING   "pico]OS " POS_VER_S "\n" POS_COPYRIGHT
 
 #ifndef NULL
 #ifndef _HAVE_NULL
