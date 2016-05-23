@@ -314,7 +314,7 @@ extern void *__heap_end;
  * If this definition is set to 1, the key string functions are
  * added to the user API.
  */
-#define NOSCFG_FEATURE_REGISTRY    1
+#define NOSCFG_FEATURE_REGISTRY    0
 
 /** Enable the query for key strings.
  * If this definition is set to 1, the functions ::nos_keyQueryBegin,
