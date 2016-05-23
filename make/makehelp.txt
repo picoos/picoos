@@ -85,7 +85,7 @@ need to perform the following steps: @n
  - create a subdirectory somewhere in the @c picoos directory tree
  - place your file @c hello.c in this directory
  - generate and place a makefile (or copy and rename the file @c outfile.mak
-   from the examples directory) in the same directory. The makefile
+   from the examples/make directory) in the same directory. The makefile
    should look like this:
 
 @code
@@ -219,7 +219,7 @@ library makefile will be executed, ensuring the library is up to date. @n
 And there is another special thing: You can divide your project into smaller
 modules. The modules are compiled to libraries and the libraries are then
 linked to the main program. For your own libraries, you should use the 
-template makefile 'library.mak' in the examples directory. A description of
+template makefile 'library.mak' in the examples/make directory. A description of
 this file you will find in the next section, see below. If you are using this
 modularized architecture, you can simply add the modules you wish to link
 to your main program to the variable @c MODULES in line 73. You do not need
@@ -243,7 +243,7 @@ make command line. In this case, a valid make call would look like this:
 
 As described above, sometimes it is useful (or maybe necessary) to divide
 a project into some smaller modules or so called libraries. For this purpose
-pico]OS provides an example makefile (see examples directory,
+pico]OS provides an example makefile (see examples/make directory,
 file @c library.mak) that looks like this:
 
 @code
@@ -337,7 +337,7 @@ may also set the NANO flag to 1 (@c NANO=1) if the library uses the
 nano layer of pico]OS. @n@n
 But in most cases you will start the makefile from within a main makefile
 that is used to compile the whole project. Take the file @c outfile.mak
-from the examples directory as a template for such a main makefile. When
+from the examples/make directory as a template for such a main makefile. When
 you add this library makefile (that means, the name and path of the directory
 where this library makefile is located) to the @c MODULES= variable in the
 main makefile, the library makefile will be automatically executed when

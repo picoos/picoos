@@ -39,21 +39,15 @@ PORT = x86w32
 endif
 export PORT
 
-SRCDIR = examples
-export DIR_USRINC = $(SRCDIR)
-ifneq '$(strip $(OLIBNAME))' ''
-OLIBVAR = OLIBNAME=$(OLIBNAME)
-endif
+# Set root path
+RELROOT = ../../
 
 ifeq '$(strip $(SOURCEFILE))' ''
 
-# Set root path
-RELROOT = ../
-
 include $(RELROOT)make/common.mak
 
-MAKECMD = -$(MAKE) -f $(SRCDIR)/makefile -C .. SOURCEFILE=$(SRCDIR)/
-MAKECLCMD = -$(MAKE) clean -f $(SRCDIR)/makefile -C .. SOURCEFILE=$(SRCDIR)/
+MAKECMD = -$(MAKE) SOURCEFILE=
+MAKECLCMD = -$(MAKE) clean SOURCEFILE=
 
 default: all
 
@@ -107,9 +101,6 @@ else
 
 # --------------------------------------------------------------------------
 
-# Set root path
-RELROOT = ./
-
 # Build mode
 BUILD = DEBUG
 
@@ -120,6 +111,8 @@ endif
 
 # Include base make file
 include $(RELROOT)make/common.mak
+
+DIR_OUTPUT = $(CURRENTDIR)/bin
 
 # --------------------------------------------------------------------------
 

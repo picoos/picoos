@@ -46,7 +46,7 @@ include $(RELROOT)make/common.mak
 TARGET = test
 
 # Set source files
-SRC_TXT = $(RELROOT)examples/test.c
+SRC_TXT = $(RELROOT)examples/apps/test.c
 SRC_OBJ =
 SRC_LIB =
 

@@ -35,7 +35,7 @@ When you  have a working GNU  make installed, you are  now ready to build the
 example  programs  that are  shipped  with  pico]OS.  Assuming your host is a
 MS Windows  machine and you have  MS Visual Studio 6 or the MinGW GCC package
 installed,  you  can compile  the  RTOS for  MS Windows.  Simply  change into
-the examples  directory  and enter  "make PORT=x86w32".  If you have  trouble
+the examples/app  directory  and enter  "make PORT=x86w32". If you have trouble
 building  the  examples,  please read  the  readme file  in the  appropriated
 port  directory  (eg. ports/x86w32/readme.txt).  You will find the  generated
 executables in the directory out/x86w32/deb/.

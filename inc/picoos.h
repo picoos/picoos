@@ -2737,7 +2737,7 @@ POSEXTERN INT_t POSCALL posAtomicSub(POSATOMIC_t *var, INT_t value);
  * routines that need to send buffers through a queue to the
  * application task. @n
  * An example program that demonstrates the usage of lists is available
- * in the examples directory: lists.c
+ * in the examples/apps directory: ex_lists.c
  * @{
  */
 
