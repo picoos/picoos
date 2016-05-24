@@ -8,7 +8,7 @@ till huge architectures like 32 bit processors with lots of memory.
 Please see the [documentation][3] for further information.
 
 pico]OS was originally created by Dennis Kuschel and Swen Moczarski,
-see [original site at sourceforge][1] for details. The have
+see [original site at sourceforge][1] for details. They have
 given up on development of it. But as pico]OS is _great_ software,
 I decided to pick up the maintenance and developent of it.
 
