@@ -307,11 +307,8 @@ VAR_t p_pos_initTask(POSTASK_t task,
   /* allocate call- and data-stack memory */
   alloc_stacks(task);
 
-  /* initialize data stack */
-  sp = task->dstackptr - 2;
-  task->dstackptr = sp;
-  sp[1] = (UVAR_t)(((MEMPTR_t)funcarg) >> 8);
-  sp[0] = (UVAR_t)((MEMPTR_t)funcarg);
+  /* cc65 defaults to __fastcall__, so data stack is empty as
+     funcarg is passed in ax */
 
   /* initialize call stack */
 
@@ -341,8 +338,8 @@ VAR_t p_pos_initTask(POSTASK_t task,
   sp[4] = (UVAR_t)((MEMPTR_t)((void*)funcptr));
 
   sp[3] = 0x00;  /* flags. irqs enabled. */
-  sp[2] = 0x00;  /* A */
-  sp[1] = 0x00;  /* X */
+  sp[2] = (UVAR_t)((MEMPTR_t)funcarg);  /* A */
+  sp[1] = (UVAR_t)(((MEMPTR_t)funcarg) >> 8);  /* X */
   sp[0] = 0x02;  /* Y */
 
   return 0;
