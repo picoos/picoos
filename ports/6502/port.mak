@@ -93,7 +93,7 @@ else
 endif
 
 # Define Compiler Flags
-CFLAGS += -t $(TG) -O -T -o 
+CFLAGS += --all-cdecl -t $(TG) -O -T -o 
 
 # Define Assembler Flags
 ASFLAGS += -t $(TG) -o 
