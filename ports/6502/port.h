@@ -53,6 +53,8 @@
 /* The cc65 compiler does not support the 'volatile' -keyword correctly */
 #define volatile
 
+/* New compiler defaults to __fastcall__ but old one doesn't. */
+#define POSCALL __fastcall__
 
 
 /*---------------------------------------------------------------------------
