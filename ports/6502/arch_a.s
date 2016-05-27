@@ -138,9 +138,6 @@ _savedchars:
 ; ---------------------------------------------------------------
 
 .proc  _p_putchar
-    ldy     #$00
-    lda     (sp),y
-
     cmp     #13
     bne     putc0
     ldx     _savedchars
@@ -184,7 +181,7 @@ putc5:
     jsr     SCREEN_OUT
 putc2:
     lda     #1
-    jmp     incsp1
+    rts
 
 .endproc
 
@@ -740,7 +737,6 @@ tmi02:
     lda     KEY_BUF
     ldx     KEY_BUF+1
     stx     KEY_BUF
-    jsr     pusha
     jsr     _c_nos_keyinput
 tmi05:
 .ENDIF
@@ -845,10 +841,8 @@ orgisr:
 ; ---------------------------------------------------------------
 
 .proc _p_pos_findbit
-    ldy     #$00
-    lda     (sp),y
     tax
-    iny
+    ldy     #$00
     lda     (sp),y
     ;accu = bitfield
     ;x = offset
@@ -876,11 +870,11 @@ bitFound:
     bcs     correctOffset
 
     ; return a
-    jmp     incsp2
+    jmp     incsp1
          
 correctOffset:  
     sbc     #9
     ; return a
-    jmp     incsp2
+    jmp     incsp1
 
 .endproc

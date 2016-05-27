@@ -278,7 +278,7 @@ static void free_stacks(POSTASK_t task)
  * INITIALIZE THIS PORT
  *-------------------------------------------------------------------------*/
 
-void p_pos_initArch(void)
+void POSCALL p_pos_initArch(void)
 {
 #if (STASKS != 0)
   unsigned char *p = (unsigned char*) stasks_alloctab_g;
@@ -299,19 +299,22 @@ void p_pos_initArch(void)
 #error Only  POSCFG_TASKSTACKTYPE = 2  supported
 #endif
 
-VAR_t p_pos_initTask(POSTASK_t task,
-                    POSTASKFUNC_t funcptr, void *funcarg)
+VAR_t POSCALL p_pos_initTask(POSTASK_t task,
+                             POSTASKFUNC_t funcptr, void *funcarg)
 {
   UVAR_t *sp;
 
   /* allocate call- and data-stack memory */
   alloc_stacks(task);
 
-  /* initialize data stack */
+#if __CC65__ < 0x02F0
+  /* initialize data stack for older compiler, which
+     doesn't default to __fastcall__ */
   sp = task->dstackptr - 2;
   task->dstackptr = sp;
   sp[1] = (UVAR_t)(((MEMPTR_t)funcarg) >> 8);
   sp[0] = (UVAR_t)((MEMPTR_t)funcarg);
+#endif
 
   /* initialize call stack */
 
@@ -341,15 +344,15 @@ VAR_t p_pos_initTask(POSTASK_t task,
   sp[4] = (UVAR_t)((MEMPTR_t)((void*)funcptr));
 
   sp[3] = 0x00;  /* flags. irqs enabled. */
-  sp[2] = 0x00;  /* A */
-  sp[1] = 0x00;  /* X */
+  sp[2] = (UVAR_t)((MEMPTR_t)funcarg);  /* A */
+  sp[1] = (UVAR_t)(((MEMPTR_t)funcarg) >> 8);  /* X */
   sp[0] = 0x02;  /* Y */
 
   return 0;
 }
 
 
-void  p_pos_freeStack(POSTASK_t task)
+void POSCALL p_pos_freeStack(POSTASK_t task)
 {
   free_stacks(task);
 }
