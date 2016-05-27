@@ -33,8 +33,6 @@
 /*
  * This file is originally from the pico]OS realtime operating system
  * (http://picoos.sourceforge.net).
- *
- * CVS-ID $Id: fbit_gen.c,v 1.2 2006/10/15 08:51:42 dkuschel Exp $
  */
 
 

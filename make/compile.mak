@@ -29,8 +29,6 @@
 
 #  This file is originally from the pico]OS realtime operating system
 #  (http://picoos.sourceforge.net).
-#
-#  $Id: compile.mak,v 1.9 2006/04/16 08:49:02 dkuschel Exp $
 
 
 # Compile files

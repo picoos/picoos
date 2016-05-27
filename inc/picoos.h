@@ -4,8 +4,6 @@
  * This file is originally from the pico]OS realtime operating system
  * (http://picoos.sourceforge.net).
  *
- * CVS-ID $Id: picoos.h,v 1.29 2010/02/20 13:18:52 dkuschel Exp $
- *
  */
 
 /**

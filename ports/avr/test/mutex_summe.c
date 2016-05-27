@@ -55,9 +55,8 @@
  *    work.
  *    With the hex-file you can program the target device and run the
  *    program in the real world :-)
- *
- * CVS-ID $Id: mutex_summe.c,v 1.2 2008/08/22 21:41:09 smocz Exp $
  */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <inttypes.h>

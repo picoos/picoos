@@ -37,8 +37,6 @@
  *
  * This file is originally from the pico]OS realtime operating system
  * (http://picoos.sourceforge.net).
- *
- * CVS-ID $Id: noscfg.h,v 1.5 2011/11/27 09:03:46 ari Exp $
  */
 
 #ifndef _NOSCFG_H

@@ -29,8 +29,6 @@
 
 #  This file is originally from the pico]OS realtime operating system
 #  (http://picoos.sourceforge.net).
-#
-#  $Id: out.mak,v 1.6 2006/04/16 08:49:01 dkuschel Exp $
 
 
 # Build target: generate executable

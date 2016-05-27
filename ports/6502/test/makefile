@@ -29,8 +29,6 @@
 
 #  This file is originally from the pico]OS realtime operating system
 #  (http://picoos.sourceforge.net).
-#
-#  $Id: makefile,v 1.4 2006/03/14 18:21:30 dkuschel Exp $
 
 
 # This port is 6502

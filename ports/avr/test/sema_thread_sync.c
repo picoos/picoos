@@ -55,8 +55,6 @@
  *    work. 
  *    With the hex-file you can program the target device and run the
  *    program in the real world :-)
- * 
- * CVS-ID $Id: sema_thread_sync.c,v 1.1 2004/02/23 19:45:45 smocz Exp $
  */
 #include <stdio.h>
 #include <stdlib.h>

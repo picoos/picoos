@@ -37,8 +37,6 @@
  *
  * This file is originally from the pico]OS realtime operating system
  * (http://picoos.sourceforge.net).
- *
- * CVS-ID $Id: ex_lists.c,v 1.2 2005/01/17 21:22:31 dkuschel Exp $
  */
 
 

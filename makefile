@@ -29,8 +29,6 @@
 
 #  This file is originally from the pico]OS realtime operating system
 #  (http://picoos.sourceforge.net).
-#
-#  $Id: makefile,v 1.4 2006/03/14 18:45:43 dkuschel Exp $
 
 
 # Set root path and include base make file

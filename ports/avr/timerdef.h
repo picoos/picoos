@@ -33,8 +33,6 @@
 /*
  * This file is originally from the pico]OS realtime operating system
  * (http://picoos.sourceforge.net).
- *
- * CVS-ID $Id: timerdef.h,v 1.7 2008/09/01 20:14:37 smocz Exp $
  */
 
 #ifndef TIMERDEF_H

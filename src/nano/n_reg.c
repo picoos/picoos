@@ -37,8 +37,6 @@
  *
  * This file is originally from the pico]OS realtime operating system
  * (http://picoos.sourceforge.net).
- *
- * CVS-ID $Id: n_reg.c,v 1.5 2006/10/16 19:41:27 dkuschel Exp $
  */
 
 

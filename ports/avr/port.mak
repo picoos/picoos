@@ -29,8 +29,6 @@
 
 #  This file is originally from the pico]OS realtime operating system
 #  (http://picoos.sourceforge.net).
-#
-#  $Id: port.mak,v 1.4 2008/08/21 08:05:10 smocz Exp $
 
 
 # Define the MCU

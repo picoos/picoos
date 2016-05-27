@@ -29,8 +29,6 @@
 
 #  This file is originally from the pico]OS realtime operating system
 #  (http://picoos.sourceforge.net).
-#
-#  $Id: makefile,v 1.1 2006/10/15 09:24:42 dkuschel Exp $
 
 
 # This port is for MyCPU

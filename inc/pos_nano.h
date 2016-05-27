@@ -37,8 +37,6 @@
  *
  * This file is originally from the pico]OS realtime operating system
  * (http://picoos.sourceforge.net).
- *
- * CVS-ID $Id: pos_nano.h,v 1.8 2006/10/16 19:42:41 dkuschel Exp $
  */
 
 #ifndef _POS_NANO_H

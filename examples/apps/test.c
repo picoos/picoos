@@ -37,8 +37,6 @@
  *
  * This file is originally from the pico]OS realtime operating system
  * (http://picoos.sourceforge.net).
- *
- * CVS-ID $Id: test.c,v 1.3 2004/03/13 19:11:25 dkuschel Exp $
  */
 
 #ifndef _NORTLIB

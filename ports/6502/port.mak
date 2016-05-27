@@ -29,8 +29,6 @@
 
 #  This file is originally from the pico]OS realtime operating system
 #  (http://picoos.sourceforge.net).
-#
-#  $Id: port.mak,v 1.4 2006/10/15 09:18:47 dkuschel Exp $
 
 
 # Compiler: Define target type

@@ -33,8 +33,6 @@
 /*
  * This file is originally from the pico]OS realtime operating system
  * (http://picoos.sourceforge.net).
- *
- * CVS-ID $Id: arch_c.c,v 1.3 2004/03/21 18:30:57 dkuschel Exp $
  */
 
 

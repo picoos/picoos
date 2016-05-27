@@ -37,8 +37,6 @@
  *
  * This file is originally from the pico]OS realtime operating system
  * (http://picoos.sourceforge.net).
- *
- * CVS-ID $Id: n_core.c,v 1.9 2006/10/16 19:41:27 dkuschel Exp $
  */
 
 #define _N_CORE_C

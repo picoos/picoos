@@ -33,8 +33,6 @@
 /*
  * This file is originally from the pico]OS realtime operating system
  * (http://picoos.sourceforge.net).
- *
- * CVS-ID $Id: pingpong.c,v 1.1.1.1 2004/02/16 20:11:31 smocz Exp $
  */
 
 #include <stdio.h>

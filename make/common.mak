@@ -29,8 +29,6 @@
 
 #  This file is originally from the pico]OS realtime operating system
 #  (http://picoos.sourceforge.net).
-#
-#  $Id: common.mak,v 1.7 2006/10/15 08:50:51 dkuschel Exp $
 
 
 # Include configuration

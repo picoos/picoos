@@ -37,8 +37,6 @@
  *
  * This file is originally from the pico]OS realtime operating system
  * (http://picoos.sourceforge.net).
- *
- * CVS-ID $Id: poscfg.h,v 1.12 2012/01/19 10:21:29 ari Exp $
  */
 
 

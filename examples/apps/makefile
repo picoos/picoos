@@ -29,8 +29,6 @@
 
 #  This file is originally from the pico]OS realtime operating system
 #  (http://picoos.sourceforge.net).
-#
-#  $Id: makefile,v 1.4 2005/02/01 22:20:40 dkuschel Exp $
 
 
 # The default port is x86w32

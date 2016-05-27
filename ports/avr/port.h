@@ -37,8 +37,6 @@
  *
  * This file is originally from the pico]OS realtime operating system
  * (http://picoos.sourceforge.net).
- *
- * CVS-ID $Id: port.h,v 1.12 2008/08/30 09:33:28 smocz Exp $
  */
 
 

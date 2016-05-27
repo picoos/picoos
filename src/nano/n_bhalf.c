@@ -37,8 +37,6 @@
  *
  * This file is originally from the pico]OS realtime operating system
  * (http://picoos.sourceforge.net).
- *
- * CVS-ID $Id: n_bhalf.c,v 1.7 2006/10/16 19:41:27 dkuschel Exp $
  */
 
 #define _N_BHALF_C

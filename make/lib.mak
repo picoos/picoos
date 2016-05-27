@@ -29,8 +29,6 @@
 
 #  This file is originally from the pico]OS realtime operating system
 #  (http://picoos.sourceforge.net).
-#
-#  $Id: lib.mak,v 1.4 2006/03/23 21:36:51 dkuschel Exp $
 
 
 # Build target: generate library

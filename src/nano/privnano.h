@@ -29,8 +29,6 @@
  *
  *  This file is part of the pico]OS realtime operating system.
  *
- *  $Id: privnano.h,v 1.4 2006/10/16 19:41:27 dkuschel Exp $
- *
  */
 
 #ifndef _PRIVNANO_H

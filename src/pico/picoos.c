@@ -38,8 +38,6 @@
  *
  * This file is originally from the pico]OS realtime operating system
  * (http://picoos.sourceforge.net).
- *
- * CVS-ID $Id: picoos.c,v 1.18 2009/01/06 12:04:14 dkuschel Exp $
  */
 
 

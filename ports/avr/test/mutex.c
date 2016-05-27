@@ -36,10 +36,8 @@
  *
  * This example shows the usage of a mutex. For a correct run the EXIT_FEATURE
  * has to be activated in poscfg.h.
- *
- *
- * CVS-ID $Id: mutex.c,v 1.2 2008/08/22 21:41:09 smocz Exp $
  */
+
 #include <stdio.h>
 #include <inttypes.h>
 

@@ -29,8 +29,6 @@
 
 #  This file is originally from the pico]OS realtime operating system
 #  (http://picoos.sourceforge.net).
-#
-#  $Id: port.mak,v 1.6 2006/04/14 13:43:50 dkuschel Exp $
 
 
 # Set default compiler.

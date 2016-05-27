@@ -37,8 +37,6 @@
  *
  * This file is originally from the pico]OS realtime operating system
  * (http://picoos.sourceforge.net).
- *
- * CVS-ID $Id: n_mem.c,v 1.8 2006/10/16 19:41:27 dkuschel Exp $
  */
 
 #define _N_MEM_C

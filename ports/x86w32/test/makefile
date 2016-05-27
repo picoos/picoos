@@ -29,8 +29,6 @@
 
 #  This file is originally from the pico]OS realtime operating system
 #  (http://picoos.sourceforge.net).
-#
-#  $Id: makefile,v 1.1 2005/01/10 22:40:31 dkuschel Exp $
 
 
 # This port is Windows 32Bit (80x86)
