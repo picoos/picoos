@@ -85,10 +85,10 @@ html help with use of the doxygen tool.
 Makefile searches for the configuration file 'config.mak' in
 the pico]OS root directory. You can put in there your build parameters.
 
-`#--- start of file ---
- PORT  = avr
- BUILD = DEBUG
- #---- end of file ----`
+    #--- start of file ---
+     PORT  = avr
+     BUILD = DEBUG
+    #---- end of file ----
 
 Please report bugs at [github][7].
 
