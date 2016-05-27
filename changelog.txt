@@ -1,3 +1,14 @@
+Version 1.1.0:
+  o  add power management api and support for tickless idle
+  o  add tickless idle implementation for cortex-m stm32
+
+Version 1.0.4a:
+  o  add stdarg support to nosPrint -functions
+  o  add C++ support to makefiles
+  o  add some MSP430X support
+  o  bug fixes and enhancements to cortex-m and msp430 ports
+  o  add PIC32 port
+  
 Version 1.0.4:
   o  bugs fixed in these ports: ARM Cortex-M, MSP430, Unix
   o  fixed some minor compilation issues, removed some compiler warnings
