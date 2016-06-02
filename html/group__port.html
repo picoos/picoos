@@ -129,7 +129,7 @@ It is possible to implement the findbit mechanism as look up table. For this pur
 <br />
  </p>
 <div class="image">
-<img src="../pic/portfc1.png"  align="middle" border="0"/>
+<img src="portfc1.png"  align="middle" border="0"/>
 </div>
 <p><br />
  The context switching (multitasking) is done by simply swaping the stack frame when an interrupt service routine (eg. the timer interrupt) is left. But it must also be possible for a task to give of processing time without the need of an interrupt. This is done by the function <a class="el" href="group__port.html#ga29774435bfbbb74fd003a0e3c5332af0">p_pos_softContextSwitch</a> at the right side in the diagram. Since this function is not called by a processor interrupt, it must build up an ISR compatible stack frame by itself. Note that the second part of this function is equal to the function <a class="el" href="group__port.html#ga8a42bf245c41c524c80a72b82fe13d76">p_pos_intContextSwitch</a>, so the function must be terminated by an return-from-interrupt instruction, even if the function was called from a C-routine.<br />
@@ -138,7 +138,7 @@ It is possible to implement the findbit mechanism as look up table. For this pur
 <br />
  </p>
 <div class="image">
-<img src="../pic/portfc2.png"  align="middle" border="0"/>
+<img src="portfc2.png"  align="middle" border="0"/>
 </div>
 <p><br />
  There is a special interrupt handling needed when interrupts are interruptable on your system. To prevent a deadlock situation (that is, an ISR would be called again and again until the stack flows over), a counting flag variable is exported by pico]OS: <a class="el" href="picoos_8h.html#acff307fe2f3f00d7badb582ff4ab2897" title="Global flag variable. This variable is nonzero when the CPU is currently executing an interrupt servi...">posInInterrupt_g</a>. This variable contains the value zero if no interrupt is running yet. And only if no other interrupt is running, the ISR must save the stack pointer to the task environment structure where <a class="el" href="picoos_8h.html#afed0dbeed05c3fb45c5b39aa85898fa2" title="Global task variable. This variable points to the environment structure of the currently active task...">posCurrentTask_g</a> points to. This behaviour is shown at the right side in the diagram above.<br />
@@ -147,7 +147,7 @@ It is possible to implement the findbit mechanism as look up table. For this pur
 <br />
  </p>
 <div class="image">
-<img src="../pic/portfc3.png"  align="middle" border="0"/>
+<img src="portfc3.png"  align="middle" border="0"/>
 </div>
 <p><br />
  </p><h3>Save energy on battery-powered systems</h3>
@@ -159,7 +159,7 @@ It is possible to implement the findbit mechanism as look up table. For this pur
 <br />
  </p>
 <div class="image">
-<img src="../pic/tickless.png"  align="middle" border="0"/>
+<img src="tickless.png"  align="middle" border="0"/>
 </div>
 <p><br />
  Please note that on most hardware stopping to periodic timer interrupt and programming it (the same or other hardware timer) to wake up system after sleep time <em>might introduce jitter to task scheduling</em>. If good quality realtime scheduling is important to application, it should use ::posPowerSleepDisable to disable sleeping during critical actions or leave tickless mode off. </p>
