@@ -252,7 +252,7 @@
  * @c POSCFG_ENABLE_NANO is set, so you can test from within your sources
  * if the nano layer is enabled or not. @n@n
  *
- * <p><img src="../pic/layer.png" align="middle" border=0></p>@n@n@n
+ * <p><img src="layer.png" align="middle" border=0></p>@n@n@n
  *
  * @}
  */
@@ -1132,7 +1132,7 @@ POSEXTERN VAR_t* _errno_p(void);
  * At the left side I have drawn a normal interrupt service routine
  * for reference.@n@n@n
  *
- * <p><img src="../pic/portfc1.png" align="middle" border=0></p>@n
+ * <p><img src="portfc1.png" align="middle" border=0></p>@n
  *
  * The context switching (multitasking) is done by simply swaping the
  * stack frame when an interrupt service routine (eg. the timer interrupt)
@@ -1152,7 +1152,7 @@ POSEXTERN VAR_t* _errno_p(void);
  * in the diagram above. In the middle you can see how the timer
  * interrupt routine must look like.@n@n@n
  *
- * <p><img src="../pic/portfc2.png" align="middle" border=0></p>@n
+ * <p><img src="portfc2.png" align="middle" border=0></p>@n
  *
  * There is a special interrupt handling needed when  interrupts are
  * interruptable on your system. To prevent a deadlock situation (that
@@ -1175,7 +1175,7 @@ POSEXTERN VAR_t* _errno_p(void);
  * discussed above. But attention - this method is only applicable on
  * platforms where interrupts can not interrupt each other.@n@n@n
  *
- * <p><img src="../pic/portfc3.png" align="middle" border=0></p>@n
+ * <p><img src="portfc3.png" align="middle" border=0></p>@n
  *
  * <h3>Save energy on battery-powered systems</h3>
  * Pico]OS power management API can be enabled by setting
@@ -1212,7 +1212,7 @@ POSEXTERN VAR_t* _errno_p(void);
  * up earlier because of an interrupt) and calls c_pos_timerStep
  * to update Pico]OS time.@n@n
  *
- * <p><img src="../pic/tickless.png" align="middle" border=0></p>@n
+ * <p><img src="tickless.png" align="middle" border=0></p>@n
  * 
  * Please note that on most hardware stopping to periodic timer
  * interrupt and programming it (the same or other hardware timer) to
