@@ -90,7 +90,7 @@ AINCLUDES = .
 # Distinguish between build modes
 ifeq '$(BUILD)' 'DEBUG'
   CFLAGS   += -O0 -g -Hon=DWARF
-  AFLAGS   += -g
+  ASFLAGS  += -g
   CDEFINES += _DBG
   ADEFINES += _DBG
 else
@@ -161,7 +161,7 @@ AINCLUDES = .
 # Distinguish between build modes
 ifeq '$(BUILD)' 'DEBUG'
   CFLAGS   += -O0 -g
-  AFLAGS   += -g
+  ASFLAGS  += -g
   CDEFINES += _DBG
   ADEFINES += _DBG
 else

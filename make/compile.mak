@@ -34,7 +34,7 @@
 # Compile files
 
 ifeq '$(strip $(MAKE_CPL))' ''
-($error common.mak not included)
+$(error common.mak not included)
 endif
 
 # Ensure the port variable is set.

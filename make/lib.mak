@@ -34,7 +34,7 @@
 # Build target: generate library
 
 ifeq '$(strip $(MAKE_LIB))' ''
-($error common.mak not included)
+$(error common.mak not included)
 endif
 
 ifneq '$(strip $(OLIBNAME))' ''
@@ -42,7 +42,7 @@ TARGET := $(OLIBNAME)
 endif
 
 ifeq '$(strip $(TARGET))' ''
-($error TARGET library name not set)
+$(error TARGET library name not set)
 endif
 
 # ---------------------------------------------------------------------------
