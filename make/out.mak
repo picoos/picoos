@@ -34,11 +34,11 @@
 # Build target: generate executable
 
 ifeq '$(strip $(MAKE_OUT))' ''
-($error common.mak not included)
+$(error common.mak not included)
 endif
 
 ifeq '$(strip $(TARGET))' ''
-($error TARGET output name not set)
+$(error TARGET output name not set)
 endif
 
 # ---------------------------------------------------------------------------
@@ -146,7 +146,7 @@ $(TARGETOUT): $(ALL_MODULES) $(PICOOS_LIB) $(OBJLIST) $(COMMONDEP) | $(DIR_OUT)
 
 ifneq '$(PORT)' ''
 
-# Set the library as default target.
+# Set the executable as default target.
 all: $(TARGETOUT)
 
 # Target: clean executable.

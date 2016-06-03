@@ -77,7 +77,7 @@ DIR_OUTPUT = $(CURRENTDIR)/bin
 # Include pico]OS based modules. Set here the list of modules
 # (libraries) you want to use in your project. Note that the module
 # name is the name of the directory where the sources and the makefile
-# is stored. The makefile must be named "makefile" or "makefile.pico"
+# are stored. The makefile must be named "makefile" or "makefile.pico"
 # Example:  MODULES += $(RELROOT)../lcdinterface
 MODULES +=
 

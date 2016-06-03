@@ -55,7 +55,7 @@ DIR_USRINC +=
 # set this variable, the files will be stored in the pico]OS root
 # root directory structure (pioos/out, picoos/lib, picoos/obj)
 # Note: Please keep the ifeq/endif pair. This allows to set the
-# output directory from outsite (may be by a project makefile).
+# output directory from outside (maybe by a project makefile).
 ifeq '$(strip $(DIR_OUTPUT))' ''
 DIR_OUTPUT = $(CURRENTDIR)/bin
 endif
