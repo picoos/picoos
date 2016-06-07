@@ -570,9 +570,6 @@ static void POSCALL pos_listRemove(POSLIST_t *listelem)
 static void pos_idletask(void *arg)
 {
   POS_LOCKFLAGS;
-#if POSCFG_FEATURE_POWER != 0
-  int sleepDisabled;
-#endif
 
   (void) arg;
 
@@ -595,13 +592,9 @@ static void pos_idletask(void *arg)
 #if POSCFG_FEATURE_POWER != 0
 
     POS_SCHED_LOCK;
-    sleepDisabled = posPowerSleepDisable_g;
-    POS_SCHED_UNLOCK;
 
-    if (sleepDisabled == 0) 
+    if (posPowerSleepDisable_g == 0)
     {
-      POS_SCHED_LOCK;
-
       if (posPowerCallback != NULL)
         posPowerCallback(POSPOWER_EVENT_SLEEP);
 
@@ -612,8 +605,9 @@ static void pos_idletask(void *arg)
       if (posPowerCallback != NULL)
         posPowerCallback(POSPOWER_EVENT_WAKEUP);
 
-      POS_SCHED_UNLOCK;
     }
+
+    POS_SCHED_UNLOCK;
 #endif
 
   }
