@@ -111,9 +111,10 @@ void portInitClock(void)
  
   NVIC_SetPriority(RTC_WKUP_IRQn, PORT_SYSTICK_PRI);
 
+  RTC_WakeUpCmd(DISABLE);
+
 #if POSCFG_FEATURE_TICKLESS == 0
 
-  RTC_WakeUpCmd(DISABLE);
   RTC_WakeUpClockConfig(RTC_WakeUpClock_RTCCLK_Div2);
   RTC_SetWakeUpCounter(16384 / HZ);
 
