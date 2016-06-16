@@ -69,7 +69,14 @@ void portInitClock(void)
 
   RCC_RTCCLKConfig(RCC_RTCCLKSource_LSE);
   RCC_RTCCLKCmd(ENABLE);
-  RTC_WaitForSynchro();
+
+ /*
+  * RTC_WaitForSynchro has a little bit too small timeout.
+  * If it return error, just try again (as we don't have any other
+  * alternatives than working clock).
+  */
+  while (RTC_WaitForSynchro() == ERROR) {
+  }
 
   RTC_InitTypeDef RTC_InitStructure;
 
