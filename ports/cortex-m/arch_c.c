@@ -172,6 +172,17 @@ unsigned __check_heap_overflow (void * newHeapEnd)
 
 #ifndef __CODE_RED
 
+extern void __libc_init_array(void);
+void _init(void);
+
+/*
+ * Dummy _init(). Called by __libc_init_array.
+ * In standard startup this is provided by .init section.
+ */
+void _init()
+{
+}
+
 /*
  * Our own startup code. Setup data & bss and provide region for heap.
  */
@@ -226,6 +237,7 @@ void Reset_Handler(void)
 #endif
 #endif
 
+  __libc_init_array();
   main();
   while (1)
     ;
