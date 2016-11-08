@@ -70,6 +70,18 @@ SECTIONS {
      _etext = .;
   }  > flash
 
+  .ARM.extab :
+  {
+          *(.ARM.extab* .gnu.linkonce.armextab.*)
+  } > flash
+
+  __exidx_start = .;
+  .ARM.exidx :
+  {
+          *(.ARM.exidx* .gnu.linkonce.armexidx.*)
+  } > flash
+  __exidx_end = .;
+
   .data   :
   {
      . = ALIGN(4);
