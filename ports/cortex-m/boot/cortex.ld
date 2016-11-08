@@ -50,6 +50,22 @@ SECTIONS {
      *(.rodata*)
      *(.glue_7)
      *(.glue_7t)
+     
+     . = ALIGN(4);
+     /* preinit data */
+     PROVIDE_HIDDEN (__preinit_array_start = .);
+     KEEP(*(.preinit_array))
+     PROVIDE_HIDDEN (__preinit_array_end = .);
+
+     . = ALIGN(4);
+     /* init data */
+     PROVIDE_HIDDEN (__init_array_start = .);
+     KEEP(*(SORT(.init_array.*)))
+     KEEP(*(.init_array))
+     PROVIDE_HIDDEN (__init_array_end = .);
+
+     /* skip fini data, we never terminate */
+          
      . = ALIGN(4);
      _etext = .;
   }  > flash
