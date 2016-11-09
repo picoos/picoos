@@ -125,7 +125,7 @@ ifeq '$(strip $(CORTEX))' 'm4'
 CFLAGS_COMMON += -mfpu=fpv4-sp-d16 -mfloat-abi=hard
 endif
 
-CFLAGS += -Wmissing-prototypes -Wbad-function-cast -Wno-strict-prototypes -Wmissing-prototypes
+CFLAGS += -Wbad-function-cast -Wno-strict-prototypes -Wmissing-prototypes
 CFLAGS += $(CFLAGS_COMMON) $(EXTRA_CFLAGS)
 CFLAGS += -c
 CXXFLAGS += -fno-threadsafe-statics -fno-exceptions -fno-rtti $(CFLAGS_COMMON) $(EXTRA_CFLAGS) -c
