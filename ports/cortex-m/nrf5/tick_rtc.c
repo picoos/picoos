@@ -37,8 +37,8 @@
 void portInitClock(void)
 {
   nrf_rtc_prescaler_set(NRF_RTC1, RTC_FREQ_TO_PRESCALER(HZ));
-  nrf_rtc_event_enable(NRF_RTC1, RTC_EVTENSET_TICK_Msk);
-  nrf_rtc_int_enable(NRF_RTC1, RTC_INTENSET_TICK_Msk);
+  nrf_rtc_event_enable(NRF_RTC1, NRF_RTC_EVENT_TICK);
+  nrf_rtc_int_enable(NRF_RTC1, NRF_RTC_INT_TICK_MASK);
 
   NVIC_SetPriority(RTC1_IRQn, PORT_SYSTICK_PRI);
   NVIC_EnableIRQ(RTC1_IRQn); 
