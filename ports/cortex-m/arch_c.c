@@ -610,7 +610,7 @@ void p_pos_powerSleep()
 
 #if __CORTEX_M < 3
 
-  __disableirq();
+  __disable_irq();
 
 #else
 
