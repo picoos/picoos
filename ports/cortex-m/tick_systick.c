@@ -33,8 +33,6 @@
 
 #if !defined(PORTCFG_TICK_SYSTICK) || PORTCFG_TICK_SYSTICK == 1
 
-#include "port_irq.h"
-
 /*
  * Initialize Systick timer.
  */

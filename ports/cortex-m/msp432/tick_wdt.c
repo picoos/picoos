@@ -31,7 +31,6 @@
 #define NANOINTERNAL
 
 #include <picoos.h>
-#include "port_irq.h"
 #include "driverlib.h"
 
 #if PORTCFG_TICK_WDT == 1

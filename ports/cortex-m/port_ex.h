@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, Ari Suutari <ari@stonepile.fi>.
+ * Copyright (c) 2016, Ari Suutari <ari@stonepile.fi>.
  * All rights reserved. 
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -28,8 +28,17 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _PORT_IRQ_H
-#define _PORT_IRQ_H
+
+/**
+ * @file    port_ex.h
+ *
+ * This file is originally from the pico]OS realtime operating system
+ * (http://picoos.sourceforge.net).
+ */
+
+
+#ifndef _PORT_EX_H
+#define _PORT_EX_H
 
 /*
  * Define IRQ priorities. Use defaults from port.h if
@@ -66,4 +75,4 @@
 #define PORT_CON_PRI PORT_DEFAULT_CON_PRI
 #endif
 
-#endif /* _PORT_IRQ_H */
+#endif /* _PORT_EX_H */

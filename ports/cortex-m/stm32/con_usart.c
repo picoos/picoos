@@ -30,7 +30,6 @@
 
 #define NANOINTERNAL
 #include <picoos.h>
-#include "port_irq.h"
 
 /*
  * Initialize STM32 usart console.

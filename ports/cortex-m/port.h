@@ -92,6 +92,11 @@
  */
 #define MPTR_t                int
 
+/**
+ * This port has port_ex.h.
+ */
+#define POSCFG_PORT_H_EX        1
+
 /** Required memory alignment on the target CPU.
  * To reach maximum speed, some architecures need correctly
  * aligned memory patterns. Set this define to the memory

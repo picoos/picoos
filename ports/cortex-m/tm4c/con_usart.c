@@ -30,7 +30,6 @@
 
 #define NANOINTERNAL
 #include <picoos.h>
-#include "port_irq.h"
 #include <stdbool.h>
 
 #include "inc/hw_types.h"

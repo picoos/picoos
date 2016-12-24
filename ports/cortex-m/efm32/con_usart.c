@@ -30,7 +30,6 @@
 
 #define NANOINTERNAL
 #include <picoos.h>
-#include "port_irq.h"
 
 #include "em_usart.h"
 #include "em_cmu.h"
