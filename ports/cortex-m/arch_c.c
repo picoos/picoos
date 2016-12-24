@@ -31,7 +31,6 @@
 #define NANOINTERNAL
 #include <picoos.h>
 #include <string.h>
-#include "port_irq.h"
 
 #if NOSCFG_MEM_MANAGER_TYPE == 0
 /*
