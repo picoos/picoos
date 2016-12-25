@@ -595,28 +595,10 @@ void p_pos_powerSleep()
 
   SCB->SCR |= SCB_SCR_SLEEPONEXIT_Msk; // Sleep after interrupt
 
-#if __CORTEX_M < 3
-
-  __enable_irq();
-
-#else
-
   portInterruptUnblock(0);
-
-#endif
-
   __DSB();
   __WFE();
-
-#if __CORTEX_M < 3
-
-  __disable_irq();
-
-#else
-
   portInterruptBlock();
-
-#endif
 
 #if POSCFG_FEATURE_TICKLESS
 
