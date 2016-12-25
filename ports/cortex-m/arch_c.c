@@ -411,12 +411,7 @@ void p_pos_initArch(void)
 #endif
 #endif
 
-#if __CORTEX_M >= 3
-  __set_BASEPRI(portCmsisPrio2HW(PORT_API_MAX_PRI)); // Allow SVCall, but no Timer/PendSV
-#else
-  __disable_irq();
-#endif
-
+  portInterruptBlock();
   portInitClock();
 
   NVIC_SetPriority(SVCall_IRQn, PORT_SVCALL_PRI);
@@ -606,7 +601,7 @@ void p_pos_powerSleep()
 
 #else
 
-  portExitCritical(0);
+  portInterruptUnblock(0);
 
 #endif
 
@@ -619,7 +614,7 @@ void p_pos_powerSleep()
 
 #else
 
-  portEnterCritical();
+  portInterruptBlock();
 
 #endif
 

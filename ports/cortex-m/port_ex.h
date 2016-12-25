@@ -179,9 +179,9 @@ void* __real_malloc(size_t s);
 void* __real_realloc(void* p, size_t s);
 void  __real_free(void* p);
 
-static inline POSCFG_LOCK_FLAGSTYPE portEnterCritical(void)
+static inline uint32_t portInterruptBlock(void)
 {
-  register POSCFG_LOCK_FLAGSTYPE flags;
+  register uint32_t flags;
 
 #if __CORTEX_M >= 3
   flags = __get_BASEPRI();
@@ -194,7 +194,7 @@ static inline POSCFG_LOCK_FLAGSTYPE portEnterCritical(void)
   return flags;
 }
 
-static inline void portExitCritical(POSCFG_LOCK_FLAGSTYPE flags)
+static inline void portInterruptUnblock(uint32_t flags)
 {
 #if __CORTEX_M >= 3
   __set_BASEPRI(flags);
