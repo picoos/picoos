@@ -260,15 +260,10 @@
  * the interrupts. See ::POSCFG_LOCK_FLAGSTYPE for more details.
  */
 
-#if __CORTEX_M >= 3
-
 #define POS_SCHED_LOCK          { flags = portEnterCritical(); }
+
+#if __CORTEX_M >= 3
 #define POS_IRQ_DISABLE_ALL     { flags = __get_PRIMASK(); __disable_irq(); }
-
-#else
-
-#define POS_SCHED_LOCK          { flags = __get_PRIMASK(); __disable_irq(); }
-
 #endif
 
 /** Scheduler unlocking.
@@ -276,15 +271,10 @@
  * the saved processor flags and reenables the interrupts this way.
  */
 
-#if __CORTEX_M >= 3
-
 #define POS_SCHED_UNLOCK        { portExitCritical(flags); }
+
+#if __CORTEX_M >= 3
 #define POS_IRQ_ENABLE_ALL      { if (!flags) __enable_irq(); }
-
-#else
-
-#define POS_SCHED_UNLOCK        { if (!flags) __enable_irq(); }
-
 #endif
 
 

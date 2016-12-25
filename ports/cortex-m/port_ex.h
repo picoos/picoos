@@ -179,22 +179,29 @@ void* __real_malloc(size_t s);
 void* __real_realloc(void* p, size_t s);
 void  __real_free(void* p);
 
-#if __CORTEX_M >= 3
-
 static inline POSCFG_LOCK_FLAGSTYPE portEnterCritical(void)
 {
   register POSCFG_LOCK_FLAGSTYPE flags;
 
+#if __CORTEX_M >= 3
   flags = __get_BASEPRI();
   __set_BASEPRI(portCmsisPrio2HW(PORT_API_MAX_PRI));
+#else
+  flags = __get_PRIMASK();
+  __disable_irq();
+#endif
+
   return flags;
 }
 
 static inline void portExitCritical(POSCFG_LOCK_FLAGSTYPE flags)
 {
+#if __CORTEX_M >= 3
   __set_BASEPRI(flags);
-}
-
+#else
+  if (!flags)
+    __enable_irq();
 #endif
+}
 
 #endif /* _PORT_EX_H */
