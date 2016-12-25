@@ -575,8 +575,6 @@ void p_pos_powerSleep()
 #endif
 #endif
 
-  uint32_t oldStatus;
-
   // Ensure flag that __WFE waits for is not set yet
   __SEV();
   __WFE();
@@ -608,8 +606,7 @@ void p_pos_powerSleep()
 
 #else
 
-  oldStatus = __get_BASEPRI();
-  __set_BASEPRI(0);
+  portExitCritical(0);
 
 #endif
 
@@ -622,7 +619,7 @@ void p_pos_powerSleep()
 
 #else
 
-  __set_BASEPRI(oldStatus);
+  portEnterCritical();
 
 #endif
 
