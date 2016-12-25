@@ -29,7 +29,6 @@
  */
 
 #include <picoos.h>
-#include <port_irq.h>
 
 #include "nrf_rtc.h"
 #include "nrf_clock.h"

@@ -29,7 +29,6 @@
  */
 
 #include <picoos.h>
-#include <port_irq.h>
 #include "nrf_gpio.h"
 #include "nrf_uart.h"
 
