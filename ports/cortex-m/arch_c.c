@@ -793,24 +793,6 @@ UVAR_t POSCALL p_pos_findbit(const UVAR_t bitfield, UVAR_t rrOffset)
 #endif
 #endif
 
-#if __CORTEX_M >= 3
-
-POSCFG_LOCK_FLAGSTYPE portEnterCritical(void)
-{
-  register POSCFG_LOCK_FLAGSTYPE flags;
-
-  flags = __get_BASEPRI();
-  __set_BASEPRI(portCmsisPrio2HW(PORT_API_MAX_PRI));
-  return flags;
-}
-
-void portExitCritical(POSCFG_LOCK_FLAGSTYPE flags)
-{
-  __set_BASEPRI(flags);
-}
-
-#endif
-
 #ifdef HAVE_PLATFORM_ASSERT
 void p_pos_assert(const char* text, const char *file, int line)
 {

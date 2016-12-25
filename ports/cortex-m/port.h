@@ -262,8 +262,6 @@
 
 #if __CORTEX_M >= 3
 
-POSCFG_LOCK_FLAGSTYPE portEnterCritical(void);
-
 #define POS_SCHED_LOCK          { flags = portEnterCritical(); }
 #define POS_IRQ_DISABLE_ALL     { flags = __get_PRIMASK(); __disable_irq(); }
 
@@ -279,8 +277,6 @@ POSCFG_LOCK_FLAGSTYPE portEnterCritical(void);
  */
 
 #if __CORTEX_M >= 3
-
-void portExitCritical(POSCFG_LOCK_FLAGSTYPE);
 
 #define POS_SCHED_UNLOCK        { portExitCritical(flags); }
 #define POS_IRQ_ENABLE_ALL      { if (!flags) __enable_irq(); }
