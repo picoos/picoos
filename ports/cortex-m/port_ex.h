@@ -179,7 +179,7 @@ void* __real_malloc(size_t s);
 void* __real_realloc(void* p, size_t s);
 void  __real_free(void* p);
 
-static inline uint32_t portInterruptBlock(void)
+static inline __attribute__((always_inline)) uint32_t portInterruptBlock(void)
 {
   register uint32_t flags;
 
@@ -194,7 +194,7 @@ static inline uint32_t portInterruptBlock(void)
   return flags;
 }
 
-static inline void portInterruptUnblock(uint32_t flags)
+static inline __attribute__((always_inline)) void portInterruptUnblock(uint32_t flags)
 {
 #if __CORTEX_M >= 3
   __set_BASEPRI(flags);
