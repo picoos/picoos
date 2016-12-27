@@ -411,7 +411,12 @@ void p_pos_initArch(void)
 #endif
 #endif
 
-  portInterruptBlock();
+#if __CORTEX_M >= 3
+  __set_BASEPRI(portCmsisPrio2HW(PORT_API_MAX_PRI)); // Allow SVCall, but no Timer/PendSV
+#else
+  __disable_irq();
+#endif
+
   portInitClock();
 
   NVIC_SetPriority(SVCall_IRQn, PORT_SVCALL_PRI);
@@ -489,9 +494,10 @@ void PORT_NAKED portRestoreContextImpl(void)
    * If not restored, stack would grow and grow as control
    * doesn't via same path as we got here.
    */
+  portCriticalSet(posCurrentTask_g->critical);
+
 #if __CORTEX_M >= 4
 
-  __set_BASEPRI(posCurrentTask_g->critical);
   asm volatile("mov sp, %[initMsp]     \n"  // Return MSP to initial value
       "         ldr r0, %[newPsp]      \n"  // Get PSP for next task
       "         ldmia r0!, {r4-r11,r14}\n"  // Restore registers not handled by HW
@@ -504,7 +510,6 @@ void PORT_NAKED portRestoreContextImpl(void)
 
 #elif __CORTEX_M == 3
 
-  __set_BASEPRI(posCurrentTask_g->critical);
   asm volatile("mov sp, %[initMsp]     \n"  // Return MSP to initial value
       "         ldr r0, %[newPsp]      \n"  // Get PSP for next task
       "         ldmia r0!, {r4-r11,r14}\n"  // Restore registers not handled by HW
@@ -514,7 +519,6 @@ void PORT_NAKED portRestoreContextImpl(void)
 
 #else
 
-  __set_PRIMASK(posCurrentTask_g->critical);
   asm volatile("mov sp, %[initMsp]     \n"  // Return MSP to initial value
       "         ldr r0, %[newPsp]      \n"  // Get PSP for next task
       "         ldmia r0!, {r4-r7}     \n"  // Restore registers
@@ -595,10 +599,10 @@ void p_pos_powerSleep()
 
   SCB->SCR |= SCB_SCR_SLEEPONEXIT_Msk; // Sleep after interrupt
 
-  portInterruptUnblock(0);
+  portCriticalExit(0);
   __DSB();
   __WFE();
-  portInterruptBlock();
+  portCriticalEnter();
 
 #if POSCFG_FEATURE_TICKLESS
 

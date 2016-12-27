@@ -95,7 +95,7 @@ extern void p_pos_assert(const char* text, const char *file, int line);
                   : "=r"(pspReg));                      \
                                                         \
     posCurrentTask_g->stackptr = pspReg;                \
-    posCurrentTask_g->critical = __get_BASEPRI();       \
+    posCurrentTask_g->critical = portCriticalGet();     \
                                                         \
     if (POSCFG_ARGCHECK > 1)                                              \
       P_ASSERT("TStk", (posCurrentTask_g->stack[0] == PORT_STACK_MAGIC)); \
@@ -110,7 +110,7 @@ extern void p_pos_assert(const char* text, const char *file, int line);
                   : "=r"(pspReg));                      \
                                                         \
     posCurrentTask_g->stackptr = pspReg;                \
-    posCurrentTask_g->critical = __get_BASEPRI();       \
+    posCurrentTask_g->critical = portCriticalGet();     \
                                                         \
     if (POSCFG_ARGCHECK > 1)                                              \
       P_ASSERT("TStk", (posCurrentTask_g->stack[0] == PORT_STACK_MAGIC)); \
@@ -133,7 +133,7 @@ extern void p_pos_assert(const char* text, const char *file, int line);
                   : "=r"(pspReg) :: "r1");              \
                                                         \
     posCurrentTask_g->stackptr = pspReg;                \
-    posCurrentTask_g->critical = __get_PRIMASK();       \
+    posCurrentTask_g->critical = portCriticalGet();     \
                                                         \
     if (POSCFG_ARGCHECK > 1)                                              \
       P_ASSERT("TStk", (posCurrentTask_g->stack[0] == PORT_STACK_MAGIC)); \
@@ -182,7 +182,25 @@ void* __real_malloc(size_t s);
 void* __real_realloc(void* p, size_t s);
 void  __real_free(void* p);
 
-static inline __attribute__((always_inline)) uint32_t portInterruptBlock(void)
+static inline __attribute__((always_inline)) void portCriticalSet(uint32_t flags)
+{
+#if __CORTEX_M >= 3
+  __set_BASEPRI(flags);
+#else
+  __set_PRIMASK(flags);
+#endif
+}
+
+static inline __attribute__((always_inline)) uint32_t portCriticalGet(void)
+{
+#if __CORTEX_M >= 3
+  return __get_BASEPRI();
+#else
+  return __get_PRIMASK();
+#endif
+}
+
+static inline __attribute__((always_inline)) uint32_t portCriticalEnter(void)
 {
   register uint32_t flags;
 
@@ -197,7 +215,7 @@ static inline __attribute__((always_inline)) uint32_t portInterruptBlock(void)
   return flags;
 }
 
-static inline __attribute__((always_inline)) void portInterruptUnblock(uint32_t flags)
+static inline __attribute__((always_inline)) void portCriticalExit(uint32_t flags)
 {
 #if __CORTEX_M >= 3
   __set_BASEPRI(flags);
