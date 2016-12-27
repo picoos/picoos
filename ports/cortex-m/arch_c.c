@@ -294,8 +294,8 @@ static inline void constructStackFrame(POSTASK_t task, void* stackPtr, POSTASKFU
   for (r = 11; r >= 4; r--)
     *(--stk) = r;
 
-  *(--stk) = (unsigned int) 0; // basepri
   task->stackptr = (struct PortArmStack *) stk;
+  task->critical = 0;
 }
 
 /*
@@ -491,33 +491,33 @@ void PORT_NAKED portRestoreContextImpl(void)
    */
 #if __CORTEX_M >= 4
 
+  __set_BASEPRI(posCurrentTask_g->critical);
   asm volatile("mov sp, %[initMsp]     \n"  // Return MSP to initial value
       "         ldr r0, %[newPsp]      \n"  // Get PSP for next task
-      "         ldmia r0!, {r3-r11,r14}\n"  // Restore registers not handled by HW
+      "         ldmia r0!, {r4-r11,r14}\n"  // Restore registers not handled by HW
       "         tst r14, #0x10         \n"  // Check for need to restore FP registers
       "         it eq                  \n"
       "         vldmiaeq r0!, {s16-s31}\n"
       "         msr psp, r0            \n"  // Set PSP
-      "         msr basepri, r3        \n"  // Adjust BASEPRI back to task's setting
       "         bx lr"
       : : [newPsp]"m"(posCurrentTask_g->stackptr), [initMsp]"r"(__stack));
 
 #elif __CORTEX_M == 3
 
+  __set_BASEPRI(posCurrentTask_g->critical);
   asm volatile("mov sp, %[initMsp]     \n"  // Return MSP to initial value
       "         ldr r0, %[newPsp]      \n"  // Get PSP for next task
-      "         ldmia r0!, {r3-r11,r14}\n"  // Restore registers not handled by HW
+      "         ldmia r0!, {r4-r11,r14}\n"  // Restore registers not handled by HW
       "         msr psp, r0            \n"  // Set PSP
-      "         msr basepri, r3        \n"  // Adjust BASEPRI back to task's setting
       "         bx lr"
       : : [newPsp]"m"(posCurrentTask_g->stackptr), [initMsp]"r"(__stack));
 
 #else
 
+  __set_PRIMASK(posCurrentTask_g->critical);
   asm volatile("mov sp, %[initMsp]     \n"  // Return MSP to initial value
       "         ldr r0, %[newPsp]      \n"  // Get PSP for next task
-      "         ldmia r0!, {r3-r7}     \n"  // Restore registers
-      "         msr primask, r3        \n"  // Restore PRIMASK to task's setting
+      "         ldmia r0!, {r4-r7}     \n"  // Restore registers
       "         ldmia r0!, {r1-r2}     \n"  // Restore more ...
       "         mov r8, r1             \n"  // .. Cortex-m0 can only use low
       "         mov r9, r2             \n"  //    registers in ldmia/stmia

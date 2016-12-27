@@ -86,16 +86,17 @@ extern void p_pos_assert(const char* text, const char *file, int line);
 #if __CORTEX_M >= 4
 
 #define portSaveContext() { \
-    register unsigned int pspReg asm("r0");             \
+    register void* pspReg asm("r0");                    \
     asm volatile("mrs %0, psp             \n\t"         \
                  "tst r14, #0x10          \n\t"         \
                  "it  eq                  \n\t"         \
                  "vstmdbeq %0!, {s16-s31} \n\t"         \
-                 "mrs r3, basepri         \n\t"         \
-                 "stmdb %0!, {r3-r11,r14}   "           \
-                  : "=r"(pspReg) :: "r3");              \
-    asm volatile("str %1, %0"                           \
-                  : "=m"(posCurrentTask_g->stackptr) : "r"(pspReg));      \
+                 "stmdb %0!, {r4-r11,r14}   "           \
+                  : "=r"(pspReg));                      \
+                                                        \
+    posCurrentTask_g->stackptr = pspReg;                \
+    posCurrentTask_g->critical = __get_BASEPRI();       \
+                                                        \
     if (POSCFG_ARGCHECK > 1)                                              \
       P_ASSERT("TStk", (posCurrentTask_g->stack[0] == PORT_STACK_MAGIC)); \
 }
@@ -103,13 +104,14 @@ extern void p_pos_assert(const char* text, const char *file, int line);
 #elif __CORTEX_M == 3
 
 #define portSaveContext() { \
-    register unsigned int pspReg asm("r0");               \
-    asm volatile("mrs %0, psp             \n\t"           \
-                 "mrs r3, basepri         \n\t"           \
-                 "stmdb %0!, {r3-r11,r14}   "             \
-                  : "=r"(pspReg) :: "r3");                \
-    asm volatile("str %1, %0"                             \
-                  : "=m"(posCurrentTask_g->stackptr) : "r"(pspReg));      \
+    register void* pspReg asm("r0");                    \
+    asm volatile("mrs %0, psp             \n\t"         \
+                 "stmdb %0!, {r4-r11,r14}   "           \
+                  : "=r"(pspReg));                      \
+                                                        \
+    posCurrentTask_g->stackptr = pspReg;                \
+    posCurrentTask_g->critical = __get_BASEPRI();       \
+                                                        \
     if (POSCFG_ARGCHECK > 1)                                              \
       P_ASSERT("TStk", (posCurrentTask_g->stack[0] == PORT_STACK_MAGIC)); \
 }
@@ -117,21 +119,22 @@ extern void p_pos_assert(const char* text, const char *file, int line);
 #else
 
 #define portSaveContext() { \
-    register unsigned int pspReg asm("r0");             \
+    register void* pspReg asm("r0");                    \
     asm volatile("mrs %0, psp           \n\t"           \
-                 "sub %0, %0, #4*10     \n\t"           \
+                 "sub %0, %0, #4*9      \n\t"           \
                  "mov r1, %0            \n\t"           \
-                 "mrs r3, primask       \n\t"           \
-                 "stmia r1!, {r3-r7}    \n\t"           \
+                 "stmia r1!, {r4-r7}    \n\t"           \
                  "mov r3, r8            \n\t"           \
                  "mov r4, r9            \n\t"           \
                  "mov r5, r10           \n\t"           \
                  "mov r6, r11           \n\t"           \
                  "mov r7, lr            \n\t"           \
                  "stmia r1!, {r3-r7}        "           \
-                  : "=r"(pspReg) :: "r1", "r3");        \
-    asm volatile("str %1, %0"                           \
-                  : "=m"(posCurrentTask_g->stackptr) : "r"(pspReg));      \
+                  : "=r"(pspReg) :: "r1");              \
+                                                        \
+    posCurrentTask_g->stackptr = pspReg;                \
+    posCurrentTask_g->critical = __get_PRIMASK();       \
+                                                        \
     if (POSCFG_ARGCHECK > 1)                                              \
       P_ASSERT("TStk", (posCurrentTask_g->stack[0] == PORT_STACK_MAGIC)); \
 }

@@ -389,13 +389,15 @@
 #if (POSCFG_TASKSTACKTYPE == 1)
 
 #define POS_USERTASKDATA \
-    struct PortArmStack  *stackptr;          \
-    unsigned char    *stack;                 \
-    UINT_t           stackSize;
+   uint32_t             critical;           \
+   struct PortArmStack  *stackptr;          \
+   unsigned char        *stack;             \
+   UINT_t               stackSize;
 #elif (POSCFG_TASKSTACKTYPE == 2)
 
 #define POS_USERTASKDATA \
-   struct PortArmStack  *stackptr; \
+   uint32_t             critical;           \
+   struct PortArmStack  *stackptr;          \
    unsigned char stack[PORTCFG_FIXED_STACK_SIZE];
 
 #endif
@@ -438,7 +440,6 @@ struct PortArmStack
    * Extra registers saved for task context.
    */
 
-  unsigned int basepri;
   unsigned int r4;
   unsigned int r5;
   unsigned int r6;
@@ -448,6 +449,11 @@ struct PortArmStack
   unsigned int r10;
   unsigned int r11;
   unsigned int excReturn;
+
+  /*
+   * For Cortex-M with FPU: here might be floating point
+   * registers s16-s31 (pushed to stack only if necessary).
+   */
 
   /*
    * This is frame pushed to stack during interrupt by Cortex-M hardware.
