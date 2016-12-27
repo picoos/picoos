@@ -33,6 +33,10 @@
 
 #if !defined(PORTCFG_TICK_SYSTICK) || PORTCFG_TICK_SYSTICK == 1
 
+#if PORTCFG_NVIC_CRITICAL_BLOCK > 0
+#error PORTCFG_NVIC_CRITICAL_BLOCK does not work with SysTick.
+#endif
+
 /*
  * Initialize Systick timer.
  */

@@ -643,6 +643,13 @@ void sysCall(unsigned int* args)
     ctrl |= (1 << 1); // use separate thread stack
 
     __set_CONTROL(ctrl);
+
+#if PORTCFG_NVIC_CRITICAL_BLOCK > 0
+
+    __enable_irq();
+
+#endif
+
     portRestoreContext(); // This will lower BASEPRI to 0 during restore
     break;
   }
@@ -779,4 +786,9 @@ void p_pos_assert(const char* text, const char *file, int line)
   __disable_irq();
   while(1);
 }
+#endif
+
+#if PORTCFG_NVIC_CRITICAL_BLOCK > 0
+bool portNvicCritical = false;
+uint32_t portNvicEnabledInterrupts;
 #endif

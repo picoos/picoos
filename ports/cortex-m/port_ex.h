@@ -182,12 +182,40 @@ void* __real_malloc(size_t s);
 void* __real_realloc(void* p, size_t s);
 void  __real_free(void* p);
 
+#if PORTCFG_NVIC_CRITICAL_BLOCK > 0
+extern bool portNvicCritical;
+extern uint32_t portNvicEnabledInterrupts;
+#endif
+
 static inline __attribute__((always_inline)) void portCriticalSet(uint32_t flags)
 {
 #if __CORTEX_M >= 3
+
   __set_BASEPRI(flags);
+
 #else
+#if PORTCFG_NVIC_CRITICAL_BLOCK > 0
+
+  if (flags != portNvicCritical) {
+
+    if (flags) {
+
+      portNvicCritical = true;
+      portNvicEnabledInterrupts = (NVIC->ICER[0] & PORTCFG_NVIC_CRITICAL_BLOCK);
+      NVIC->ICER[0] = PORTCFG_NVIC_CRITICAL_BLOCK;
+    }
+    else {
+
+      NVIC->ISER[0] = portNvicEnabledInterrupts;
+      portNvicCritical = false;
+    }
+  }
+
+#else
+
   __set_PRIMASK(flags);
+
+#endif
 #endif
 }
 
@@ -196,7 +224,13 @@ static inline __attribute__((always_inline)) uint32_t portCriticalGet(void)
 #if __CORTEX_M >= 3
   return __get_BASEPRI();
 #else
+#if PORTCFG_NVIC_CRITICAL_BLOCK > 0
+
+  return portNvicCritical;
+
+#else
   return __get_PRIMASK();
+#endif
 #endif
 }
 
@@ -205,11 +239,31 @@ static inline __attribute__((always_inline)) uint32_t portCriticalEnter(void)
   register uint32_t flags;
 
 #if __CORTEX_M >= 3
+
   flags = __get_BASEPRI();
   __set_BASEPRI(portCmsisPrio2HW(PORT_API_MAX_PRI));
+
 #else
+#if PORTCFG_NVIC_CRITICAL_BLOCK > 0
+
+  __disable_irq();
+
+  flags = portNvicCritical;
+  if (!portNvicCritical) {
+
+    portNvicCritical = true;
+    portNvicEnabledInterrupts = (NVIC->ICER[0] & PORTCFG_NVIC_CRITICAL_BLOCK);
+    NVIC->ICER[0] = PORTCFG_NVIC_CRITICAL_BLOCK;
+  }
+
+  __enable_irq();
+
+#else
+
   flags = __get_PRIMASK();
   __disable_irq();
+
+#endif
 #endif
 
   return flags;
@@ -218,10 +272,26 @@ static inline __attribute__((always_inline)) uint32_t portCriticalEnter(void)
 static inline __attribute__((always_inline)) void portCriticalExit(uint32_t flags)
 {
 #if __CORTEX_M >= 3
+
   __set_BASEPRI(flags);
+
 #else
+#if PORTCFG_NVIC_CRITICAL_BLOCK > 0
+
+  if (portNvicCritical && !flags) {
+
+    __disable_irq();
+    NVIC->ISER[0] = portNvicEnabledInterrupts;
+    portNvicCritical = false;
+    __enable_irq();
+  }
+
+#else
+
   if (!flags)
     __enable_irq();
+
+#endif
 #endif
 }
 
