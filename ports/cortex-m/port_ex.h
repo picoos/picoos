@@ -187,6 +187,11 @@ extern bool portNvicCritical;
 extern uint32_t portNvicEnabledInterrupts;
 #endif
 
+/**
+ * Set critical section status for task. Called during context switch to ensure
+ * that task returns to same critical section state (it is different based
+ * on how context switch occurred).
+ */
 static inline __attribute__((always_inline)) void portCriticalSet(uint32_t flags)
 {
 #if __CORTEX_M >= 3
@@ -219,6 +224,9 @@ static inline __attribute__((always_inline)) void portCriticalSet(uint32_t flags
 #endif
 }
 
+/**
+ * Get critical section status of current task. Used during context save.
+ */
 static inline __attribute__((always_inline)) uint32_t portCriticalGet(void)
 {
 #if __CORTEX_M >= 3
@@ -234,6 +242,9 @@ static inline __attribute__((always_inline)) uint32_t portCriticalGet(void)
 #endif
 }
 
+/**
+ * Enter critical section in task. This is implementation for POS_SCHED_LOCK.
+ */
 static inline __attribute__((always_inline)) uint32_t portCriticalEnter(void)
 {
   register uint32_t flags;
@@ -269,6 +280,9 @@ static inline __attribute__((always_inline)) uint32_t portCriticalEnter(void)
   return flags;
 }
 
+/**
+ * Exit critical section in task. This is implementation for POS_SCHED_UNLOCK.
+ */
 static inline __attribute__((always_inline)) void portCriticalExit(uint32_t flags)
 {
 #if __CORTEX_M >= 3
