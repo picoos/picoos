@@ -644,7 +644,7 @@ void sysCall(unsigned int* args)
 
     __set_CONTROL(ctrl);
 
-#if PORTCFG_NVIC_CRITICAL_BLOCK > 0
+#ifdef PORTCFG_NVIC_CRITICAL_BLOCK
 
     __enable_irq();
 
@@ -788,7 +788,7 @@ void p_pos_assert(const char* text, const char *file, int line)
 }
 #endif
 
-#if PORTCFG_NVIC_CRITICAL_BLOCK > 0
+#ifdef PORTCFG_NVIC_CRITICAL_BLOCK
 bool portNvicCritical = false;
 uint32_t portNvicEnabledInterrupts;
 #endif

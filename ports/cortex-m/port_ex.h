@@ -182,7 +182,7 @@ void* __real_malloc(size_t s);
 void* __real_realloc(void* p, size_t s);
 void  __real_free(void* p);
 
-#if PORTCFG_NVIC_CRITICAL_BLOCK > 0
+#ifdef PORTCFG_NVIC_CRITICAL_BLOCK
 extern bool portNvicCritical;
 extern uint32_t portNvicEnabledInterrupts;
 #endif
@@ -199,7 +199,7 @@ static inline __attribute__((always_inline)) void portCriticalSet(uint32_t flags
   __set_BASEPRI(flags);
 
 #else
-#if PORTCFG_NVIC_CRITICAL_BLOCK > 0
+#ifdef PORTCFG_NVIC_CRITICAL_BLOCK
 
   if (flags != portNvicCritical) {
 
@@ -232,7 +232,7 @@ static inline __attribute__((always_inline)) uint32_t portCriticalGet(void)
 #if __CORTEX_M >= 3
   return __get_BASEPRI();
 #else
-#if PORTCFG_NVIC_CRITICAL_BLOCK > 0
+#ifdef PORTCFG_NVIC_CRITICAL_BLOCK
 
   return portNvicCritical;
 
@@ -255,7 +255,7 @@ static inline __attribute__((always_inline)) uint32_t portCriticalEnter(void)
   __set_BASEPRI(portCmsisPrio2HW(PORT_API_MAX_PRI));
 
 #else
-#if PORTCFG_NVIC_CRITICAL_BLOCK > 0
+#ifdef PORTCFG_NVIC_CRITICAL_BLOCK
 
   __disable_irq();
 
@@ -290,7 +290,7 @@ static inline __attribute__((always_inline)) void portCriticalExit(uint32_t flag
   __set_BASEPRI(flags);
 
 #else
-#if PORTCFG_NVIC_CRITICAL_BLOCK > 0
+#ifdef PORTCFG_NVIC_CRITICAL_BLOCK
 
   if (portNvicCritical && !flags) {
 
