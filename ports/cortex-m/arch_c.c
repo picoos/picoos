@@ -489,12 +489,18 @@ void PORT_NAKED portRestoreContextImpl(void)
 #endif
 
   /*
+   * Check if task that we are switching to was running without
+   * scheduler lock (was switched away by interrupt). If so,
+   * clear scheduler lock.
+   */
+  portCriticalExit(posCurrentTask_g->critical);
+
+  /*
    * RestoreContext can happen only at lowest level of interrupt.
    * Thus it is safe to restore main stack pointer to initial value.
    * If not restored, stack would grow and grow as control
    * doesn't via same path as we got here.
    */
-  portCriticalSet(posCurrentTask_g->critical);
 
 #if __CORTEX_M >= 4
 
