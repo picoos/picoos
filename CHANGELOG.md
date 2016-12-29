@@ -5,6 +5,8 @@
 - make 6502 port work with modern cc65 compiler
 - reorganize examples
 - add tickless implementation for msp430 port
+- add support for Nordic Semiconductor NRF51 chips
+- add support for scheduler locking with NVIC instead of PRIMASK on Cortex-M0
 
 ## 1.1.0
 - add power management api and support for tickless idle
