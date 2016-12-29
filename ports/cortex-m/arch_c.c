@@ -32,6 +32,10 @@
 #include <picoos.h>
 #include <string.h>
 
+#if __CORTEX_M >= 3 && PORTCFG_NVIC_SCHED_LOCK
+#error PORTCFG_NVIC_SCHED_LOCK works only with Cortex-M0.
+#endif
+
 #if NOSCFG_MEM_MANAGER_TYPE == 0
 /*
  * To use newlib malloc/free, set memory manager type to 2
@@ -475,6 +479,17 @@ void p_pos_intContextSwitchPending(void)
 
 void PORT_NAKED p_pos_startFirstContext()
 {
+#if PORTCFG_NVIC_SCHED_LOCK
+
+  /*
+   * If using NVIC for scheduler lock on Cortex-M0, 
+   * use it now to block interrupts so PRIMASK can
+   * be turned off.
+   */
+  portSchedLock();
+  __enable_irq();
+#endif
+
   asm volatile("svc 0");
 }
 
@@ -649,13 +664,6 @@ void sysCall(unsigned int* args)
     ctrl |= (1 << 1); // use separate thread stack
 
     __set_CONTROL(ctrl);
-
-#if PORTCFG_NVIC_SCHED_LOCK
-
-    __enable_irq();
-
-#endif
-
     portRestoreContext(); // This will lower BASEPRI to 0 during restore
     break;
   }
