@@ -188,44 +188,7 @@ extern uint32_t portNvicEnabledInterrupts;
 #endif
 
 /**
- * Set critical section status for task. Called during context switch to ensure
- * that task returns to same critical section state (it is different based
- * on how context switch occurred).
- */
-static inline __attribute__((always_inline)) void portCriticalSet(uint32_t flags)
-{
-#if __CORTEX_M >= 3
-
-  __set_BASEPRI(flags);
-
-#else
-#ifdef PORTCFG_NVIC_CRITICAL_BLOCK
-
-  if (flags != portNvicCritical) {
-
-    if (flags) {
-
-      portNvicCritical = true;
-      portNvicEnabledInterrupts = (NVIC->ICER[0] & PORTCFG_NVIC_CRITICAL_BLOCK);
-      NVIC->ICER[0] = PORTCFG_NVIC_CRITICAL_BLOCK;
-    }
-    else {
-
-      NVIC->ISER[0] = portNvicEnabledInterrupts;
-      portNvicCritical = false;
-    }
-  }
-
-#else
-
-  __set_PRIMASK(flags);
-
-#endif
-#endif
-}
-
-/**
- * Get critical section status of current task. Used during context save.
+ * Get current scheduler lock status. Used during context save.
  */
 static inline __attribute__((always_inline)) uint32_t portCriticalGet(void)
 {
@@ -243,7 +206,9 @@ static inline __attribute__((always_inline)) uint32_t portCriticalGet(void)
 }
 
 /**
- * Enter critical section in task. This is implementation for POS_SCHED_LOCK.
+ * Lock task scheduler by blocking interrupts (selectively if possible).
+ * This is implementation for POS_SCHED_LOCK.
+ * @return previous lock status.
  */
 static inline __attribute__((always_inline)) uint32_t portCriticalEnter(void)
 {
@@ -281,7 +246,9 @@ static inline __attribute__((always_inline)) uint32_t portCriticalEnter(void)
 }
 
 /**
- * Exit critical section in task. This is implementation for POS_SCHED_UNLOCK.
+ * Unlock task scheduler by returning interrupt blocking status to previous state.
+ * This is implementation for POS_SCHED_UNLOCK.
+ * @param flags previous interrupt status (obtained from ::portCriticalGet or ::portCriticalEnter). 
  */
 static inline __attribute__((always_inline)) void portCriticalExit(uint32_t flags)
 {
