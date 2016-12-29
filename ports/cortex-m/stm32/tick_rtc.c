@@ -32,7 +32,6 @@
 #include <stdio.h>
 #include <time.h>
 #include <string.h>
-#include "port_irq.h"
 #include <stdbool.h>
 
 #if PORTCFG_TICK_RTC == 1

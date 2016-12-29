@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2006-2013, Ari Suutari <ari@stonepile.fi>.
+ * Copyright (c) 2016, Ari Suutari <ari@stonepile.fi>.
  * All rights reserved. 
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -28,32 +28,29 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define NANOINTERNAL
 #include <picoos.h>
+#include "nrf_gpio.h"
+#include "nrf_uart.h"
 
-/*
- * Initialize NXP/LPC uart console.
- */
-
-#if PORTCFG_CON_USART == 1
 
 #if NOSCFG_FEATURE_CONOUT == 1 || NOSCFG_FEATURE_CONIN == 1
-void portInitConsole(void)
+
+void portInitConsole()
 {
-  Chip_UART_Init(LPC_USART);
-  Chip_UART_SetBaud(LPC_USART, PORTCFG_CONSOLE_SPEED);
-  Chip_UART_ConfigData(LPC_USART, (UART_LCR_WLEN8 | UART_LCR_SBS_1BIT));
-  Chip_UART_SetupFIFOS(LPC_USART, (UART_FCR_FIFO_EN | UART_FCR_TRG_LEV2));
-  Chip_UART_TXEnable(LPC_USART);
+  nrf_uart_configure(NRF_UART0, NRF_UART_PARITY_EXCLUDED ,
+                                NRF_UART_HWFC_DISABLED);
 
-#if NOSCFG_FEATURE_CONIN == 1
+  nrf_uart_baudrate_set(NRF_UART0, NRF_UART_BAUDRATE_38400);
+  nrf_uart_enable(NRF_UART0);
 
-  // Enable receive data interrupt.
-  Chip_UART_IntEnable(LPC_USART, UART_IER_RBRINT);
-
+#if NOSCFG_FEATURE_CONOUT == 1
+  nrf_uart_task_trigger(NRF_UART0, NRF_UART_TASK_STARTTX);
 #endif
-
-  Chip_UART_IntEnable(LPC_USART, UART_IER_THREINT);
+#if NOSCFG_FEATURE_CONIN == 1
+  nrf_uart_task_trigger(NRF_UART0, NRF_UART_TASK_STARTRX);
+  nrf_uart_event_clear(NRF_UART0, NRF_UART_EVENT_RXDRDY);
+  nrf_uart_int_enable(NRF_UART0, NRF_UART_INT_MASK_RXDRDY);
+#endif
 
   // Console shouldn't be realtime-critical,
   // use low interrupt priority for it.
@@ -61,56 +58,44 @@ void portInitConsole(void)
   NVIC_EnableIRQ(UART0_IRQn);
 }
 
-/*
- * Uart interrupt handler.
- */
-
-void Uart_Handler()
-{
-  c_pos_intEnter();
-  uint32_t status;
-
-  status = Chip_UART_ReadIntIDReg(LPC_USART);
-
 #if NOSCFG_FEATURE_CONOUT == 1
-  if (status & UART_IIR_INTID_THRE) {
-
-    c_nos_putcharReady();
-  }
-#endif
-
-#if NOSCFG_FEATURE_CONIN == 1
-  if (status & (UART_IIR_INTID_RDA | UART_IIR_INTID_CTI)) {
-
-    unsigned char ch;
-
-    while (Chip_UART_ReadLineStatus(LPC_USART) & UART_LSR_RDR) {
-
-      ch = Chip_UART_ReadByte(LPC_USART);
-
-      c_nos_keyinput(ch);
-    }
-  }
-#endif
-
-  c_pos_intExitQuick();
-}
-
-#if NOSCFG_FEATURE_CONOUT == 1
-/*
- * Console output.
- */
-
-UVAR_t
-p_putchar(char c)
+UVAR_t p_putchar(char c)
 {
-  if ((Chip_UART_ReadLineStatus(LPC_USART) & UART_LSR_THRE) == 0)
+  if (nrf_uart_int_enable_check(NRF_UART0, NRF_UART_INT_MASK_TXDRDY))
     return 0;
 
-  Chip_UART_SendByte(LPC_USART, c);
+  nrf_uart_txd_set(NRF_UART0, c);
+  nrf_uart_int_enable(NRF_UART0, NRF_UART_INT_MASK_TXDRDY);
+
   return 1;
 }
 #endif
 
+void UART0_IRQHandler()
+{
+  unsigned char ch;
+
+  c_pos_intEnter();
+
+  if (nrf_uart_event_check(NRF_UART0, NRF_UART_EVENT_TXDRDY)) {
+
+    nrf_uart_event_clear(NRF_UART0, NRF_UART_EVENT_TXDRDY);
+    nrf_uart_int_disable(NRF_UART0, NRF_UART_INT_MASK_TXDRDY);
+#if NOSCFG_FEATURE_CONOUT == 1
+    c_nos_putcharReady();
 #endif
+  }
+
+  if (nrf_uart_event_check(NRF_UART0, NRF_UART_EVENT_RXDRDY)) {
+
+    nrf_uart_event_clear(NRF_UART0, NRF_UART_EVENT_RXDRDY);
+#if NOSCFG_FEATURE_CONIN == 1
+    ch = nrf_uart_rxd_get(NRF_UART0);
+    c_nos_keyinput(ch);
+#endif
+  }
+
+  c_pos_intExitQuick();
+}
+
 #endif

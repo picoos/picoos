@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, Ari Suutari <ari@stonepile.fi>.
+ * Copyright (c) 2016, Ari Suutari <ari@stonepile.fi>.
  * All rights reserved. 
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -28,42 +28,32 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _PORT_IRQ_H
-#define _PORT_IRQ_H
+#include <picoos.h>
 
-/*
- * Define IRQ priorities. Use defaults from port.h if
- * not overridden in poscfg.h
- */
+#include "nrf_rtc.h"
+#include "nrf_clock.h"
 
-#ifdef PORTCFG_API_MAX_PRI
-#define PORT_API_MAX_PRI PORTCFG_API_MAX_PRI
-#else
-#define PORT_API_MAX_PRI PORT_DEFAULT_API_MAX_PRI
-#endif
+void portInitClock(void)
+{
+  nrf_rtc_prescaler_set(NRF_RTC1, RTC_FREQ_TO_PRESCALER(HZ));
+  nrf_rtc_event_enable(NRF_RTC1, NRF_RTC_EVENT_TICK);
+  nrf_rtc_int_enable(NRF_RTC1, NRF_RTC_INT_TICK_MASK);
 
-#ifdef PORTCFG_SVCALL_PRI
-#define PORT_SVCALL_PRI PORTCFG_SVCALL_PRI
-#else
-#define PORT_SVCALL_PRI PORT_DEFAULT_SVCALL_PRI
-#endif
+  NVIC_SetPriority(RTC1_IRQn, PORT_SYSTICK_PRI);
+  NVIC_EnableIRQ(RTC1_IRQn); 
 
-#ifdef PORTCFG_SYSTICK_PRI
-#define PORT_SYSTICK_PRI PORTCFG_SYSTICK_PRI
-#else
-#define PORT_SYSTICK_PRI PORT_DEFAULT_SYSTICK_PRI
-#endif
+  nrf_rtc_task_trigger(NRF_RTC1, NRF_RTC_TASK_START);
+}
 
-#ifdef PORTCFG_PENDSV_PRI
-#define PORT_PENDSV_PRI PORTCFG_PENDSV_PRI
-#else
-#define PORT_PENDSV_PRI PORT_DEFAULT_PENDSV_PRI
-#endif
+void RTC1_IRQHandler()
+{
+  c_pos_intEnter();
+  if (nrf_rtc_event_pending(NRF_RTC1, NRF_RTC_EVENT_TICK)) {
 
-#ifdef PORTCFG_CON_PRI
-#define PORT_CON_PRI PORTCFG_CON_PRI
-#else
-#define PORT_CON_PRI PORT_DEFAULT_CON_PRI
-#endif
+    nrf_rtc_event_clear(NRF_RTC1, NRF_RTC_EVENT_TICK);
+    c_pos_timerInterrupt();
+  }
 
-#endif /* _PORT_IRQ_H */
+  c_pos_intExitQuick();
+}
+

@@ -31,7 +31,10 @@
 #define NANOINTERNAL
 #include <picoos.h>
 #include <string.h>
-#include "port_irq.h"
+
+#if __CORTEX_M >= 3 && PORTCFG_NVIC_SCHED_LOCK
+#error PORTCFG_NVIC_SCHED_LOCK works only with Cortex-M0.
+#endif
 
 #if NOSCFG_MEM_MANAGER_TYPE == 0
 /*
@@ -295,8 +298,8 @@ static inline void constructStackFrame(POSTASK_t task, void* stackPtr, POSTASKFU
   for (r = 11; r >= 4; r--)
     *(--stk) = r;
 
-  *(--stk) = (unsigned int) 0; // basepri
   task->stackptr = (struct PortArmStack *) stk;
+  task->critical = 0;
 }
 
 /*
@@ -476,6 +479,17 @@ void p_pos_intContextSwitchPending(void)
 
 void PORT_NAKED p_pos_startFirstContext()
 {
+#if PORTCFG_NVIC_SCHED_LOCK
+
+  /*
+   * If using NVIC for scheduler lock on Cortex-M0, 
+   * use it now to block interrupts so PRIMASK can
+   * be turned off.
+   */
+  portSchedLock();
+  __enable_irq();
+#endif
+
   asm volatile("svc 0");
 }
 
@@ -490,21 +504,28 @@ void PORT_NAKED portRestoreContextImpl(void)
 #endif
 
   /*
+   * Check if task that we are switching to was running without
+   * scheduler lock (was switched away by interrupt). If so,
+   * clear scheduler lock.
+   */
+  portSchedUnlock(posCurrentTask_g->critical);
+
+  /*
    * RestoreContext can happen only at lowest level of interrupt.
    * Thus it is safe to restore main stack pointer to initial value.
    * If not restored, stack would grow and grow as control
    * doesn't via same path as we got here.
    */
+
 #if __CORTEX_M >= 4
 
   asm volatile("mov sp, %[initMsp]     \n"  // Return MSP to initial value
       "         ldr r0, %[newPsp]      \n"  // Get PSP for next task
-      "         ldmia r0!, {r3-r11,r14}\n"  // Restore registers not handled by HW
+      "         ldmia r0!, {r4-r11,r14}\n"  // Restore registers not handled by HW
       "         tst r14, #0x10         \n"  // Check for need to restore FP registers
       "         it eq                  \n"
       "         vldmiaeq r0!, {s16-s31}\n"
       "         msr psp, r0            \n"  // Set PSP
-      "         msr basepri, r3        \n"  // Adjust BASEPRI back to task's setting
       "         bx lr"
       : : [newPsp]"m"(posCurrentTask_g->stackptr), [initMsp]"r"(__stack));
 
@@ -512,9 +533,8 @@ void PORT_NAKED portRestoreContextImpl(void)
 
   asm volatile("mov sp, %[initMsp]     \n"  // Return MSP to initial value
       "         ldr r0, %[newPsp]      \n"  // Get PSP for next task
-      "         ldmia r0!, {r3-r11,r14}\n"  // Restore registers not handled by HW
+      "         ldmia r0!, {r4-r11,r14}\n"  // Restore registers not handled by HW
       "         msr psp, r0            \n"  // Set PSP
-      "         msr basepri, r3        \n"  // Adjust BASEPRI back to task's setting
       "         bx lr"
       : : [newPsp]"m"(posCurrentTask_g->stackptr), [initMsp]"r"(__stack));
 
@@ -522,8 +542,7 @@ void PORT_NAKED portRestoreContextImpl(void)
 
   asm volatile("mov sp, %[initMsp]     \n"  // Return MSP to initial value
       "         ldr r0, %[newPsp]      \n"  // Get PSP for next task
-      "         ldmia r0!, {r3-r7}     \n"  // Restore registers
-      "         msr primask, r3        \n"  // Restore PRIMASK to task's setting
+      "         ldmia r0!, {r4-r7}     \n"  // Restore registers
       "         ldmia r0!, {r1-r2}     \n"  // Restore more ...
       "         mov r8, r1             \n"  // .. Cortex-m0 can only use low
       "         mov r9, r2             \n"  //    registers in ldmia/stmia
@@ -576,8 +595,6 @@ void p_pos_powerSleep()
 #endif
 #endif
 
-  uint32_t oldStatus;
-
   // Ensure flag that __WFE waits for is not set yet
   __SEV();
   __WFE();
@@ -603,29 +620,10 @@ void p_pos_powerSleep()
 
   SCB->SCR |= SCB_SCR_SLEEPONEXIT_Msk; // Sleep after interrupt
 
-#if __CORTEX_M < 3
-
-  __enable_irq();
-
-#else
-
-  oldStatus = __get_BASEPRI();
-  __set_BASEPRI(0);
-
-#endif
-
+  portSchedUnlock(0);
   __DSB();
   __WFE();
-
-#if __CORTEX_M < 3
-
-  __disableirq();
-
-#else
-
-  __set_BASEPRI(oldStatus);
-
-#endif
+  portSchedLock();
 
 #if POSCFG_FEATURE_TICKLESS
 
@@ -794,24 +792,6 @@ UVAR_t POSCALL p_pos_findbit(const UVAR_t bitfield, UVAR_t rrOffset)
 #endif
 #endif
 
-#if __CORTEX_M >= 3
-
-POSCFG_LOCK_FLAGSTYPE portEnterCritical(void)
-{
-  register POSCFG_LOCK_FLAGSTYPE flags;
-
-  flags = __get_BASEPRI();
-  __set_BASEPRI(portCmsisPrio2HW(PORT_API_MAX_PRI));
-  return flags;
-}
-
-void portExitCritical(POSCFG_LOCK_FLAGSTYPE flags)
-{
-  __set_BASEPRI(flags);
-}
-
-#endif
-
 #ifdef HAVE_PLATFORM_ASSERT
 void p_pos_assert(const char* text, const char *file, int line)
 {
@@ -820,4 +800,9 @@ void p_pos_assert(const char* text, const char *file, int line)
   __disable_irq();
   while(1);
 }
+#endif
+
+#if PORTCFG_NVIC_SCHED_LOCK
+bool portNvicSchedLock = false;
+uint32_t portNvicEnabledInterrupts;
 #endif

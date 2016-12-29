@@ -92,6 +92,11 @@
  */
 #define MPTR_t                int
 
+/**
+ * This port has port_ex.h.
+ */
+#define POSCFG_PORT_H_EX        1
+
 /** Required memory alignment on the target CPU.
  * To reach maximum speed, some architecures need correctly
  * aligned memory patterns. Set this define to the memory
@@ -255,17 +260,10 @@
  * the interrupts. See ::POSCFG_LOCK_FLAGSTYPE for more details.
  */
 
+#define POS_SCHED_LOCK          { flags = portSchedLock(); }
+
 #if __CORTEX_M >= 3
-
-POSCFG_LOCK_FLAGSTYPE portEnterCritical(void);
-
-#define POS_SCHED_LOCK          { flags = portEnterCritical(); }
 #define POS_IRQ_DISABLE_ALL     { flags = __get_PRIMASK(); __disable_irq(); }
-
-#else
-
-#define POS_SCHED_LOCK          { flags = __get_PRIMASK(); __disable_irq(); }
-
 #endif
 
 /** Scheduler unlocking.
@@ -273,17 +271,10 @@ POSCFG_LOCK_FLAGSTYPE portEnterCritical(void);
  * the saved processor flags and reenables the interrupts this way.
  */
 
+#define POS_SCHED_UNLOCK        { portSchedUnlock(flags); }
+
 #if __CORTEX_M >= 3
-
-void portExitCritical(POSCFG_LOCK_FLAGSTYPE);
-
-#define POS_SCHED_UNLOCK        { portExitCritical(flags); }
 #define POS_IRQ_ENABLE_ALL      { if (!flags) __enable_irq(); }
-
-#else
-
-#define POS_SCHED_UNLOCK        { if (!flags) __enable_irq(); }
-
 #endif
 
 
@@ -398,13 +389,15 @@ void portExitCritical(POSCFG_LOCK_FLAGSTYPE);
 #if (POSCFG_TASKSTACKTYPE == 1)
 
 #define POS_USERTASKDATA \
-    struct PortArmStack  *stackptr;          \
-    unsigned char    *stack;                 \
-    UINT_t           stackSize;
+   uint32_t             critical;           \
+   struct PortArmStack  *stackptr;          \
+   unsigned char        *stack;             \
+   UINT_t               stackSize;
 #elif (POSCFG_TASKSTACKTYPE == 2)
 
 #define POS_USERTASKDATA \
-   struct PortArmStack  *stackptr; \
+   uint32_t             critical;           \
+   struct PortArmStack  *stackptr;          \
    unsigned char stack[PORTCFG_FIXED_STACK_SIZE];
 
 #endif
@@ -447,7 +440,6 @@ struct PortArmStack
    * Extra registers saved for task context.
    */
 
-  unsigned int basepri;
   unsigned int r4;
   unsigned int r5;
   unsigned int r6;
@@ -457,6 +449,11 @@ struct PortArmStack
   unsigned int r10;
   unsigned int r11;
   unsigned int excReturn;
+
+  /*
+   * For Cortex-M with FPU: here might be floating point
+   * registers s16-s31 (pushed to stack only if necessary).
+   */
 
   /*
    * This is frame pushed to stack during interrupt by Cortex-M hardware.
@@ -471,78 +468,6 @@ struct PortArmStack
   unsigned int pc;
   unsigned int xpsr;
 };
-
-#ifdef _DBG
-#define HAVE_PLATFORM_ASSERT
-extern void p_pos_assert(const char* text, const char *file, int line);
-#endif
-
-/**
- * Macro to save context of current stack.
- */
-#if __CORTEX_M >= 4
-
-#define portSaveContext() { \
-    register unsigned int pspReg asm("r0");             \
-    asm volatile("mrs %0, psp             \n\t"         \
-                 "tst r14, #0x10          \n\t"         \
-                 "it  eq                  \n\t"         \
-                 "vstmdbeq %0!, {s16-s31} \n\t"         \
-                 "mrs r3, basepri         \n\t"         \
-                 "stmdb %0!, {r3-r11,r14}   "           \
-                  : "=r"(pspReg) :: "r3");              \
-    asm volatile("str %1, %0"                           \
-                  : "=m"(posCurrentTask_g->stackptr) : "r"(pspReg));      \
-    if (POSCFG_ARGCHECK > 1)                                              \
-      P_ASSERT("TStk", (posCurrentTask_g->stack[0] == PORT_STACK_MAGIC)); \
-}
-
-#elif __CORTEX_M == 3
-
-#define portSaveContext() { \
-    register unsigned int pspReg asm("r0");               \
-    asm volatile("mrs %0, psp             \n\t"           \
-                 "mrs r3, basepri         \n\t"           \
-                 "stmdb %0!, {r3-r11,r14}   "             \
-                  : "=r"(pspReg) :: "r3");                \
-    asm volatile("str %1, %0"                             \
-                  : "=m"(posCurrentTask_g->stackptr) : "r"(pspReg));      \
-    if (POSCFG_ARGCHECK > 1)                                              \
-      P_ASSERT("TStk", (posCurrentTask_g->stack[0] == PORT_STACK_MAGIC)); \
-}
-
-#else
-
-#define portSaveContext() { \
-    register unsigned int pspReg asm("r0");             \
-    asm volatile("mrs %0, psp           \n\t"           \
-                 "sub %0, %0, #4*10     \n\t"           \
-                 "mov r1, %0            \n\t"           \
-                 "mrs r3, primask       \n\t"           \
-                 "stmia r1!, {r3-r7}    \n\t"           \
-                 "mov r3, r8            \n\t"           \
-                 "mov r4, r9            \n\t"           \
-                 "mov r5, r10           \n\t"           \
-                 "mov r6, r11           \n\t"           \
-                 "mov r7, lr            \n\t"           \
-                 "stmia r1!, {r3-r7}        "           \
-                  : "=r"(pspReg) :: "r1", "r3");        \
-    asm volatile("str %1, %0"                           \
-                  : "=m"(posCurrentTask_g->stackptr) : "r"(pspReg));      \
-    if (POSCFG_ARGCHECK > 1)                                              \
-      P_ASSERT("TStk", (posCurrentTask_g->stack[0] == PORT_STACK_MAGIC)); \
-}
-
-#endif
-
-
-/**
- * Restore context for current task.
- */
-#define portRestoreContext() asm volatile("b portRestoreContextImpl")
-
-extern void portRestoreContextImpl(void);
-extern unsigned char *portIrqStack;
 
 /**
  * Calculate CMSIS NVIC_SetPriority -compatible
@@ -600,37 +525,5 @@ extern unsigned char *portIrqStack;
 
 #define PORT_NAKED __attribute__((naked)) \
                    __attribute__ ((__optimize__("omit-frame-pointer")))
-
-void portInitClock(void);
-void portInitConsole(void);
-void portSystemInit(void);
-void portRestoreClocksAfterWakeup(void);
-
-typedef void (* const PortExcHandlerFunc)(void);
-
-#ifndef __CODE_RED
-void Reset_Handler(void);
-#endif
-
-// Helpful macro to define weak interrupt handler definitions.
-
-#define PORT_WEAK_HANDLER(n) void __attribute__((weak, alias("Default_Handler"))) n()
-
-void SVC_Handler(void);
-void PendSV_Handler(void);
-void SysTick_Handler(void);
-void HardFault_Handler(void);
-void UsageFault_Handler(void);
-void Uart_Handler(void);
-
-// Prototypes for malloc wrapping.
-
-void* __wrap_malloc(size_t s);
-void* __wrap_realloc(void* p, size_t s);
-void  __wrap_free(void* p);
-
-void* __real_malloc(size_t s);
-void* __real_realloc(void* p, size_t s);
-void  __real_free(void* p);
 
 #endif /* _PORT_H */

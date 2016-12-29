@@ -91,6 +91,11 @@ SECTIONS {
      . = ALIGN(4);
     *(.gnu.linkonce.d*)
      . = ALIGN(4);
+  }  > ram AT > flash
+
+  .edata   :
+  {
+     . = ALIGN(4);
      _edata = . ;
   }  > ram AT > flash
 

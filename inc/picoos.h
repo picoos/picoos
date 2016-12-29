@@ -3399,6 +3399,9 @@ struct POSTASK {
 #endif /* !DOX */
 };
 
+#if POSCFG_PORT_H_EX
+#include <port_ex.h>
+#endif
 
 #endif /* _PICOOS_H */
 

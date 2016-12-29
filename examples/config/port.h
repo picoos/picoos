@@ -88,6 +88,13 @@
  */
 #define MPTR_t                   long
 
+/**
+ * Sometimes port.h and poscfg.h are not enough. If POSCFG_PORT_H_EX
+ * is defined as 1 an additional config file named port_ex.h is
+ * included by pico]OS after poscfg.h.
+ */
+#define POSCFG_PORT_H_EX        0
+
 /** Required memory alignment on the target CPU.
  * To reach maximum speed, some architecures need correctly
  * aligned memory patterns. Set this define to the memory
