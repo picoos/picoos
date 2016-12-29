@@ -493,7 +493,7 @@ void PORT_NAKED portRestoreContextImpl(void)
    * scheduler lock (was switched away by interrupt). If so,
    * clear scheduler lock.
    */
-  portCriticalExit(posCurrentTask_g->critical);
+  portSchedUnlock(posCurrentTask_g->critical);
 
   /*
    * RestoreContext can happen only at lowest level of interrupt.
@@ -605,10 +605,10 @@ void p_pos_powerSleep()
 
   SCB->SCR |= SCB_SCR_SLEEPONEXIT_Msk; // Sleep after interrupt
 
-  portCriticalExit(0);
+  portSchedUnlock(0);
   __DSB();
   __WFE();
-  portCriticalEnter();
+  portSchedLock();
 
 #if POSCFG_FEATURE_TICKLESS
 
@@ -650,7 +650,7 @@ void sysCall(unsigned int* args)
 
     __set_CONTROL(ctrl);
 
-#ifdef PORTCFG_NVIC_CRITICAL_BLOCK
+#if PORTCFG_NVIC_SCHED_LOCK
 
     __enable_irq();
 
@@ -794,7 +794,7 @@ void p_pos_assert(const char* text, const char *file, int line)
 }
 #endif
 
-#ifdef PORTCFG_NVIC_CRITICAL_BLOCK
-bool portNvicCritical = false;
+#if PORTCFG_NVIC_SCHED_LOCK
+bool portNvicSchedLock = false;
 uint32_t portNvicEnabledInterrupts;
 #endif

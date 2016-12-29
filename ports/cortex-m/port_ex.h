@@ -95,7 +95,7 @@ extern void p_pos_assert(const char* text, const char *file, int line);
                   : "=r"(pspReg));                      \
                                                         \
     posCurrentTask_g->stackptr = pspReg;                \
-    posCurrentTask_g->critical = portCriticalGet();     \
+    posCurrentTask_g->critical = portSchedStatus();     \
                                                         \
     if (POSCFG_ARGCHECK > 1)                                              \
       P_ASSERT("TStk", (posCurrentTask_g->stack[0] == PORT_STACK_MAGIC)); \
@@ -110,7 +110,7 @@ extern void p_pos_assert(const char* text, const char *file, int line);
                   : "=r"(pspReg));                      \
                                                         \
     posCurrentTask_g->stackptr = pspReg;                \
-    posCurrentTask_g->critical = portCriticalGet();     \
+    posCurrentTask_g->critical = portSchedStatus();     \
                                                         \
     if (POSCFG_ARGCHECK > 1)                                              \
       P_ASSERT("TStk", (posCurrentTask_g->stack[0] == PORT_STACK_MAGIC)); \
@@ -133,7 +133,7 @@ extern void p_pos_assert(const char* text, const char *file, int line);
                   : "=r"(pspReg) :: "r1");              \
                                                         \
     posCurrentTask_g->stackptr = pspReg;                \
-    posCurrentTask_g->critical = portCriticalGet();     \
+    posCurrentTask_g->critical = portSchedStatus();     \
                                                         \
     if (POSCFG_ARGCHECK > 1)                                              \
       P_ASSERT("TStk", (posCurrentTask_g->stack[0] == PORT_STACK_MAGIC)); \
@@ -182,22 +182,22 @@ void* __real_malloc(size_t s);
 void* __real_realloc(void* p, size_t s);
 void  __real_free(void* p);
 
-#ifdef PORTCFG_NVIC_CRITICAL_BLOCK
-extern bool portNvicCritical;
+#if PORTCFG_NVIC_SCHED_LOCK
+extern bool portNvicSchedLock;
 extern uint32_t portNvicEnabledInterrupts;
 #endif
 
 /**
  * Get current scheduler lock status. Used during context save.
  */
-static inline __attribute__((always_inline)) uint32_t portCriticalGet(void)
+static inline __attribute__((always_inline)) uint32_t portSchedStatus(void)
 {
 #if __CORTEX_M >= 3
   return __get_BASEPRI();
 #else
-#ifdef PORTCFG_NVIC_CRITICAL_BLOCK
+#if PORTCFG_NVIC_SCHED_LOCK
 
-  return portNvicCritical;
+  return portNvicSchedLock;
 
 #else
   return __get_PRIMASK();
@@ -208,9 +208,9 @@ static inline __attribute__((always_inline)) uint32_t portCriticalGet(void)
 /**
  * Lock task scheduler by blocking interrupts (selectively if possible).
  * This is implementation for POS_SCHED_LOCK.
- * @return previous lock status.
+ * @return previous lock status. Used as argument for ::portSchedUnlock.
  */
-static inline __attribute__((always_inline)) uint32_t portCriticalEnter(void)
+static inline __attribute__((always_inline)) uint32_t portSchedLock(void)
 {
   register uint32_t flags;
 
@@ -220,16 +220,16 @@ static inline __attribute__((always_inline)) uint32_t portCriticalEnter(void)
   __set_BASEPRI(portCmsisPrio2HW(PORT_API_MAX_PRI));
 
 #else
-#ifdef PORTCFG_NVIC_CRITICAL_BLOCK
+#if PORTCFG_NVIC_SCHED_LOCK
 
   __disable_irq();
 
-  flags = portNvicCritical;
-  if (!portNvicCritical) {
+  flags = portNvicSchedLock;
+  if (!portNvicSchedLock) {
 
-    portNvicCritical = true;
-    portNvicEnabledInterrupts = (NVIC->ICER[0] & PORTCFG_NVIC_CRITICAL_BLOCK);
-    NVIC->ICER[0] = PORTCFG_NVIC_CRITICAL_BLOCK;
+    portNvicSchedLock = true;
+    portNvicEnabledInterrupts = (NVIC->ICER[0] & PORTCFG_NVIC_SCHED_LOCK_IRQS);
+    NVIC->ICER[0] = PORTCFG_NVIC_SCHED_LOCK_IRQS;
   }
 
   __enable_irq();
@@ -248,22 +248,22 @@ static inline __attribute__((always_inline)) uint32_t portCriticalEnter(void)
 /**
  * Unlock task scheduler by returning interrupt blocking status to previous state.
  * This is implementation for POS_SCHED_UNLOCK.
- * @param flags previous interrupt status (obtained from ::portCriticalGet or ::portCriticalEnter). 
+ * @param flags previous interrupt status (obtained from ::portSchedStatus or ::portSchedLock). 
  */
-static inline __attribute__((always_inline)) void portCriticalExit(uint32_t flags)
+static inline __attribute__((always_inline)) void portSchedUnlock(uint32_t flags)
 {
 #if __CORTEX_M >= 3
 
   __set_BASEPRI(flags);
 
 #else
-#ifdef PORTCFG_NVIC_CRITICAL_BLOCK
+#if PORTCFG_NVIC_SCHED_LOCK
 
-  if (portNvicCritical && !flags) {
+  if (portNvicSchedLock && !flags) {
 
     __disable_irq();
     NVIC->ISER[0] = portNvicEnabledInterrupts;
-    portNvicCritical = false;
+    portNvicSchedLock = false;
     __enable_irq();
   }
 
