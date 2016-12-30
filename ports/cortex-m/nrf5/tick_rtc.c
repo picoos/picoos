@@ -45,8 +45,78 @@ void portInitClock(void)
   nrf_rtc_task_trigger(NRF_RTC1, NRF_RTC_TASK_START);
 }
 
+#if POSCFG_FEATURE_TICKLESS != 0
+
+#ifndef PORTCFG_POWER_TICKLESS_SAFETY_MARGIN
+#define PORTCFG_POWER_TICKLESS_SAFETY_MARGIN MS(5)
+#endif
+
+/*
+ * Turn of timer tick and schedule wakeup
+ * after given ticks.
+ */
+void p_pos_powerTickSuspend(UVAR_t ticks)
+{
+/*
+ * First, turn periodic tick off.
+ */
+  nrf_rtc_task_trigger(NRF_RTC1, NRF_RTC_TASK_STOP);
+  nrf_rtc_int_disable(NRF_RTC1, NRF_RTC_INT_TICK_MASK);
+  nrf_rtc_event_disable(NRF_RTC1, NRF_RTC_EVENT_TICK);
+
+/*
+ * Then, schedule RTC wakeup after ticks have passed.
+ */
+  if (ticks == INFINITE)
+    return;
+
+  if (ticks > RTC_COUNTER_COUNTER_Msk) // max 2^24
+    ticks = RTC_COUNTER_COUNTER_Msk;
+
+  ticks -= PORTCFG_POWER_TICKLESS_SAFETY_MARGIN; // oscillator starts up 2 ms
+
+  nrf_rtc_task_trigger(NRF_RTC1, NRF_RTC_TASK_CLEAR);
+  nrf_rtc_cc_set(NRF_RTC1, 0, ticks);
+  nrf_rtc_event_clear(NRF_RTC1, NRF_RTC_EVENT_COMPARE_0);
+  nrf_rtc_event_enable(NRF_RTC1, NRF_RTC_EVENT_COMPARE_0);
+  nrf_rtc_int_enable(NRF_RTC1, NRF_RTC_INT_COMPARE0_MASK);
+  nrf_rtc_task_trigger(NRF_RTC1, NRF_RTC_TASK_START);
+}
+
+void p_pos_powerTickResume()
+{
+/*
+ * Make sure that rtc compare wakeup is disabled.
+ */
+  nrf_rtc_event_clear(NRF_RTC1, NRF_RTC_EVENT_COMPARE_0);
+  nrf_rtc_int_disable(NRF_RTC1, NRF_RTC_INT_COMPARE0_MASK);
+  nrf_rtc_event_disable(NRF_RTC1, NRF_RTC_EVENT_COMPARE_0);
+
+/*
+ * Now step the timer with amount of ticks we really slept.
+ */
+  c_pos_timerStep(nrf_rtc_counter_get(NRF_RTC1));
+
+/*
+ * Safe to enable tick now.
+ */
+  nrf_rtc_event_enable(NRF_RTC1, NRF_RTC_EVENT_TICK);
+  nrf_rtc_int_enable(NRF_RTC1, NRF_RTC_INT_TICK_MASK);
+}
+
+#endif
+
 void RTC1_IRQHandler()
 {
+  if (nrf_rtc_event_pending(NRF_RTC1, NRF_RTC_EVENT_COMPARE_0)) {
+
+    nrf_rtc_event_clear(NRF_RTC1, NRF_RTC_EVENT_COMPARE_0);
+    nrf_rtc_int_disable(NRF_RTC1, NRF_RTC_INT_COMPARE0_MASK);
+    nrf_rtc_event_disable(NRF_RTC1, NRF_RTC_EVENT_COMPARE_0);
+    SCB->SCR &= ~SCB_SCR_SLEEPONEXIT_Msk;
+    return;
+  }
+
   c_pos_intEnter();
   if (nrf_rtc_event_pending(NRF_RTC1, NRF_RTC_EVENT_TICK)) {
 
