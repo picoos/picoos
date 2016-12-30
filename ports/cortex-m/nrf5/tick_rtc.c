@@ -67,10 +67,7 @@ void p_pos_powerTickSuspend(UVAR_t ticks)
 /*
  * Then, schedule RTC wakeup after ticks have passed.
  */
-  if (ticks == INFINITE)
-    return;
-
-  if (ticks > RTC_COUNTER_COUNTER_Msk) // max 2^24
+  if (ticks == INFINITE || ticks > RTC_COUNTER_COUNTER_Msk) // max 2^24
     ticks = RTC_COUNTER_COUNTER_Msk;
 
   ticks -= PORTCFG_POWER_TICKLESS_SAFETY_MARGIN; // oscillator starts up 2 ms
