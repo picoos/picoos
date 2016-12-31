@@ -105,6 +105,7 @@ void p_pos_powerTickResume()
 
 void RTC1_IRQHandler()
 {
+#if POSCFG_FEATURE_TICKLESS != 0
   if (nrf_rtc_event_pending(NRF_RTC1, NRF_RTC_EVENT_COMPARE_0)) {
 
     nrf_rtc_event_clear(NRF_RTC1, NRF_RTC_EVENT_COMPARE_0);
@@ -113,6 +114,7 @@ void RTC1_IRQHandler()
     SCB->SCR &= ~SCB_SCR_SLEEPONEXIT_Msk;
     return;
   }
+#endif
 
   c_pos_intEnter();
   if (nrf_rtc_event_pending(NRF_RTC1, NRF_RTC_EVENT_TICK)) {
