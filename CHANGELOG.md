@@ -7,6 +7,8 @@
 - add tickless implementation for msp430 port
 - add support for Nordic Semiconductor NRF51 chips
 - add support for scheduler locking with NVIC instead of PRIMASK on Cortex-M0
+- fix race condition with sleep and high priority Cortex-M interrupts, which
+  resulted in infinite sleep.
 
 ## 1.1.0
 - add power management api and support for tickless idle
