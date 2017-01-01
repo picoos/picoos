@@ -595,10 +595,6 @@ void p_pos_powerSleep()
 #endif
 #endif
 
-  // Ensure flag that __WFE waits for is not set yet
-  __SEV();
-  __WFE();
-
 #if POSCFG_FEATURE_TICKLESS
 
   UVAR_t nextWake = c_pos_nextWakeup();
@@ -618,9 +614,39 @@ void p_pos_powerSleep()
 
 #endif
 
+  /*
+   * It is important that NO interrupt occurs during __WFE flag
+   * manipulation and after SLEEPONEXIT bit is set before *all*
+   * interrupts are enabled. Otherwise a high priority interrupt
+   * (one that higher priority than pico]OS interrupts might
+   * occur and put system to sleep before pico]OS -compatible
+   * interrupts are enabled.
+   */
+#if __CORTEX_M >= 3 || PORTCFG_NVIC_SCHED_LOCK
+
+   __disable_irq();
+
+#endif
+
+   // Ensure flag that __WFE waits for is not set yet
+   __SEV();
+   __WFE();
   SCB->SCR |= SCB_SCR_SLEEPONEXIT_Msk; // Sleep after interrupt
 
+  /*
+   * Now we can be sure that __WFE flag is set by next interrupt that
+   * clears SLEEPONEXIT before completing. It is safe to allow interrupts
+   * again. For Cortex-M0, portSchedUnlock will turn PRIMASK off. For
+   * M3/M4, it alters only BASEPRI so PRIMASK must be cleared separately.
+   */
   portSchedUnlock(0);
+
+#if __CORTEX_M >= 3
+
+  __enable_irq();
+
+#endif
+
   __DSB();
   __WFE();
   portSchedLock();
