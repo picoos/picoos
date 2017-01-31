@@ -39,7 +39,7 @@ Getting started
 ---------------
 
 There are two methods to work with pico]OS. The first is to build the pico]OS
-library and link it to your project that you may develope with some kind of
+library and link it to your project that you may develop with some kind of
 integrated compiler/debugger IDE. The second method is to use the Makefile
 system that is provided with pico]OS to build all you need - the pico]OS RTOS
 library, application libararies and your main program.
