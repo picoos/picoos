@@ -1,6 +1,8 @@
 # Change Log
 
 ## [Unreleased]
+
+## [1.1.1]
 - bug fixes to tickless idle
 - make 6502 port work with modern cc65 compiler
 - reorganize examples
