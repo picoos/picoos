@@ -880,7 +880,7 @@ typedef struct POSMUTEX *POSMUTEX_t;
 typedef struct POSFLAG *POSFLAG_t;
 
 /** @brief  Handle to a timer object.
- * @sa posTimerCreate, posTimerDestroy, posTimerSet, posTimerStart
+ * @sa posTimerCreate, posTimerDestroy, posTimerSet, posTimerCallbackSet, posTimerStart
  */
 typedef struct POSTIMER *POSTIMER_t;
 
@@ -888,6 +888,11 @@ typedef struct POSTIMER *POSTIMER_t;
  * @sa posAtomicGet, posAtomicSet, posAtomicAdd, posAtomicSub
  */
 typedef volatile INT_t  POSATOMIC_t;
+
+#if (DOX!=0) || (POSCFG_FEATURE_TIMER != 0)
+/** @brief  Timer callback function pointer */
+typedef void (*POSTIMERFUNC_t)(POSTIMER_t, void* arg);
+#endif
 
 #if (DOX!=0) || (POSCFG_FEATURE_LISTS != 0)
 struct POSLIST;
@@ -2424,6 +2429,10 @@ POSEXTERN VAR_t POSCALL posFlagWait(POSFLAG_t flg, UINT_t timeoutticks);
  * A timer object is a counting variable that is counted down by the
  * system timer interrupt tick rate. If the variable reaches zero,
  * a semaphore, that is bound to the timer, will be signaled.
+ * Instead of using semaphore, timer can also invoke a callback function
+ * (this is optional and controlled by ::POSCFG_FEATURE_TIMERCALLBACK).
+ * If using callback, the function must be as quick and short as possible,
+ * because it is invoked from timer interrupt context.
  * If the timer is in auto reload mode, the timer is restarted and
  * will signal the semaphore again and again, depending on the
  * period rate the timer is set to.
@@ -2484,7 +2493,7 @@ POSEXTERN  JIF_t POSCALL posGetJiffies(void);
  * @return  handle to the new timer object. NULL is returned on error.
  * @note    ::POSCFG_FEATURE_TIMER must be defined to 1 
  *          to have timer support compiled in.
- * @sa      posTimerSet, posTimerStart, posTimerDestroy
+ * @sa      posTimerSet, posTimerCallbackSet, posTimerStart, posTimerDestroy
  */
 POSEXTERN POSTIMER_t POSCALL posTimerCreate(void);
 
@@ -2503,10 +2512,36 @@ POSEXTERN POSTIMER_t POSCALL posTimerCreate(void);
  * @return  zero on success.
  * @note    ::POSCFG_FEATURE_TIMER must be defined to 1 
  *          to have timer support compiled in.
- * @sa      posTimerCreate, posTimerStart
+ * @sa      posTimerCreate, posTimerStart, posTimerCallbackSet
  */
 POSEXTERN VAR_t POSCALL posTimerSet(POSTIMER_t tmr, POSSEMA_t sema,
                                     UINT_t waitticks, UINT_t periodticks);
+
+#if (DOX!=0) || (POSCFG_FEATURE_TIMERCALLBACK != 0)
+/**
+ * Timer function.
+ * Sets up a timer object with callback function. Note that function is
+ * called from timer interrupt context - keep it short and fast.
+ * @param   tmr  handle to the timer object.
+ * @param   callback   function that shall be called when timer fires.
+ * @param   arg        argument to callback function.
+ * @param   waitticks  number of initial wait ticks. The timer fires the
+ *                     first time when this ticks has been expired.
+ * @param   periodticks  After the timer has fired, it is reloaded with
+ *                       this value, and will fire again when this count
+ *                       of ticks has been expired (auto reload mode).
+ *                       If this value is set to zero, the timer
+ *                       won't be restarted (= one shot mode).
+ * @return  zero on success.
+ * @note    ::POSCFG_FEATURE_TIMER must be defined to 1 
+ *          to have timer support compiled in.
+ * @sa      posTimerCreate, posTimerStart, posTimerSet
+ */
+POSEXTERN VAR_t POSCALL posTimerCallbackSet(POSTIMER_t tmr,
+                                            POSTIMERFUNC_t callback, void* arg,
+                                            UINT_t waitticks, UINT_t periodticks);
+#endif
+
 /**
  * Timer function.
  * Starts a timer. The timer will fire first time when the

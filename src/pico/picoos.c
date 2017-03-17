@@ -160,7 +160,14 @@ typedef struct TIMER {
 #endif
   struct TIMER   *prev;
   struct TIMER   *next;
+#if POSCFG_FEATURE_TIMERCALLBACK != 0
+#define pos_timerFired(t) t->callback((POSTIMER_t)t, t->callbackArg)
+  POSTIMERFUNC_t callback;
+  void*          callbackArg;
+#else
+#define pos_timerFired(t) posSemaSignal(t->sema)
   POSSEMA_t      sema;
+#endif
   UINT_t         counter;
   UINT_t         wait;
   UINT_t         reload;
@@ -772,6 +779,14 @@ static VAR_t POSCALL pos_sched_event(EVENT_t ev)
 
 #endif  /* SYS_FEATURE_EVENTS */
 
+/*-------------------------------------------------------------------------*/
+
+#if (POSCFG_FEATURE_TIMER != 0) && (POSCFG_FEATURE_TIMERCALLBACK != 0)
+static void pos_timerSemaSignal(POSTIMER_t timer, void* sema)
+{
+  posSemaSignal((POSSEMA_t)sema);
+}
+#endif
 
 
 /*---------------------------------------------------------------------------
@@ -992,7 +1007,7 @@ void POSCALL c_pos_timerInterrupt(void)
     --(tmr->counter);
     if (tmr->counter == 0)
     {
-      posSemaSignal(tmr->sema);
+      pos_timerFired(tmr);
 #if POSCFG_FEATURE_TIMERFIRED != 0
       tmr->fired = 1;
 #endif
@@ -1098,7 +1113,7 @@ void POSCALL c_pos_timerStep(UVAR_t ticks)
 
       if (tmr->counter == 0)
       {
-        posSemaSignal(tmr->sema);
+        pos_timerFired(tmr);
 #if POSCFG_FEATURE_TIMERFIRED != 0
         tmr->fired = 1;
 #endif
@@ -2652,14 +2667,19 @@ void POSCALL posTimerDestroy(POSTIMER_t tmr)
 VAR_t POSCALL posTimerSet(POSTIMER_t tmr, POSSEMA_t sema,
                           UINT_t waitticks, UINT_t periodticks)
 {
-  register TIMER_t  *t = (TIMER_t*) tmr;
   register EVENT_t  ev = (EVENT_t) sema;
+  P_ASSERT("posTimerSet: semaphore valid", sema != NULL);
+  POS_ARGCHECK_RET(ev, ev->e.magic, POSMAGIC_EVENTU, -E_ARG); 
+
+#if POSCFG_FEATURE_TIMERCALLBACK != 0
+  return posTimerCallbackSet(tmr, pos_timerSemaSignal, sema,
+                             waitticks, periodticks);
+#else
+  register TIMER_t  *t = (TIMER_t*) tmr;
   POS_LOCKFLAGS;
 
   P_ASSERT("posTimerSet: timer valid", tmr != NULL);
-  P_ASSERT("posTimerSet: semaphore valid", sema != NULL);
-  POS_ARGCHECK_RET(t, t->magic, POSMAGIC_TIMER, -E_ARG); 
-  POS_ARGCHECK_RET(ev, ev->e.magic, POSMAGIC_EVENTU, -E_ARG); 
+  POS_ARGCHECK_RET(t, t->magic, POSMAGIC_TIMER, -E_ARG);
 #if POSCFG_ARGCHECK > 1
   if (waitticks == 0)
      return -E_ARG;
@@ -2672,7 +2692,36 @@ VAR_t POSCALL posTimerSet(POSTIMER_t tmr, POSSEMA_t sema,
   t->reload = periodticks;
   POS_SCHED_UNLOCK;
   return E_OK;
+#endif
 }
+
+/*-------------------------------------------------------------------------*/
+
+#if POSCFG_FEATURE_TIMERCALLBACK != 0
+VAR_t POSCALL posTimerCallbackSet(POSTIMER_t tmr, POSTIMERFUNC_t callback,
+                                  void* arg, UINT_t waitticks, UINT_t periodticks)
+{
+  register TIMER_t  *t = (TIMER_t*) tmr;
+  POS_LOCKFLAGS;
+
+  P_ASSERT("posTimerSet: timer valid", tmr != NULL);
+  P_ASSERT("posTimerSet: callback valid", callback != NULL);
+  POS_ARGCHECK_RET(t, t->magic, POSMAGIC_TIMER, -E_ARG); 
+#if POSCFG_ARGCHECK > 1
+  if (waitticks == 0)
+     return -E_ARG;
+#endif
+
+  posTimerStop(tmr);
+  POS_SCHED_LOCK;
+  t->callback    = callback;
+  t->callbackArg = arg;
+  t->wait        = waitticks;
+  t->reload      = periodticks;
+  POS_SCHED_UNLOCK;
+  return E_OK;
+}
+#endif
 
 /*-------------------------------------------------------------------------*/
 
