@@ -432,6 +432,13 @@
  */
 #define POSCFG_FEATURE_TIMERDESTROY  1
 
+/** Include function ::posTimerCallbackSet.
+ * If this definition is set to 1, the function ::posTimerCallbackSet will
+ * be included into the pico]OS kernel. Note that also
+ * ::POSCFG_FEATURE_TIMER must be set to 1.
+ */
+#define POSCFG_FEATURE_TIMERCALLBACK    1
+
 /** Include function ::posTimerFired.
  * If this definition is set to 1, the function ::posTimerFired will
  * be included into the pico]OS kernel. Note that also
