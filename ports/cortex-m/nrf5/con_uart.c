@@ -35,6 +35,8 @@
 
 #if NOSCFG_FEATURE_CONOUT == 1 || NOSCFG_FEATURE_CONIN == 1
 
+static bool txOn;
+
 void portInitConsole()
 {
   nrf_uart_configure(NRF_UART0, NRF_UART_PARITY_EXCLUDED ,
@@ -44,7 +46,7 @@ void portInitConsole()
   nrf_uart_enable(NRF_UART0);
 
 #if NOSCFG_FEATURE_CONOUT == 1
-  nrf_uart_task_trigger(NRF_UART0, NRF_UART_TASK_STARTTX);
+  txOn = false;
 #endif
 #if NOSCFG_FEATURE_CONIN == 1
   nrf_uart_task_trigger(NRF_UART0, NRF_UART_TASK_STARTRX);
@@ -61,8 +63,11 @@ void portInitConsole()
 #if NOSCFG_FEATURE_CONOUT == 1
 UVAR_t p_putchar(char c)
 {
-  if (nrf_uart_int_enable_check(NRF_UART0, NRF_UART_INT_MASK_TXDRDY))
+  if (txOn)
     return 0;
+
+  nrf_uart_task_trigger(NRF_UART0, NRF_UART_TASK_STARTTX);
+  txOn = true;
 
   nrf_uart_txd_set(NRF_UART0, c);
   nrf_uart_int_enable(NRF_UART0, NRF_UART_INT_MASK_TXDRDY);
@@ -81,6 +86,9 @@ void UART0_IRQHandler()
 
     nrf_uart_event_clear(NRF_UART0, NRF_UART_EVENT_TXDRDY);
     nrf_uart_int_disable(NRF_UART0, NRF_UART_INT_MASK_TXDRDY);
+    nrf_uart_task_trigger(NRF_UART0, NRF_UART_TASK_STOPTX);
+    txOn = false;
+
 #if NOSCFG_FEATURE_CONOUT == 1
     c_nos_putcharReady();
 #endif
