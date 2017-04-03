@@ -261,10 +261,10 @@
 #define _PICOOS_H
 
 
-#define POS_VER_N           0x0110
-#define POS_VER_S           "1.1.0"
+#define POS_VER_N           0x0112
+#define POS_VER_S           "1.1.2"
 #define POS_COPYRIGHT       "(c) 2004-2012, Dennis Kuschel\n" \
-                            "(c) 2011-2016, Ari Suutari"
+                            "(c) 2011-2017, Ari Suutari"
 
 #define POS_STARTUPSTRING   "pico]OS " POS_VER_S "\n" POS_COPYRIGHT
 
