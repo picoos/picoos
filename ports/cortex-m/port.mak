@@ -148,8 +148,12 @@ endif
 # newlib-nano would be nice. But first there
 # were odd problems with getc(). After that 
 # odd problems with malloc'ed memory.
-# But to try it, uncomment following line:
-#LDFLAGS += --specs=nano.specs
+# But to try it, set NEWLIB_NANO = 1 in Makefile.
+ifeq '$(strip $(NEWLIB_NANO))' '1'
+CFLAGS_COMMON += --specs=nano.specs
+LDFLAGS += --specs=nano.specs
+endif
+
 LDFLAGS += -Wl,--wrap=malloc,--wrap=free,--wrap=realloc,--wrap=__sfp_lock_acquire,--wrap=__sfp_lock_release,--wrap=fopen
 LDFLAGS += -nostartfiles -Wl,-Map,$(DIR_OUT)/$(TARGET).map,--cref,--gc-sections
 
