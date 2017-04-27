@@ -177,18 +177,22 @@ static REGELEM_t POSCALL n_regAlloc(void)
   }
   else
   {
+#if NOS_REGKEY_PREALLOC > 1
     re = (REGELEM_t) nosMemAlloc( NOS_REGKEY_PREALLOC *
                                   ALIGNEDSIZE(sizeof(struct regelem)) );
     if (re == NULL)
       return NULL;
 
-#if NOS_REGKEY_PREALLOC > 1
     for (i=0; i<NOS_REGKEY_PREALLOC-1; ++i)
     {
       re->next = reglist_free_g;
       reglist_free_g = re;
       re = NEXTALIGNED(REGELEM_t, re);
     }
+#else
+    re = (REGELEM_t) nosMemAlloc(sizeof(struct regelem));
+    if (re == NULL)
+      return NULL;
 #endif
   }
   RESET_REFCOUNT(re);
