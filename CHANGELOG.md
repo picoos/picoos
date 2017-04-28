@@ -4,6 +4,7 @@
 - add posTimerCallbackSet to create a callback timer instead of normal one.
   Callback is done from timer interrupt context with scheduler lock,
   which limits it's usefulness (causes easily jitter in interrupt response).
+- fix registry allocation error when NOS_REGKEY_PREALLOC was set to 0.
 
 ## [1.1.1]
 - bug fixes to tickless idle
