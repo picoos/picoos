@@ -3670,7 +3670,7 @@ void  POSCALL posInit(POSTASKFUNC_t firstfunc, void *funcarg, VAR_t priority)
   POS_SETTASKNAME(task, "idle task");
 #endif
 
-  /* start mutlitasking */
+  /* start multitasking */
   posNextTask_g = posTaskCreate(firstfunc, funcarg,
 #if POSCFG_TASKSTACKTYPE == 0
                 priority, stackFirstTask);
