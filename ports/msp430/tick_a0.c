@@ -90,7 +90,7 @@ void p_pos_powerTickSuspend(UVAR_t ticks)
 /*
  * First, stop timer.
  */
-  TA0CTL &= ~MC_3;    // Stop timer.
+  TA0CTL |= TACLR;    // Startup clear.
   TA0CCTL0 &= ~CCIFG; // clear possible interrupt
 
 /*
@@ -108,7 +108,8 @@ void p_pos_powerTickSuspend(UVAR_t ticks)
   TA0CCR0 = ticks * T0CYCLES_PER_TICK - 1;
 
   sleeping = true;
-  TA0CTL |= MC_1;  // Up mode.
+  TA0CTL |= CLK_DIVIDER;
+  TA0CTL |= MC_3;  // Use up/down mode to work around errata TAB23
 }
 
 void p_pos_powerTickResume()
@@ -119,7 +120,7 @@ void p_pos_powerTickResume()
 /*
  * Now step the timer with amount of ticks we really slept.
  */
-  c_pos_timerStep((TA0R + 1) / T0CYCLES_PER_TICK);
+  c_pos_timerStep(TA0R / T0CYCLES_PER_TICK);
 
 /*
  * Enable timer now.
