@@ -5,6 +5,8 @@
   Callback is done from timer interrupt context with scheduler lock,
   which limits it's usefulness (causes easily jitter in interrupt response).
 - fix registry allocation error when NOS_REGKEY_PREALLOC was set to 0.
+- MSP430 port calculated number of actual ticks slept in tickless mode wrong,
+  which caused system hang for 1 tick sleeps.
 
 ## [1.1.1]
 - bug fixes to tickless idle
