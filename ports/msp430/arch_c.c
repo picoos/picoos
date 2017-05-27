@@ -317,7 +317,7 @@ void p_pos_powerWakeup()
 }
 
 #ifndef PORTCFG_POWER_TICKLESS_MIN
-#define PORTCFG_POWER_TICKLESS_MIN MS(100)
+#define PORTCFG_POWER_TICKLESS_MIN 10
 #endif
 
 void p_pos_powerSleep()
