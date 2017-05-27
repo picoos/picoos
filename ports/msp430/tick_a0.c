@@ -119,7 +119,7 @@ void p_pos_powerTickResume()
 /*
  * Now step the timer with amount of ticks we really slept.
  */
-  c_pos_timerStep(TA0R / T0CYCLES_PER_TICK);
+  c_pos_timerStep((TA0R + 1) / T0CYCLES_PER_TICK);
 
 /*
  * Enable timer now.
