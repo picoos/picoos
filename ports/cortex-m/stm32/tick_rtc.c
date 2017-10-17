@@ -74,6 +74,8 @@ void portInitClock(void)
   * If it return error, just try again (as we don't have any other
   * alternatives than working clock).
   */
+
+  RTC_BypassShadowCmd(DISABLE);
   while (RTC_WaitForSynchro() == ERROR) {
   }
 
