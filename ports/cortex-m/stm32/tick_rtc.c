@@ -103,6 +103,7 @@ void portInitClock(void)
 
   RTC_SetTime(RTC_Format_BIN, &time);
   RTC_SetDate(RTC_Format_BIN, &date);
+  RTC_BypassShadowCmd(ENABLE);
 
 /*
  * Configure Wakup interrupt
@@ -144,10 +145,34 @@ static long rtcTimeNow()
 {
   RTC_TimeTypeDef time;
   RTC_DateTypeDef date;
+  RTC_TimeTypeDef time2;
+  RTC_DateTypeDef date2;
+  uint32_t        ss;
+  uint32_t        ss2;
   struct tm t;
 
+  // RTC is in BYPSHAD mode. Read the registers twice.
   RTC_GetTime(RTC_Format_BIN, &time);
   RTC_GetDate(RTC_Format_BIN, &date);
+  ss = RTC_GetSubSecond();
+
+  RTC_GetTime(RTC_Format_BIN, &time2);
+  RTC_GetDate(RTC_Format_BIN, &date2);
+  ss2 = RTC_GetSubSecond();
+
+  // Check read values. If they match, read was ok. Otherwise read third time.
+  if (ss != ss2 ||
+      time.RTC_Seconds != time2.RTC_Seconds ||
+      time.RTC_Minutes != time2.RTC_Minutes ||
+      time.RTC_Hours != time2.RTC_Hours ||
+      date.RTC_Date != date2.RTC_Date ||
+      date.RTC_Month != date2.RTC_Month ||
+      date.RTC_Year != date2.RTC_Year) {
+
+    RTC_GetTime(RTC_Format_BIN, &time);
+    RTC_GetDate(RTC_Format_BIN, &date);
+    ss = RTC_GetSubSecond();
+  }
 
   memset(&t, '\0', sizeof(t));
 
@@ -162,7 +187,7 @@ static long rtcTimeNow()
   long msecs;
 
   secs = mktime(&t);
-  msecs = 1000 - (RTC_GetSubSecond() * 1000 / 1024);
+  msecs = 1000 - (ss * 1000 / 1024);
 
   return 1000 * secs + msecs;
 }
