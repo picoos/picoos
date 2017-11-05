@@ -89,6 +89,8 @@ DCFGDEF = $(DIR_PORT)/default
 else
 DCFGDEF = $(DIR_PORT)/$(CPU)/default
 endif
+else
+export DIR_CONFIG
 endif
 
 # Define all object files.

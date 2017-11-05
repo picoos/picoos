@@ -161,10 +161,6 @@ DIR_SRC  = $(RELROOT)src
 DIR_INC  = $(RELROOT)inc
 DIR_PORT = $(RELROOT)ports/$(PORT)
 
-ifneq '$(strip DIR_CONFIG)' ''
-export DIR_CONFIG
-endif
-
 # ---------------------------------------------------------------------------
 
 # Include port specific make file.
