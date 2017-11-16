@@ -37,6 +37,12 @@
 #include <signal.h>
 #include <sys/time.h>
 
+#if NOSCFG_FEATURE_CONIN == 1
+#include <termios.h>
+#include <unistd.h>
+#include <fcntl.h>
+#endif
+
 static void timerExpiredContext(void);
 static void timerExpired(int sig, siginfo_t *info, void *uap);
 
@@ -132,6 +138,21 @@ p_pos_initArch(void)
   timer.it_value.tv_sec = timer.it_interval.tv_sec;
   timer.it_value.tv_usec = timer.it_interval.tv_usec;
   setitimer(ITIMER_REAL, &timer, NULL);
+
+#if NOSCFG_FEATURE_CONIN == 1
+
+  struct termios ts;
+
+  tcgetattr(0, &ts);
+
+  cfmakeraw(&ts);
+  ts.c_cc[VMIN]=1;
+  ts.c_cc[VTIME]=0;
+
+  tcsetattr(0, TCSANOW, &ts);
+  fcntl(0, F_SETFL, fcntl(0, F_GETFL) | O_NONBLOCK);
+
+#endif
 }
 
 /*
@@ -218,6 +239,17 @@ static void timerExpiredContext()
 {
   c_pos_intEnter();
   c_pos_timerInterrupt();
+
+#if NOSCFG_FEATURE_CONIN == 1
+
+// Make a nonblocking read to stdin.
+
+  unsigned char c;
+  if (read(0, &c, 1) == 1)
+    c_nos_keyinput(c);
+  
+#endif
+
   c_pos_intExit();
   setcontext(&posCurrentTask_g->ucontext);
   assert(0);
