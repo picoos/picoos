@@ -33,9 +33,11 @@ For example, UART handler could look like this:
     void  PORT_NAKED 
     __attribute__((vector(_UART1_VECTOR), nomips16)) void UARTx_Handler()
     {
+      portSaveContext();
       c_pos_intEnter();
 
       // interrupt handler code here.
 
       c_pos_intExitQuick();
+      portRestoreContext();
     }
