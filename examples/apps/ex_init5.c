@@ -20,7 +20,7 @@ static char membuf_g[HEAPSIZE];
 void *__heap_start  = (void*) &membuf_g[0];
 void *__heap_end    = (void*) &membuf_g[HEAPSIZE-1];
 
-
+  
 /* function prototype: first task function */
 void firsttask(void *arg);
 

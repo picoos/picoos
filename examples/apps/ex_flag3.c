@@ -1,11 +1,8 @@
 /*
- *  pico]OS semaphore example 2
- *
- *  How to use a semaphore to protect a shared resource.
- *  (see also ex_mutx1.c)
+ *  pico]OS flag example 
  *
  *  License:  modified BSD, see license.txt in the picoos root directory.
- *
+ *	@author: ibrahimatay
  */
 
 
@@ -26,22 +23,22 @@
 #endif
 
 
-/* method tanımları */
+/* methods defication */
 void incrementCounter(int tasknbr);
 void task1(void *arg);
 void task2(void *arg);
 void task3(void *arg);
 
-/* semaphore tanımı */
+/* semaphore defication */
 POSSEMA_t   semaphore = NULL;
 
-/* semaphore seviyesinde erisilecek atomik degisken tanımı */
+/*  variable to be atomic at semaphore level */
 int  counter = 0;
 
-/* bayrak tanımı */
+/* flag variable */
 POSFLAG_t   flagset;
 
-/* sistemde kullanılacak en fazla gorev tanımı*/
+/* task counter varible */
 int taskCount = 3;
 
 
@@ -52,28 +49,27 @@ int taskCount = 3;
  */
 void incrementCounter(int tasknbr) {
 	
-	/* gecisi degisken tanımın yapılması */
+	/* temporary variable */
 	int c;
 
-	
 	posSemaGet(semaphore);
 	
-	/* atomic degisken bilgisinin alınması */
+	/* get the variable value*/
 	c = counter;
 
-	/* indeks degerinin artırılması */
+	/* increase the temporary variable*/
 	c++;
 
-	/* Isleme beklemesinin saglanmasi */
+	/* wait the 500ms */
 	posTaskSleep(MS(500)); 
   
-	/* gecisi indes degerlin, atamic degere aktarılması */
+	/* swap the variables */
 	counter = c;
 
-	/* gorev ve islem indeks degerinin ekranan basilması */  
+	/* print the status */ 
 	nosPrintf2("task%i: counter = %i\n", tasknbr, counter);
 	
-	/* bayrak durumuna degistirilme kontrolu */
+	/* flag state change control */
 	if(tasknbr == taskCount){
 		tasknbr = 1;
 	}
@@ -82,10 +78,10 @@ void incrementCounter(int tasknbr) {
 	
 	tempOfIndexValue = tempOfIndexValue+1;
   
-	/* Bayrak durumun güncellenmesini saglar */
+	/* flag updated */
 	posFlagSet(flagset, tempOfIndexValue);
 	
-	/* bir sonraki gorev durumuna gecisi yapıtırı */
+	/* next the semaphore */
 	posSemaSignal(semaphore);
 }
 
@@ -122,29 +118,28 @@ void task1(void *arg)
 
 void task2(void *arg)
 {
-	VAR_t f; // bayrak bilgisi tanımı
+	VAR_t f; // flag definition variable
 	
 	(void) arg;
 
-	
 	for(;;) {
 	
-		// Gecerli bayrak durumunun alınması
+		// get the flag status
 		f = posFlagGet(flagset, POSFLAG_MODE_GETSINGLE);
 		
 		if(f==2){
 			incrementCounter(2);
 		}
 		
-		// Bayrak durumunun guncellenmesi
+		/* flag status update */
 		posFlagSet(flagset, 3);
 		nosPrintf1("flag value = %i\n",f);
 		
-		//Isleme beklemesinin saglanmasi
+		/* do something here and waste some time */
 		posTaskSleep(MS(500));
 	}
 	
-	// Bir sonra ki islem duruma gecisi
+	// next the task
 	posSemaSignal(semaphore);
 }
 
@@ -175,13 +170,9 @@ void firsttask(void *arg) {
 	POSTASK_t  t;
 	UVAR_t i;
 
-	/* Ekranan indeks degeri yazılması amacı ile
-	 * kullanılacak olan degiskenin sadece bir gorev kullanımında 
-	 * sahiplenebilmesi icin ilgili tanımın yapılması
-	 */
 	posAtomicSet(&counter, 0);
 
-	/* bayrak isleminin baslatilmasi */
+	/* creating the flag */
 	flagset = posFlagCreate();
   
 	if (flagset == NULL)
@@ -189,9 +180,8 @@ void firsttask(void *arg) {
 		nosPrint("Failed to create a set of flags!\n");
 		return;
 	}
-  
-  
-	/* semaphore nesnesinin 1 degeri ile baslatilması */
+
+	/* creating semaphore object with set one default value */
 	semaphore = posSemaCreate(1);
 
 	if (semaphore == NULL){
@@ -200,30 +190,29 @@ void firsttask(void *arg) {
 		return;
 	}
 
-	t = nosTaskCreate(task2,    /* gorev methodunun pinter degeri 	*/
-		NULL,					/* varsayılan method arguman degeri */
-		1,						/* islem oncelik durumu          	*/
-		0,
-		"task2");				/* gorev isimi        				*/
+	t = nosTaskCreate(task2,    /* ptr to function:  task2 that is executed 	*/
+		NULL,					/* optional argument, not used here             */
+		1,						/* priority of the first task                   */
+		0,						/* stack size for the first task, 0 = default   */
+		"task2");				/* task name       								*/
 
 	if (t == NULL) {
 		nosPrint("Failed to start second task!\n");
 	}
 
-	/* ikinci gorev nesnesi */
-	t = nosTaskCreate(task3,    /* gorev methodunun pinter degeri 	*/
-                    NULL,       /* varsayılan method arguman degeri */
-                    1,          /* islem oncelik durumu          	*/
-                    0,          
-                    "task3");   /* gorev isimi        				*/
+	t = nosTaskCreate(task3,    /* ptr to function: task3 that is executed */
+                    NULL,       /* optional argument, not used here             */
+                    1,          /* priority of the first task                   */
+                    0,          /* stack size for the first task, 0 = default   */
+                    "task3");   /* task name       				*/
 
 	if (t == NULL) {
 		nosPrint("Failed to start third task!\n");
 	}
 
-	/* ilk bayrak durumun belirlenmesi*/
+	/* first flag status change */
 	posFlagSet(flagset, 1);
 	
-	/*  task1 gorvein cagirilması */
+  	/* task1 handled */
 	task1(arg);
 }

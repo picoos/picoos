@@ -66,7 +66,7 @@ all:
 	$(MAKECMD)ex_mutx2.c
 	$(MAKECMD)ex_sema1.c
 	$(MAKECMD)ex_sema2.c
-	$(MAKECMD)ex_sema3.c
+	$(MAKECMD)ex_sema3.c 
 	$(MAKECMD)ex_sema4.c
 	$(MAKECMD)ex_sint1.c
 	$(MAKECMD)ex_task4.c

@@ -1,13 +1,9 @@
 /*
- *  pico]OS semaphore example 2
- *
- *  How to use a semaphore to protect a shared resource.
- *  (see also ex_mutx1.c)
+ *  pico]OS flag example 
  *
  *  License:  modified BSD, see license.txt in the picoos root directory.
- *
+ *	@author: ibrahimatay
  */
-
 
 /* Include source code for pico]OS
  * initialization with nano layer.
@@ -25,15 +21,15 @@
 #error The feature NOSCFG_FEATURE_CONOUT is not enabled!
 #endif
 
-/* fonskiyon tan�mlar� */
+/* methods defication */
 void incrementCounter(int tasknbr);
 void task1(void *arg);
 void task2(void *arg);
 
-/* semaphore tan�m� */
+/* semaphore defication */
 POSSEMA_t   semaphore = NULL;
 
-/* semaphore seviyesinde erisilecek atomik degisken tan�m� */
+/*  variable to be atomic at semaphore level */
 int  counter = 0;
 
 /* This function is called from two tasks.
@@ -43,27 +39,27 @@ int  counter = 0;
  */
 void incrementCounter(int tasknbr) {
 
-	/* gecisi degisken tan�m�n yap�lmas� */
+	/* temporary variable */
 	int c;
 
 	posSemaGet(semaphore);
 
-	/* atomic degisken bilgisinin al�nmas� */
+	/* get the variable value*/
 	c = counter;
 
-	/* indeks degerinin art�r�lmas� */
+	/* increase the temporary variable*/
 	c++;
 
-	/* Isleme beklemesinin saglanmasi */
+	/* wait the 500ms */
 	posTaskSleep(MS(500));
 
-	/* gecisi indes degerlin, atamic degere aktar�lmas� */
+	/* swap the variables */
 	counter = c;
 
-	/* gorev ve islem indeks degerinin ekranan basilmas� */
+	/* print the status */ 
 	nosPrintf2("task%i: counter = %i\n", tasknbr, counter);
 	
-	/* bir sonraki gorev durumuna gecisi yap�t�r� */
+	/* next the task */
 	posSemaSignal(semaphore);
 }
 
@@ -75,9 +71,7 @@ void task1(void *arg)
 
 	for(;;)
 	{
-		/* E�er sayac degeri 2'ye tam bolunuyor 
-		 * ise (yani cift ise) kaynak erisimi saglaniyor
-		 */
+		/* if the counter is divided by value 2, the resource is accessible*/
 		if ((counter % 2) == 0) {
 			incrementCounter(2);
 		}
@@ -92,9 +86,7 @@ void task2(void *arg)
 
 	for(;;)
 	{
-		/* E�er sayac degeri 2'ye tam bolunmuyor
-		*  ise (yani tek ise) kaynak erisimi saglaniyor
-		*/
+		/* if the counter is not divided by value 2, the resource is accessible*/
 		if ((counter % 2) == !0) {
 			incrementCounter(2);
 		}
@@ -111,31 +103,30 @@ void firsttask(void *arg)
 {
   POSTASK_t  t;
 
-#if 1
+	#if 1
 
-   /* semaphore nesnesinin 1 degeri ile baslatilmas� */
-  semaphore = posSemaCreate(1);
+	/* creating semaphore object with set one default value */
+	semaphore = posSemaCreate(1);
 
-  if (semaphore == NULL)
-  {
-    nosPrint("Failed to create a semaphore!\n");
-    return;
-  }
+	if (semaphore == NULL)
+	{
+		nosPrint("Failed to create a semaphore!\n");
+		return;
+	}
 
-#endif
+	#endif
 
-  /* ikinci gorev nesnesi */
-  t = nosTaskCreate(task2,    /* gorev methodunun pinter degeri   */
-	  NULL,					  /* varsay�lan method arguman degeri */
-	  2,					  /* islem oncelik durumu          	  */
-	  0,
-	  "task2");               /* gorev isimi        			  */
+	t = nosTaskCreate(task2,   /* ptr to function: first task that is executed */
+		NULL,				   /* optional argument, not used here             */
+		2,					   /* priority of the first task                   */
+		0,					   /* stack size for the first task, 0 = default   */
+		"task2");              /* task name      			  				   */
 
-  if (t == NULL)
-  {
-    nosPrint("Failed to start second task!\n");
-  }
+	if (t == NULL)
+	{
+		nosPrint("Failed to start second task!\n");
+	}
 
-  /*  task1 gorvein cagirilmas� */
-  task1(arg);
+    /* task1 handled */
+ 	task1(arg);
 }
