@@ -90,7 +90,20 @@ the pico]OS root directory. You can put in there your build parameters.
      BUILD = DEBUG
     #---- end of file ----
 
-Please report bugs at [github][7].
+Contributing to pico]OS development
+-----------------------------------
+
+Development takes place at [github][7].
+To submit code, please follow these guidelines:
+
+- fork the project before making changes
+- create a git branch in forked project
+- code must be under same [license][8] as rest of pico]OS (modified BSD license)
+- format code in pico]OS style
+  -- indent with 2 spaces, no tabs
+  -- try to follow style of existing source files
+- before submitting pull request consider squashing of your commits
+- submit pull request
 
 [1]: http://picoos.sf.net
 [2]: http://stonepile.fi/tags/picoos
@@ -99,4 +112,5 @@ Please report bugs at [github][7].
 [5]: http://github.com/AriZuu
 [6]: https://sourceforge.net/projects/msys2/
 [7]: http://github.com/AriZuu/picoos
+[8]: http://github.com/AriZuu/LICENSE
 
