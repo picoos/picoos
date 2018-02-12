@@ -66,12 +66,15 @@ all:
 	$(MAKECMD)ex_mutx2.c
 	$(MAKECMD)ex_sema1.c
 	$(MAKECMD)ex_sema2.c
-	$(MAKECMD)ex_sema3.c
+	$(MAKECMD)ex_sema3.c 
 	$(MAKECMD)ex_sema4.c
 	$(MAKECMD)ex_sint1.c
 	$(MAKECMD)ex_task4.c
 	$(MAKECMD)ex_timr1.c
 	$(MAKECMD)ex_timr2.c
+	$(MAKECMD)ex_sema5.c
+	$(MAKECMD)ex_task5.c
+	$(MAKECMD)ex_flag3.c
 
 clean:
 	$(MAKECLCMD)test.c NANO=0
@@ -94,6 +97,9 @@ clean:
 	$(MAKECLCMD)ex_task4.c
 	$(MAKECLCMD)ex_timr1.c
 	$(MAKECLCMD)ex_timr2.c
+	$(MAKECMD)ex_sema5.c
+	$(MAKECMD)ex_task5.c
+	$(MAKECMD)ex_flag3.c
 
 else
 
