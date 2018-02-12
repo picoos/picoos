@@ -100,8 +100,8 @@ To submit code, please follow these guidelines:
 - create a git branch in forked project
 - code must be under same [license][8] as rest of pico]OS (modified BSD license)
 - format code in pico]OS style
-  -- indent with 2 spaces, no tabs
-  -- try to follow style of existing source files
+  - indent with 2 spaces, no tabs
+  - try to follow style of existing source files
 - before submitting pull request consider squashing of your commits
 - submit pull request
 
