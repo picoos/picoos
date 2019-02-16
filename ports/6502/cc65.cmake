@@ -1,0 +1,27 @@
+set(CMAKE_SYSTEM_PROCESSOR 6502)
+
+# which compilers to use for C and C++
+set(CMAKE_C_COMPILER cl65)
+set(CMAKE_ASM_COMPILER ca65)
+
+set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
+
+# search for programs in the build host directories
+set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
+
+set(CMAKE_ASM_COMPILE_OBJECT "<CMAKE_ASM_COMPILER> <DEFINES> <INCLUDES> <FLAGS> -o <OBJECT> <SOURCE>")
+
+
+# for libraries and headers in the target directories
+set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY NEVER)
+set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE NEVER)
+set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE NEVER)
+
+# find additional toolchain executables
+find_program( CMAKE_AR ar65 )
+
+set( CMAKE_C_CREATE_STATIC_LIBRARY
+    "<CMAKE_COMMAND> -E remove <TARGET> "
+    "<CMAKE_AR> a <TARGET> <LINK_FLAGS> <OBJECTS>"
+)
+set( CMAKE_ASM_CREATE_STATIC_LIBRARY ${CMAKE_C_CREATE_STATIC_LIBRARY} )
