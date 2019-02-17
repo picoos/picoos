@@ -27,58 +27,19 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 
-include_guard(GLOBAL)
+set(PORT_DEFAULT_TOOLCHAIN GNU)
 
-enable_language(ASM)
+if(NOT DEFINED CORTEX)
+set(CORTEX m3)
+endif()
 
-# Pico layer files.
+if(CORTEX STREQUAL "m0")
 
-set(FILES_CORE src/pico/picoos.c)
-if(GENERIC_FINDBIT)
+  set(GENERIC_FINDBIT 1)
 
-  list(APPEND FILES_CORE src/pico/fbit_gen.c)
+else()
+
+  set(GENERIC_FINDBIT 0)
 
 endif()
 
-# Nano layer files.
-
-if (NANO)
-
-  file(GLOB FILES_NANO src/nano/*.c)
-  set(DEFS_NANO POSNANO)
-
-endif()
-
-# Port files
-
-file(GLOB FILES_PORT ports/${PORT}/*.c
-                     ports/${PORT}/*.s
-                     ports/${PORT}/boot/*.c
-                     ports/${PORT}/boot/*.s)
-
-if (CPU)
-
-  file(GLOB FILES_CPU ports/${PORT}/${CPU}/*.c
-                      ports/${PORT}/${CPU}/*.s
-                      ports/${PORT}/${CPU}/boot/*.c
-                      ports/${PORT}/${CPU}/boot/*.s)
-
-endif()
-
-if(CMSIS_MODULES)
-
-  add_subdirectory(${CMSIS_MODULES} cmsis)
-
-endif()
-
-# Create picoos library
-
-add_library(picoos STATIC ${FILES_CORE} ${FILES_NANO} ${FILES_PORT} ${FILES_CPU})
-target_include_directories(picoos BEFORE PUBLIC inc ${DIR_CONFIG} ports/${PORT})
-target_compile_definitions(picoos PUBLIC _POSPACK ${DEFS_NANO})
-
-if(CMSIS_MODULES)
-
-  target_link_libraries(picoos cmsis)
-
-endif()
