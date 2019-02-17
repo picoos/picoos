@@ -66,9 +66,12 @@ string(APPEND CMAKE_C_FLAGS_INIT " -Wmissing-prototypes")
 
 string(APPEND CMAKE_CXX_FLAGS_INIT " -fno-exceptions -fno-rtti")
 
-# Linker settings
+# Assembler settings
 
 string(APPEND CMAKE_ASM_FLAGS_INIT " -x assembler-with-cpp")
+
+# Linker settings
+
 string(APPEND CMAKE_EXE_LINKER_FLAGS_INIT " -Wl,--gc-sections")
 
 
