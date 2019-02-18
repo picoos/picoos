@@ -72,6 +72,6 @@ string(APPEND CMAKE_ASM_FLAGS_INIT " -x assembler-with-cpp")
 
 # Linker settings
 
-string(APPEND CMAKE_EXE_LINKER_FLAGS_INIT " -Wl,--gc-sections")
+set(CMAKE_EXE_LINKER_FLAGS_INIT " -Wl,--gc-sections")
 
 
