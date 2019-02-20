@@ -107,10 +107,10 @@ To submit code, please follow these guidelines:
 
 [1]: http://picoos.sf.net
 [2]: http://stonepile.fi/tags/picoos
-[3]: http://arizuu.github.io/picoos
+[3]: http://picoos.github.io/picoos
 [4]: http://github.com/AriZuu/picoos-micro
 [5]: http://github.com/AriZuu
 [6]: https://sourceforge.net/projects/msys2/
-[7]: http://github.com/AriZuu/picoos
-[8]: http://github.com/AriZuu/LICENSE
+[7]: http://github.com/picoos/picoos
+[8]: http://github.com/picoos/LICENSE
 
