@@ -82,3 +82,19 @@ if(CMSIS_MODULES)
   target_link_libraries(picoos cmsis)
 
 endif()
+
+# Documentation
+
+find_package(Doxygen)
+if (DOXYGEN_FOUND)
+
+  add_custom_target(picoos-docs
+        COMMAND rm -rf ${CMAKE_CURRENT_SOURCE_DIR}/doc/html
+        COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/make/doxygen.cfg
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+        COMMENT "Generating dox." )
+
+else()
+
+  message(STATUS "Doxygen missing.")
+endif()
