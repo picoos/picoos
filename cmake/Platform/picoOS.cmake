@@ -31,3 +31,18 @@ include(Platform/Generic)
 
 set(UNIX TRUE)
 set(CMAKE_EXECUTABLE_SUFFIX ".elf")
+
+if (NOT CMAKE_BUILD_TYPE)
+
+  message(STATUS "No build type selected. Using Debug.")
+  set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Build type (defaults to Debug)")
+
+endif()
+
+macro(add_peer_directory dir)
+
+  get_filename_component(ABSDIR ${dir} ABSOLUTE)
+  get_filename_component(BASE ${ABSDIR} NAME)
+  add_subdirectory(${ABSDIR} ${BASE})
+
+endmacro()
