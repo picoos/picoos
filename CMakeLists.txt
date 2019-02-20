@@ -88,9 +88,10 @@ endif()
 find_package(Doxygen)
 if (DOXYGEN_FOUND)
 
+  configure_file(make/doxygen.cfg.in doxygen.cfg)
   add_custom_target(picoos-docs
         COMMAND rm -rf ${CMAKE_CURRENT_SOURCE_DIR}/doc/html
-        COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/make/doxygen.cfg
+        COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/doxygen.cfg
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
         COMMENT "Generating dox." )
 
