@@ -225,7 +225,7 @@ void printListContent1(POSLISTHEAD_t *listhead)
   {
     i++;
     e = POSLIST_ELEMENT(pl, ELEMENT_t, list);
-    nosPrintf2("%i.element, data = %i\n", i, e->data);
+    nosPrintf("%i.element, data = %i\n", i, e->data);
   }
 }
 
@@ -243,7 +243,7 @@ void printListContent2(POSLISTHEAD_t *listhead)
   POSLIST_FOREACH_BEGIN(listhead, e, ELEMENT_t, list)
   {
     i++;
-    nosPrintf2("%i.element, data = %i\n", i, e->data);
+    nosPrintf("%i.element, data = %i\n", i, e->data);
   }
   POSLIST_FOREACH_END;
 }
@@ -266,13 +266,13 @@ void list1_task(void *arg)
     pl = posListGet(&listhead1_g, POSLIST_HEAD, INFINITE);
     if (pl == NULL)
     {
-      nosPrintf1("%05u list2_task: error\n", jiffies);
+      nosPrintf("%05u list2_task: error\n", jiffies);
       break;
     }
 
     /* print element */
     e = POSLIST_ELEMENT(pl, ELEMENT_t, list);
-    nosPrintf2("%05u list1_task: got buffer, data = %i\n",
+    nosPrintf("%05u list1_task: got buffer, data = %i\n",
                jiffies, e->data);
 
     /* free memory of element */
@@ -303,7 +303,7 @@ void list2_task(void *arg)
     pl = posListGet(&listhead2_g, POSLIST_HEAD, MS(2000));
     if (pl == NULL)
     {
-      nosPrintf1("%05u list2_task: timeout\n", jiffies);
+      nosPrintf("%05u list2_task: timeout\n", jiffies);
       if (++tocnt == 6)
       {
         nosPrint("list2_task terminated.\n");
@@ -315,7 +315,7 @@ void list2_task(void *arg)
     {
       /* print element */
       e = POSLIST_ELEMENT(pl, ELEMENT_t, list);
-      nosPrintf2("%05u list2_task: got buffer, data = %i\n",
+      nosPrintf("%05u list2_task: got buffer, data = %i\n",
                  jiffies, e->data);
 
       /* put element into list 1 */
@@ -368,17 +368,17 @@ void task1(void *arg)
   
   nosPrint("List 1:\n");
   printListContent1(&listhead1_g);
-  nosPrintf1("Length of list 1 = %i\n", posListLen(&listhead1_g));
+  nosPrintf("Length of list 1 = %i\n", posListLen(&listhead1_g));
   nosPrint("\nList 2:\n");
   printListContent2(&listhead2_g);
-  nosPrintf1("Length of list 2 = %i\n", posListLen(&listhead2_g));
+  nosPrintf("Length of list 2 = %i\n", posListLen(&listhead2_g));
 
 
   /* get first element from list 1 */
 
   nosPrint("\nRemove first element from list1:\n");
   listel = posListGet(&listhead1_g, POSLIST_HEAD, 0);
-  nosPrintf1("element.data = %i\n",
+  nosPrintf("element.data = %i\n",
              POSLIST_ELEMENT(listel, ELEMENT_t, list)->data);
   nosPrint("\nNew list 1: <key>\n");
   nosKeyGet();

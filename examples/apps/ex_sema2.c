@@ -66,7 +66,7 @@ void incrementCounter(int tasknbr)
   counter = c;
 
   /* print some text */
-  nosPrintf2("task%i: counter = %i\n", tasknbr, counter);
+  nosPrintf("task%i: counter = %i\n", tasknbr, counter);
 
   /* quit exclusive access to the counter variable */
   posSemaSignal(semaphore);

@@ -56,7 +56,7 @@ void incrementCounter(int tasknbr, int r)
   posMutexLock(mutex);
 
   /* print some text */
-  nosPrintf3("task%i(%i): counter = %i\n", tasknbr, r, counter);
+  nosPrintf("task%i(%i): counter = %i\n", tasknbr, r, counter);
 
   /* increment counter (read... */
   c = counter;

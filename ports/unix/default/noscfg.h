@@ -250,6 +250,9 @@ extern void *__heap_end;
  */
 #define NOSCFG_FEATURE_SPRINTF       1
 
+/** Modern printf.
+ */
+#define NOSCFG_FEATURE_USE_STDARG    1
 /** @} */
 
 

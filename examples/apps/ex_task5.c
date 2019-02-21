@@ -58,7 +58,7 @@ void incrementCounter(int tasknbr) {
 	counter = c;
 
 	/* print the status */
-	nosPrintf2("task%i: counter = %i\n", tasknbr, counter);
+	nosPrintf("task%i: counter = %i\n", tasknbr, counter);
 	
 	/* next the semaphore */
 	posSemaSignal(semaphore);

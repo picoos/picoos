@@ -74,7 +74,7 @@ void secondtask(void *arg)
   for(;;)
   {
     /* print string: "Task 2" */
-    nosPrintf1("%s\n", name);
+    nosPrintf("%s\n", name);
 
     /* sleep (=do nothing) for two seconds */
     nosTaskSleep(MS(2000));

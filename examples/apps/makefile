@@ -31,9 +31,9 @@
 #  (http://picoos.sourceforge.net).
 
 
-# The default port is x86w32
+# The default port is unix
 ifeq '$(strip $(PORT))' ''
-PORT = x86w32
+PORT = unix
 endif
 export PORT
 

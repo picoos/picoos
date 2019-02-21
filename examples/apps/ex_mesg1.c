@@ -79,7 +79,7 @@ void printerTask(void *arg)
 
     /* print the content of the buffer,
        regardless of the message type */
-    nosPrintf1("printer task: %s", msg->buffer);
+    nosPrintf("printer task: %s", msg->buffer);
 
     /* free the message buffer again */
     posMessageFree(msg);

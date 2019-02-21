@@ -119,7 +119,7 @@ void timertask(void *arg)
     posSemaGet(semaphore);
 
     /* print some text */
-    nosPrintf1("%i. timertask: got the semaphore\n", ++i);
+    nosPrintf("%i. timertask: got the semaphore\n", ++i);
   }
 }
 
