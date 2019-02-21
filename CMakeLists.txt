@@ -75,6 +75,11 @@ endif()
 
 add_library(picoos STATIC ${FILES_CORE} ${FILES_NANO} ${FILES_PORT} ${FILES_CPU})
 target_include_directories(picoos BEFORE PUBLIC inc ${DIR_CONFIG} ports/${PORT})
+
+if(CMAKE_C_COMPILER_ID STREQUAL "Clang")
+  target_compile_options(picoos PRIVATE -Wno-parentheses-equality)
+endif()
+
 target_compile_definitions(picoos PUBLIC _POSPACK ${DEFS_NANO})
 
 if(CMSIS_MODULES)
