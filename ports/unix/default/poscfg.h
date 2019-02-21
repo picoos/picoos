@@ -528,6 +528,10 @@
  * way too small for unix system. If requested size
  * is less than this use minimum value instead.
  */
-#define POSCFG_MIN_STACK_SIZE	65535
+#define PORTCFG_MIN_STACK_SIZE	65535
+
+/** Set IRQ stack size.
+ */
+#define PORTCFG_IRQ_STACK_SIZE 1024
 
 #endif /* _POSCFG_H */

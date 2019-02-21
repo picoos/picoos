@@ -72,7 +72,7 @@ void firsttask(void *arg)
   for(;;)
   {
     /* print some text */
-    nosPrintf1("\nfirsttask: going to signal flag %i\n", i);
+    nosPrintf("\nfirsttask: going to signal flag %i\n", i);
 
     /* signal the flag event (trigger the other task) */
     posFlagSet(flagset, i);
@@ -110,14 +110,14 @@ void eventtask(void *arg)
     }
     else
     {
-      nosPrintf1("eventtask: got flags: 0x%02x -", f);
+      nosPrintf("eventtask: got flags: 0x%02x -", f);
 
       i = 0;
       while (f != 0)
       {
         if ((f & 1) != 0)
         {
-          nosPrintf1(" %i", i);
+          nosPrintf(" %i", i);
         }
         i++;
         f >>= 1;

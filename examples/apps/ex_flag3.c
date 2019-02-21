@@ -67,7 +67,7 @@ void incrementCounter(int tasknbr) {
 	counter = c;
 
 	/* print the status */ 
-	nosPrintf2("task%i: counter = %i\n", tasknbr, counter);
+	nosPrintf("task%i: counter = %i\n", tasknbr, counter);
 	
 	/* flag state change control */
 	if(tasknbr == taskCount){
@@ -98,12 +98,12 @@ void task1(void *arg)
 	
 		f = posFlagGet(flagset, POSFLAG_MODE_GETSINGLE);
 		
-		nosPrintf1("\nfirsttask: going to signal flag %i\n", f);
+		nosPrintf("\nfirsttask: going to signal flag %i\n", f);
 		
 		if(f==1){
 			incrementCounter(1);
 			posFlagSet(flagset, 2);
-			nosPrintf1("flag value = %i\n",f);
+			nosPrintf("flag value = %i\n",f);
 			task2(arg);
 		} 
 		
@@ -133,7 +133,7 @@ void task2(void *arg)
 		
 		/* flag status update */
 		posFlagSet(flagset, 3);
-		nosPrintf1("flag value = %i\n",f);
+		nosPrintf("flag value = %i\n",f);
 		
 		/* do something here and waste some time */
 		posTaskSleep(MS(500));
@@ -158,7 +158,7 @@ void task3(void *arg)
 		}
 			
 		posFlagSet(flagset, 1);
-		nosPrintf1("flag value = %i\n",f);
+		nosPrintf("flag value = %i\n",f);
 		
 		posTaskSleep(MS(500));
 	}

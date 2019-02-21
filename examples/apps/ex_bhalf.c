@@ -85,7 +85,7 @@ void bottomhalf(void *arg, UVAR_t bh)
 
   /* print some text (this should usually not be done
      from within a bottom half!) */
-  nosPrintf2("bottom half %i running, counter = %i\n", bh, intCounter);
+  nosPrintf("bottom half %i running, counter = %i\n", bh, intCounter);
 }
 
 

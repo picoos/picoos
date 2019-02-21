@@ -77,7 +77,7 @@ void sharedResource(int tasknbr)
    * that are currently executing this section of code.
    */
   c = posAtomicGet(&counter);
-  nosPrintf2("task%i: counter = %i\n", tasknbr, c);
+  nosPrintf("task%i: counter = %i\n", tasknbr, c);
 
   /* decrement global counter */
   posAtomicSub(&counter, 1);

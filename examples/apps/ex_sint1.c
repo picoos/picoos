@@ -94,7 +94,7 @@ void task2(void *arg)
     /* We got a signal from the ISR.
      * Print now the counter.
      */
-    nosPrintf1("interrupt signalled, counter = %i\n", isrCounter);
+    nosPrintf("interrupt signalled, counter = %i\n", isrCounter);
   }
 }
 

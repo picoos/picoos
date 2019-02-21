@@ -129,7 +129,7 @@ void receiverTask(void *arg)
       case MSGID_PRINTNUMBER:
       {
         /* print the number stored in the message */
-        nosPrintf1("number: %i\n", msg->payload.number);
+        nosPrintf("number: %i\n", msg->payload.number);
         posMessageFree(msg);
         break;
       }
