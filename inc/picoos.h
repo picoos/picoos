@@ -526,7 +526,7 @@
 #else
 #define SYS_POSTALLOCATE    0
 #endif
-#if (MVAR_BITS != 8) && (MVAR_BITS != 16) && (MVAR_BITS != 32)
+#if (MVAR_BITS != 8) && (MVAR_BITS != 16) && (MVAR_BITS != 32) && (MVAR_BITS != 64)
 #error MVAR_BITS must be 8, 16 or 32
 #endif
 #if POSCFG_MAX_PRIO_LEVEL == 0
