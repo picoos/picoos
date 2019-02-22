@@ -1,0 +1,88 @@
+/** @file CMakeLists.txt *//**
+@defgroup cmake Using CMake
+@ingroup intro
+
+
+                     <h3> Introduction </h3>
+
+Since version 1.2 it is possible to use CMake to build pico]OS to build
+things instead of traditional GNU Make -based system. As CMake has a bit
+higher abstraction level than GNU Make, it is easier to handle build of
+complex systems with many separate modules. @n
+
+pico]OS needs modern CMake, 3.13 or newer. @n
+
+
+@n                 <h3> Building firmware or executable </h3>
+
+To build pico]OS libraries and executables one has to write a 
+CMakeLists.txt file. Standard CMake documentation can be followed,
+as long as some special requirements are remembered. @n
+
+Here is a minimal CMakeFiles.txt which builds a small 6502 application:
+
+@code
+cmake_minimum_required(VERSION 3.13)
+
+set(PORT 6502)
+set(NANO 0)
+set(DIR_CONFIG ${CMAKE_CURRENT_SOURCE_DIR})
+
+include(../../cmake/ToolchainInit.cmake)
+
+project(example)
+
+add_peer_directory(${PICOOS_DIR})
+
+add_executable(example example.c)
+target_link_libraries(example picoos)
+
+@endcode
+
+This example defines following CMake variables: @n
+
+- @c PORT       Which pico]OS port to use. Here 6502 is used, but it could something else, like cortex-m (for arm stuff)
+- @c NANO       1 or 0 to indicate if pico]OS nano layer is neeeded
+- @c DIR_CONFIG directory which contains pico]OS configuration files (poscfg.h & noscfg.h)
+
+To perform some initialization like default toolchain definitions from ports,
+CMakeLists.txt should include ToolchainInit.cmake from pico]OS cmake directory.
+To include libraries in current module, add_peer_directory macro is provided (this
+corresponds to standard CMake add_subdirectory, except that directory is not
+subdirectory). @n
+
+Module that needs pico]OS functions should always include it in project and
+use target_link_libraries to add it to current module output.
+
+After CMakeLists.txt is completed, the module can be build like this:
+@code
+
+mkdir Debug
+cd Debug
+cmake -DCMAKE_BUILD_TYPE=Debug ..
+make
+
+@endcode
+
+Notice that usual CMake style is to perform builds outside the source directory (like the "Debug" directory here).
+
+@n               <h3> Port configuration in port.cmake </h3>
+
+Each platform port need to have a port.cmake file. It is used to
+provide common settings like default toolchain for compilation.
+
+
+@code
+
+set(PORT_DEFAULT_TOOLCHAIN GNU)
+set(GENERIC_FINDBIT 1)
+
+@endcode
+
+pico]OS toolchain initialization loads port.cmake before project() in CMakeLists.txt.
+Following variables are supported:
+
+- @c PORT_DEFAULT_TOOLCHAIN Used to set CMAKE_TOOLCHAIN_FILE if not already set. A cmake include file (like GNU.cmake) is expected to be found in port directory.
+- @c GENERIC_FINDBIT If set to 1, the file fbit_gen.c is compiled into pico]OS library.
+
+*/

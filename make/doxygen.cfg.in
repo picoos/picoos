@@ -66,7 +66,8 @@ INPUT                  = inc/picoos.h inc/pos_nano.h \
                          examples/config/poscfg.h \
                          examples/config/port.h \
                          examples/config/noscfg.h \
-                         make/makehelp.txt
+                         make/makehelp.txt \
+                         cmake/cmakehelp.txt \
 FILE_PATTERNS          = 
 RECURSIVE              = NO
 EXCLUDE                = 
