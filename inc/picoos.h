@@ -22,7 +22,11 @@
  * <ul><li> @ref intro <ul>
  *   <li> @ref layer    </li><li> @ref port      </li>
  *   <li> @ref debug    </li><li> @ref make      </li>
+<<<<<<< HEAD
  *   <li> @ref cmake      </li></ul></li></ul>
+=======
+ *   <li> @ref cmake    </li></ul></li></ul>
+>>>>>>> v112
  * <ul><li><b>Configuration</b><ul>
  *   <li><b>Pico Layer</b><ul>
  *     <li> @ref arch     </li><li> @ref codestyle </li>
@@ -164,7 +168,7 @@
  * @section license License
  *
  *  Copyright (c) 2004-2012, Dennis Kuschel. @n
- *  Copyright (c) 2011-2016, Ari Suutari. @n
+ *  Copyright (c) 2011-2019, Ari Suutari. @n
  *  All rights reserved. @n
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -194,11 +198,7 @@
  *
  * @n@n
  * @section cont Contact Information
- * Dennis Kuschel @n
- * Kurt-Georg-Kiesinger-Allee 14 @n
- * 28279 Bremen @n
- * GERMANY @n
- *
+ * Dennis Kuschel (original author) @n
  * mail: dennis_k@freenet.de @n
  * web:  http://picoos.sourceforge.net @n
  *
@@ -247,7 +247,7 @@
  * is disabled by default to lower the memory usage for small devices.
  * There are two ways to enable the nano layer: First, if you run your
  * makefile, you can add the parameter @c NANO=1 to the make command line.
- * Second, you can set this parameter in your application makefile. @n
+ * Second, you can set this parameter in your application makefile or CMakeLists.txt. @n
  * If the parameter @c NANO is set to 1, the makesystem will automatically
  * compile and link the nano layer source files. Also the global define
  * @c POSCFG_ENABLE_NANO is set, so you can test from within your sources
@@ -262,10 +262,10 @@
 #define _PICOOS_H
 
 
-#define POS_VER_N           0x0112
-#define POS_VER_S           "1.1.2"
+#define POS_VER_N           0x0120
+#define POS_VER_S           "1.2.0"
 #define POS_COPYRIGHT       "(c) 2004-2012, Dennis Kuschel\n" \
-                            "(c) 2011-2017, Ari Suutari"
+                            "(c) 2011-2019, Ari Suutari"
 
 #define POS_STARTUPSTRING   "pico]OS " POS_VER_S "\n" POS_COPYRIGHT
 
