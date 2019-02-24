@@ -23,6 +23,7 @@ Compared to latest sf.net release (1.0.4) it has following updates:
   (otherwise projects that had many directories run into troubles)
 - Pico & nano layers are augmented by [micro-layer][4], which contains 
   support for filesystems (and some other things)
+- Support for using CMake as build system instead of GNU Make
 
 I'm also actively maintaining hardware support for some environments:
 
