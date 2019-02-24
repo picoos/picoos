@@ -22,11 +22,7 @@
  * <ul><li> @ref intro <ul>
  *   <li> @ref layer    </li><li> @ref port      </li>
  *   <li> @ref debug    </li><li> @ref make      </li>
-<<<<<<< HEAD
- *   <li> @ref cmake      </li></ul></li></ul>
-=======
  *   <li> @ref cmake    </li></ul></li></ul>
->>>>>>> v112
  * <ul><li><b>Configuration</b><ul>
  *   <li><b>Pico Layer</b><ul>
  *     <li> @ref arch     </li><li> @ref codestyle </li>
