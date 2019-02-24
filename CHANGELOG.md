@@ -1,5 +1,7 @@
 # Change Log
 
+## [1.2.1 Unreleased]
+
 ## [1.2.0]
 - add posTimerCallbackSet to create a callback timer instead of normal one.
   Callback is done from timer interrupt context with scheduler lock,

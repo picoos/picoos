@@ -258,8 +258,8 @@
 #define _PICOOS_H
 
 
-#define POS_VER_N           0x0120
-#define POS_VER_S           "1.2.0"
+#define POS_VER_N           0x0121
+#define POS_VER_S           "1.2.1"
 #define POS_COPYRIGHT       "(c) 2004-2012, Dennis Kuschel\n" \
                             "(c) 2011-2019, Ari Suutari"
 
