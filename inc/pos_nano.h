@@ -324,7 +324,7 @@ NANOEXT void POSCALL nosMemFree(void *p);
  *          ::NOSCFG_MEM_MANAGE_MODE is set to 1
  * @sa      nosMemAlloc, nosMemFree, NOSCFG_MEM_MANAGER_TYPE
  */
-NANOEXT void POSCALL *nosMemRealloc(void *memblock, UINT_t size);
+NANOEXT void* POSCALL nosMemRealloc(void *memblock, UINT_t size);
 #endif
 
 /* overwrite standard memory allocation functions */
