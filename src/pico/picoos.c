@@ -2668,6 +2668,10 @@ VAR_t POSCALL posTimerSet(POSTIMER_t tmr, POSSEMA_t sema,
                           UINT_t waitticks, UINT_t periodticks)
 {
   register EVENT_t  ev = (EVENT_t) sema;
+#if POSCFG_FEATURE_TIMERCALLBACK == 0
+  register TIMER_t  *t = (TIMER_t*) tmr;
+#endif
+
   P_ASSERT("posTimerSet: semaphore valid", sema != NULL);
   POS_ARGCHECK_RET(ev, ev->e.magic, POSMAGIC_EVENTU, -E_ARG); 
 
@@ -2675,7 +2679,6 @@ VAR_t POSCALL posTimerSet(POSTIMER_t tmr, POSSEMA_t sema,
   return posTimerCallbackSet(tmr, pos_timerSemaSignal, sema,
                              waitticks, periodticks);
 #else
-  register TIMER_t  *t = (TIMER_t*) tmr;
   POS_LOCKFLAGS;
 
   P_ASSERT("posTimerSet: timer valid", tmr != NULL);
