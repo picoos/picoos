@@ -27,5 +27,48 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 
-set(PORT_DEFAULT_TOOLCHAIN GNU)
-set(GENERIC_FINDBIT 1)
+set(CMAKE_SYSTEM_PROCESSOR MSP430)
+
+# which compilers to use for C and C++
+
+set(CMAKE_C_COMPILER msp430-elf-gcc)
+set(CMAKE_CXX_COMPILER msp430-elf-g++)
+set(CMAKE_ASM_COMPILER msp430-elf-gcc)
+set(CMAKE_OBJCOPY msp430-elf-objcopy)
+set(CMAKE_OBJDUMP msp430-elf-objdump)
+
+set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
+
+# search settings
+
+set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
+set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY NEVER)
+set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE NEVER)
+set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE NEVER)
+
+# find additional toolchain executables
+
+find_program(MSP430_SIZE_EXECUTABLE msp430-elf-size)
+find_program(MSP430_OBJCOPY_EXECUTABLE msp430-elf-objcopy)
+find_program(MSP430_OBJDUMP_EXECUTABLE msp430-elf-objdump)
+
+# MCU setting
+
+set(CMAKE_C_FLAGS_INIT "-mmcu=${MCU}")
+set(CMAKE_ASM_FLAGS_INIT "-mmcu=${MCU}")
+
+# Common GNU settings for all ports
+
+include(ToolchainGNU-Common)
+
+# Linker settings to create image.
+
+string(APPEND CMAKE_EXE_LINKER_FLAGS_INIT " -Wl,-Map,${PROJECT_NAME}.map,")
+string(APPEND CMAKE_EXE_LINKER_FLAGS_INIT "--cref")
+
+# TI gcc doesn't know where it's own includes are located :-)
+
+get_filename_component(TI_TOOLCHAIN_BIN ${MSP430_OBJDUMP_EXECUTABLE} DIRECTORY)
+get_filename_component(TI_TOOLCHAIN ${TI_TOOLCHAIN_BIN} DIRECTORY)
+string(APPEND CMAKE_C_FLAGS_INIT " -I${TI_TOOLCHAIN}/include")
+string(APPEND CMAKE_EXE_LINKER_FLAGS_INIT " -L${TI_TOOLCHAIN}/include")

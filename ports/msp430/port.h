@@ -252,13 +252,21 @@
  * code that stores the processor state and disables
  * the interrupts. See ::POSCFG_LOCK_FLAGSTYPE for more details.
  */
+#if __GNUC__ == 4
 #define POS_SCHED_LOCK          { flags = __read_status_register() & GIE; __dint(); }
+#else
+#define POS_SCHED_LOCK          { flags = __get_SR_register() & GIE; __dint(); }
+#endif
 
 /** Scheduler unlocking.
  * This is the counterpart macro of ::POS_SCHED_LOCK. It restores
  * the saved processor flags and reenables the interrupts this way.
  */
+#if __GNUC__ == 4
 #define POS_SCHED_UNLOCK        { __bis_status_register(flags); }
+#else
+#define POS_SCHED_UNLOCK        { __bis_SR_register(flags); }
+#endif
 
 /** @} */
 

@@ -61,11 +61,19 @@ EXT_OUT = .elf
 #
 
 # Define tools: compiler, assembler, archiver, linker
+ifeq '$(strip $(COMPILER))' 'MSPGCC4'
 CXX = msp430-g++
 CC = msp430-gcc
 AS = msp430-gcc
 AR = msp430-ar
 LD = msp430-gcc
+else
+CXX = msp430-elf-g++
+CC = msp430-elf-gcc
+AS = msp430-elf-gcc
+AR = msp430-elf-ar
+LD = msp430-elf-gcc
+endif
 
 # Define to 1 if CC outputs an assembly file
 CC2ASM = 0

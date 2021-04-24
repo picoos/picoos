@@ -55,7 +55,11 @@ extern unsigned int _end[];
 extern unsigned int __stack[];
 void __pos_nos_malloc_init(void);
 
+#if __GNUC__ == 4
 __attribute__((naked, section(".init8"))) __attribute__ ((__optimize__("omit-frame-pointer"))) void __pos_nos_malloc_init()
+#else
+__attribute__((naked, section(".crt_0690pos_init"))) __attribute__ ((__optimize__("omit-frame-pointer"))) void __pos_nos_malloc_init()
+#endif
 {
   /*
    * Start heap after .bss segment, align it upwards.
@@ -75,7 +79,11 @@ __attribute__((naked, section(".init8"))) __attribute__ ((__optimize__("omit-fra
   /*
    * Fill unused portion of IRQ stack with PORT_STACK_MAGIC.
    */
+#if __GNUC__ == 4
   register unsigned char* s = (unsigned char*) __read_stack_pointer() - 10; // Just to be sure not to overwrite anything
+#else
+  register unsigned char* s = (unsigned char*) __get_SP_register() - 10; // Just to be sure not to overwrite anything
+#endif
 
   while (s >= portIrqStack) {
 
@@ -325,7 +333,11 @@ void p_pos_powerSleep()
 #if defined(__MSP430_HAS_UART1__) && (PORTCFG_CON_PERIPH == 2)
   if (!(U1TCTL & TXEPT) || !(U1TCTL & SSEL0)) { // Cannot stop SMCLK if USART is working
 
+#if __GNUC__ == 4
     __bis_status_register(LPM0_bits | GIE);
+#else
+    __bis_SR_register(LPM0_bits | GIE);
+#endif
     __dint();
     return;
   }
@@ -344,7 +356,11 @@ void p_pos_powerSleep()
 
 #endif
 
+#if __GNUC__ == 4
   __bis_status_register(LPM3_bits | GIE);
+#else
+  __bis_SR_register(LPM3_bits | GIE);
+#endif
   __dint();
 
 #if defined(__MSP430_HAS_UCS_RF__) || defined(__MSP430_HAS_UCS__)
