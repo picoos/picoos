@@ -294,7 +294,7 @@ void PORT_NAKED portRestoreContextImpl(void)
 
   if (posInInterrupt_g == 0) {
 
-    asm volatile("mov %0, r1" : : "m"(posCurrentTask_g->stackptr) : "r1");
+    asm volatile("mov %0, r1" : : "m"(posCurrentTask_g->stackptr));
   }
 
 #ifdef __MSP430X__

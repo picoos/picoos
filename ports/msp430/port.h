@@ -457,7 +457,7 @@ extern void p_pos_assert(const char* text, const char *file, int line);
     asm volatile("mov r1, %[ts]\n\t"             \
                  "mov %[is], r1"                 \
         : [ts]"=m"(posCurrentTask_g->stackptr)   \
-        : [is]"r"(__stack) : "r1");              \
+        : [is]"r"(__stack));                     \
       if (POSCFG_ARGCHECK > 1)                   \
             P_ASSERT("TStk", (posCurrentTask_g->stack[0] == PORT_STACK_MAGIC)); \
         } \
