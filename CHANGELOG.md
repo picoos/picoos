@@ -1,6 +1,7 @@
 # Change Log
 
 ## [1.2.1 Unreleased]
+- add support for Texas Instrument MSP430 GCC (v9)
 
 ## [1.2.0]
 - add posTimerCallbackSet to create a callback timer instead of normal one.
