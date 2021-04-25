@@ -36,7 +36,7 @@
 # Set default compiler.
 # Possible compilers are currently GCC (GNU C).
 ifeq '$(strip $(COMPILER))' ''
-COMPILER = GCC
+COMPILER = MSPGCC4
 endif
 export COMPILER
 
