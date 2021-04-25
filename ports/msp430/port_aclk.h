@@ -34,11 +34,11 @@
 
 #else
 
-#if defined(__msp430x22x4) || defined(__msp430x22x2) || defined(__MSP430G2553__) || defined(__MSP430G2533__)
+#if defined(__MSP430F2274__)
 
 #define PORT_ACLK_HZ 12000      // VLO on msp430x2xx is 12 Khz
 
-#elif defined(__cc430x513x)
+#elif defined(__CC430F5137__)
 
 #define PORT_ACLK_HZ 10000      // VLO on msp430x5xx is 10 Khz
 
