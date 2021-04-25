@@ -90,7 +90,11 @@ static void initFll(uint16_t fsystem, uint16_t fref)
 
 // Before tweaking clock parameters, disable FLL.
 
+#if __GNUC__ == 4
   __bis_status_register(SCG0);
+#else
+  __bis_SR_register(SCG0);
+#endif
 
 // Set FLL parameters. First put DCO to lowest tap,
 // then set new FLLD and FLLN values.
@@ -114,7 +118,11 @@ static void initFll(uint16_t fsystem, uint16_t fref)
 
 // Enable FLL again.
 
+#if __GNUC__ == 4
   __bic_status_register(SCG0);
+#else
+  __bic_SR_register(SCG0);
+#endif
 
 // Wait for DCO fault flag to clear.
 
