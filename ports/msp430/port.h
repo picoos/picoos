@@ -255,7 +255,7 @@
 #if __GNUC__ == 4
 #define POS_SCHED_LOCK          { flags = __read_status_register() & GIE; __dint(); }
 #else
-#define POS_SCHED_LOCK          { flags = __get_SR_register() & GIE; __dint(); }
+#define POS_SCHED_LOCK          { flags = _get_SR_register() & GIE; _disable_interrupts(); }
 #endif
 
 /** Scheduler unlocking.
@@ -265,7 +265,7 @@
 #if __GNUC__ == 4
 #define POS_SCHED_UNLOCK        { __bis_status_register(flags); }
 #else
-#define POS_SCHED_UNLOCK        { __bis_SR_register(flags); }
+#define POS_SCHED_UNLOCK        { _bis_SR_register(flags); }
 #endif
 
 /** @} */

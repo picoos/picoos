@@ -82,7 +82,7 @@ __attribute__((naked, section(".crt_0690pos_init"))) __attribute__ ((__optimize_
 #if __GNUC__ == 4
   register unsigned char* s = (unsigned char*) __read_stack_pointer() - 10; // Just to be sure not to overwrite anything
 #else
-  register unsigned char* s = (unsigned char*) __get_SP_register() - 10; // Just to be sure not to overwrite anything
+  register unsigned char* s = (unsigned char*) _get_SP_register() - 10; // Just to be sure not to overwrite anything
 #endif
 
   while (s >= portIrqStack) {
@@ -254,7 +254,7 @@ void p_pos_initArch(void)
 void PORT_NAKED p_pos_softContextSwitch(void)
 {
   asm volatile ("push r2");
-  __dint();
+  _disable_interrupts();
 
   portSaveContext();
   posCurrentTask_g = posNextTask_g;
@@ -336,9 +336,9 @@ void p_pos_powerSleep()
 #if __GNUC__ == 4
     __bis_status_register(LPM0_bits | GIE);
 #else
-    __bis_SR_register(LPM0_bits | GIE);
+    _bis_SR_register(LPM0_bits | GIE);
 #endif
-    __dint();
+    _disable_interrupts();
     return;
   }
 #endif
@@ -359,9 +359,9 @@ void p_pos_powerSleep()
 #if __GNUC__ == 4
   __bis_status_register(LPM3_bits | GIE);
 #else
-  __bis_SR_register(LPM3_bits | GIE);
+  _bis_SR_register(LPM3_bits | GIE);
 #endif
-  __dint();
+  _disable_interrupts();
 
 #if defined(__MSP430_HAS_UCS_RF__) || defined(__MSP430_HAS_UCS__)
 
@@ -389,7 +389,7 @@ void p_pos_powerSleep()
 void p_pos_assert(const char* text, const char *file, int line)
 {
 // Something fatal, stay here forever.
-  __dint();
+  _disable_interrupts();
   while(1);
 }
 #endif

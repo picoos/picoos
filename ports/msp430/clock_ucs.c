@@ -93,7 +93,7 @@ static void initFll(uint16_t fsystem, uint16_t fref)
 #if __GNUC__ == 4
   __bis_status_register(SCG0);
 #else
-  __bis_SR_register(SCG0);
+  _bis_SR_register(SCG0);
 #endif
 
 // Set FLL parameters. First put DCO to lowest tap,
@@ -121,7 +121,7 @@ static void initFll(uint16_t fsystem, uint16_t fref)
 #if __GNUC__ == 4
   __bic_status_register(SCG0);
 #else
-  __bic_SR_register(SCG0);
+  _bic_SR_register(SCG0);
 #endif
 
 // Wait for DCO fault flag to clear.
