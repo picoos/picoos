@@ -71,6 +71,14 @@ if(CMSIS_MODULES)
 
 endif()
 
+if(HAL_MODULES)
+
+  foreach(M ${HAL_MODULES})
+     add_peer_directory(${M})
+  endforeach()
+
+endif()
+
 # Create picoos library
 
 add_library(picoos STATIC ${FILES_CORE} ${FILES_NANO} ${FILES_PORT} ${FILES_CPU})
@@ -85,6 +93,15 @@ target_compile_definitions(picoos PUBLIC _POSPACK ${DEFS_NANO})
 if(CMSIS_MODULES)
 
   target_link_libraries(picoos cmsis)
+
+endif()
+
+if(HAL_MODULES)
+
+  foreach(M ${HAL_MODULES})
+     get_filename_component(BASE ${M} NAME)
+     target_link_libraries(picoos ${BASE})
+  endforeach()
 
 endif()
 
