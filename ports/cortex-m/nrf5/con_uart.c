@@ -78,7 +78,9 @@ UVAR_t p_putchar(char c)
 
 void UART0_IRQHandler()
 {
+#if NOSCFG_FEATURE_CONIN == 1
   unsigned char ch;
+#endif
 
   c_pos_intEnter();
 
