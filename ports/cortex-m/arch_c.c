@@ -57,8 +57,8 @@
 /*
  * Svc numbers.
  */
-#define SVC_START_FIRST_CONTEXT    0
-#define SVC_SOFT_CONTEXT_SWITCH    1
+#define SVC_START_FIRST_CONTEXT    1
+#define SVC_SOFT_CONTEXT_SWITCH    2
 
 static inline void constructStackFrame(POSTASK_t task, void* stackPtr, POSTASKFUNC_t funcptr, void *funcarg);
 void timerIrqHandler(void);
@@ -444,7 +444,7 @@ void p_pos_initArch(void)
 
 void p_pos_softContextSwitch(void)
 {
-  asm volatile("svc 1");
+  asm volatile("svc 2");
 }
 
 /*
@@ -490,7 +490,7 @@ void PORT_NAKED p_pos_startFirstContext()
   __enable_irq();
 #endif
 
-  asm volatile("svc 0");
+  asm volatile("svc 1");
 }
 
 /*
