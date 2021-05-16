@@ -2782,7 +2782,7 @@ POSEXTERN INT_t POSCALL posAtomicSub(POSATOMIC_t *var, INT_t value);
  *                    POSLIST_HEAD to add the element to the head of
  *                    the list or POSLIST_TAIL to add the element to
  *                    the tail of the list.
- * @param   new       pointer to the list element to add.
+ * @param   elem      pointer to the list element to add.
  * @note    ::POSCFG_FEATURE_LISTS must be defined to 1 
  *          to have list support compiled in. @n
  *          Note that list heads must be initialized before elements
@@ -2790,7 +2790,7 @@ POSEXTERN INT_t POSCALL posAtomicSub(POSATOMIC_t *var, INT_t value);
  * @sa      posListGet, posListLen, posListRemove, posListJoin, posListInit
  */
 POSEXTERN void POSCALL posListAdd(POSLISTHEAD_t *listhead, UVAR_t pos,
-                                  POSLIST_t *new);
+                                  POSLIST_t *elem);
 
 /**
  * List Function.
