@@ -1,11 +1,11 @@
 /*
  * Copyright (c) 2011-2013, Ari Suutari <ari@stonepile.fi>.
- * All rights reserved. 
- * 
+ * All rights reserved.
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
- * 
+ *
  *  1. Redistributions of source code must retain the above copyright
  *     notice, this list of conditions and the following disclaimer.
  *  2. Redistributions in binary form must reproduce the above copyright
@@ -13,8 +13,8 @@
  *     documentation and/or other materials provided with the distribution.
  *  3. The name of the author may not be used to endorse or promote
  *     products derived from this software without specific prior written
- *     permission. 
- * 
+ *     permission.
+ *
  * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS
  * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -351,9 +351,9 @@ void p_pos_freeStack(POSTASK_t task)
  * task is still running with this stack for short time.
  *
  * Just save pointer to stack to be free'd and
- * free it later (first check that previous 
+ * free it later (first check that previous
  * pending free is already done).
- * 
+ *
  * Stack will be freed during context switch.
  */
   checkPendingFreeStack();
@@ -437,7 +437,7 @@ void p_pos_initArch(void)
  * Called by pico]OS to switch tasks when not serving interrupt.
  * Since we run tasks in system/user mode, "swi" instruction is
  * used to generate an exception to get into suitable mode
- * for context switching. 
+ * for context switching.
  *
  * The actual switching is then performed by armSwiHandler.
  */
@@ -482,7 +482,7 @@ void PORT_NAKED p_pos_startFirstContext()
 #if PORTCFG_NVIC_SCHED_LOCK
 
   /*
-   * If using NVIC for scheduler lock on Cortex-M0, 
+   * If using NVIC for scheduler lock on Cortex-M0,
    * use it now to block interrupts so PRIMASK can
    * be turned off.
    */
@@ -614,6 +614,7 @@ void p_pos_powerSleep()
 
 #endif
 
+#if PORTCFG_SLEEP_ON_EXIT
   /*
    * It is important that NO interrupt occurs during __WFE flag
    * manipulation and after SLEEPONEXIT bit is set before *all*
@@ -633,6 +634,7 @@ void p_pos_powerSleep()
    __WFE();
   SCB->SCR |= SCB_SCR_SLEEPONEXIT_Msk; // Sleep after interrupt
 
+#endif
   /*
    * Now we can be sure that __WFE flag is set by next interrupt that
    * clears SLEEPONEXIT before completing. It is safe to allow interrupts
@@ -641,14 +643,30 @@ void p_pos_powerSleep()
    */
   portSchedUnlock(0);
 
+#if PORTCFG_SLEEP_ON_EXIT
 #if __CORTEX_M >= 3
 
   __enable_irq();
 
 #endif
+#endif
+
+  /*
+   * Normally processor is put to sleep with __WFE(). Hoever, if there
+   * are special requirements for sleep (for example NRF52 + SoftDevice environment)
+   * PORTCFG_CUSTOM_SLEEP can be used to provide such solution.
+   */
+#ifdef PORTCFG_CUSTOM_SLEEP
+
+  PORTCFG_CUSTOM_SLEEP();
+
+#else
 
   __DSB();
   __WFE();
+
+#endif
+
   portSchedLock();
 
 #if POSCFG_FEATURE_TICKLESS

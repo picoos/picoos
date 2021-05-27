@@ -1,11 +1,11 @@
 /*
  * Copyright (c) 2016, Ari Suutari <ari@stonepile.fi>.
- * All rights reserved. 
- * 
+ * All rights reserved.
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
- * 
+ *
  *  1. Redistributions of source code must retain the above copyright
  *     notice, this list of conditions and the following disclaimer.
  *  2. Redistributions in binary form must reproduce the above copyright
@@ -13,8 +13,8 @@
  *     documentation and/or other materials provided with the distribution.
  *  3. The name of the author may not be used to endorse or promote
  *     products derived from this software without specific prior written
- *     permission. 
- * 
+ *     permission.
+ *
  * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS
  * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -73,6 +73,10 @@
 #define PORT_CON_PRI PORTCFG_CON_PRI
 #else
 #define PORT_CON_PRI PORT_DEFAULT_CON_PRI
+#endif
+
+#ifndef PORTCFG_SLEEP_ON_EXIT
+#define PORTCFG_SLEEP_ON_EXIT 1
 #endif
 
 #ifdef _DBG
@@ -248,7 +252,7 @@ static inline __attribute__((always_inline)) uint32_t portSchedLock(void)
 /**
  * Unlock task scheduler by returning interrupt blocking status to previous state.
  * This is implementation for POS_SCHED_UNLOCK.
- * @param flags previous interrupt status (obtained from ::portSchedStatus or ::portSchedLock). 
+ * @param flags previous interrupt status (obtained from ::portSchedStatus or ::portSchedLock).
  */
 static inline __attribute__((always_inline)) void portSchedUnlock(uint32_t flags)
 {
