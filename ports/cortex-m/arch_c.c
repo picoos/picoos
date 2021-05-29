@@ -600,6 +600,7 @@ void p_pos_powerSleep()
   UVAR_t nextWake = c_pos_nextWakeup();
   bool restoreTick = false;
   bool restoreDeepSleep = false;
+  bool willSleepOnExit;
 
   if (nextWake < PORTCFG_POWER_TICKLESS_MIN) {
 
@@ -613,8 +614,11 @@ void p_pos_powerSleep()
   }
 
 #endif
+#warning jos sevonpend on päällä niin pelkkä _wfe, EI SCHED UNLOCK
 
-#if PORTCFG_SLEEP_ON_EXIT
+  willSleepOnExit = ((SCB->SCR & SCB_SCR_SEVONPEND_Msk) == 0);
+  if (willSleepOnExit) {
+
   /*
    * It is important that NO interrupt occurs during __WFE flag
    * manipulation and after SLEEPONEXIT bit is set before *all*
@@ -625,16 +629,15 @@ void p_pos_powerSleep()
    */
 #if __CORTEX_M >= 3 || PORTCFG_NVIC_SCHED_LOCK
 
-   __disable_irq();
+     __disable_irq();
 
 #endif
 
    // Ensure flag that __WFE waits for is not set yet
-   __SEV();
-   __WFE();
-  SCB->SCR |= SCB_SCR_SLEEPONEXIT_Msk; // Sleep after interrupt
+    __SEV();
+    __WFE();
+    SCB->SCR |= SCB_SCR_SLEEPONEXIT_Msk; // Sleep after interrupt
 
-#endif
   /*
    * Now we can be sure that __WFE flag is set by next interrupt that
    * clears SLEEPONEXIT before completing. It is safe to allow interrupts
@@ -643,13 +646,12 @@ void p_pos_powerSleep()
    */
   portSchedUnlock(0);
 
-#if PORTCFG_SLEEP_ON_EXIT
 #if __CORTEX_M >= 3
 
   __enable_irq();
 
 #endif
-#endif
+  }
 
   /*
    * Normally processor is put to sleep with __WFE(). Hoever, if there
@@ -667,7 +669,8 @@ void p_pos_powerSleep()
 
 #endif
 
-  portSchedLock();
+  if (willSleepOnExit)
+    portSchedLock();
 
 #if POSCFG_FEATURE_TICKLESS
 
