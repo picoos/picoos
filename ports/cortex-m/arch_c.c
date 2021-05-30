@@ -614,7 +614,6 @@ void p_pos_powerSleep()
   }
 
 #endif
-#warning jos sevonpend on päällä niin pelkkä _wfe, EI SCHED UNLOCK
 
   willSleepOnExit = ((SCB->SCR & SCB_SCR_SEVONPEND_Msk) == 0);
   if (willSleepOnExit) {
