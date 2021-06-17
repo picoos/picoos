@@ -52,12 +52,15 @@ void portInitClock(void)
 #define PORTCFG_POWER_TICKLESS_SAFETY_MARGIN MS(5)
 #endif
 
+static uint32_t sleepStart;
+
 /*
  * Turn of timer tick and schedule wakeup
  * after given ticks.
  */
 void p_pos_powerTickSuspend(UVAR_t ticks)
 {
+  uint32_t sleepEnd;
 /*
  * First, turn periodic tick off.
  */
@@ -73,8 +76,10 @@ void p_pos_powerTickSuspend(UVAR_t ticks)
 
   ticks -= PORTCFG_POWER_TICKLESS_SAFETY_MARGIN; // oscillator starts up 2 ms
 
-  nrf_rtc_task_trigger(NRF_RTC1, NRF_RTC_TASK_CLEAR);
-  nrf_rtc_cc_set(NRF_RTC1, 0, ticks);
+  sleepStart = nrf_rtc_counter_get(NRF_RTC1);
+  sleepEnd = (sleepStart + ticks) & 0x00ffffff;
+  nrf_rtc_cc_set(NRF_RTC1, 0, sleepEnd);
+
   nrf_rtc_event_clear(NRF_RTC1, NRF_RTC_EVENT_COMPARE_0);
   nrf_rtc_event_enable(NRF_RTC1, NRF_RTC_EVENT_COMPARE_0);
   nrf_rtc_int_enable(NRF_RTC1, NRF_RTC_INT_COMPARE0_MASK);
@@ -83,6 +88,7 @@ void p_pos_powerTickSuspend(UVAR_t ticks)
 
 void p_pos_powerTickResume()
 {
+  int32_t delta;
 /*
  * Make sure that rtc compare wakeup is disabled.
  */
@@ -93,8 +99,8 @@ void p_pos_powerTickResume()
 /*
  * Now step the timer with amount of ticks we really slept.
  */
-  c_pos_timerStep(nrf_rtc_counter_get(NRF_RTC1));
-  nrf_rtc_task_trigger(NRF_RTC1, NRF_RTC_TASK_CLEAR);
+  delta = (nrf_rtc_counter_get(NRF_RTC1) - sleepStart) & 0x00ffffff;
+  c_pos_timerStep(delta);
 
 /*
  * Safe to enable tick now.
