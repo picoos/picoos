@@ -64,7 +64,7 @@ string(APPEND CMAKE_C_FLAGS_INIT " -Wmissing-prototypes")
 
 # C++ specific settings
 
-string(APPEND CMAKE_CXX_FLAGS_INIT " -fno-exceptions -fno-rtti")
+string(APPEND CMAKE_CXX_FLAGS_INIT " -fno-exceptions -fno-rtti -fno-unwind-tables -fno-threadsafe-statics -fno-use-cxa-atexit")
 
 # Assembler settings
 
